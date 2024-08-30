@@ -135,7 +135,7 @@ import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useRoute } from 'vue-router';
 import { message } from 'ant-design-vue';
-import { useMenu } from '../../../store/use-menu';
+import { useMenu } from '../../../stores/use-menu';
 import dayjs from 'dayjs';
 
 const router = useRouter();
@@ -236,7 +236,7 @@ const formFields = [
 
 const getUsersEdit = () => {
   axios
-    .get(`http://127.0.0.1:8000/api/users/${route.params.id}/edit`)
+    .get(`http://127.0.0.1:8000/api/auth/users/${route.params.id}/edit`)
     .then((response) => {
       users.username = response.data.users.username;
       users.name = response.data.users.name;
@@ -266,7 +266,7 @@ const getUsersEdit = () => {
 
 const updateUsers = () => {
   axios
-    .put(`http://127.0.0.1:8000/api/users/${route.params.id}`, users)
+    .put(`http://127.0.0.1:8000/api/auth/users/${route.params.id}`, users)
     .then((response) => {
       if (response.status == 200) {
         message.success('Cập nhật thành công!');

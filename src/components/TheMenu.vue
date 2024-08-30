@@ -24,7 +24,7 @@
 
 <script setup>
 import { storeToRefs } from 'pinia';
-import { useMenu } from '../store/use-menu';
+import { useMenu } from '../stores/use-menu';
 const store = useMenu();
 const { selectedKeys, openKeys } = storeToRefs(store);
 </script>

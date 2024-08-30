@@ -1,8 +1,17 @@
 <template>
   <div>
-    <n-button @click="showRegister = true" ghost style="color: white">
+    <!-- Nút Đăng Ký -->
+    <n-button
+      v-if="!auth.isLoggedIn"
+      @click="showRegister = true"
+      ghost
+      style="color: white"
+      class="me-1"
+    >
       <i class="fa-solid fa-user-plus me-2"></i> Đăng Ký
     </n-button>
+
+    <!-- Modal Đăng Ký -->
     <n-modal
       v-model:show="showRegister"
       class="custom-card"
@@ -20,10 +29,11 @@
           <span style="color: red; font-size: medium"
             >Bạn đã có tài khoản?</span
           >
-          <n-button @click="openLoginModal" type="error" ghost
-            >Đăng nhập ngay</n-button
-          >
+          <n-button @click="openLoginModal" type="error" ghost>
+            Đăng nhập ngay
+          </n-button>
         </div>
+        <!-- Form đăng ký -->
         <n-form
           @submit.prevent="handleRegisterSubmit"
           v-for="(field, index) in formFields"
@@ -38,9 +48,9 @@
               :allow-clear="field.allowClear"
             />
           </n-form-item>
-          <div v-if="errors[field.model]" class="error">
+          <!-- <div v-if="errors[field.model]" class="error">
             {{ errors[field.model][0] }}
-          </div>
+          </div> -->
         </n-form>
         <n-button
           block
@@ -53,14 +63,98 @@
         </n-button>
       </div>
     </n-modal>
+
+    <!-- Nút Đăng Nhập -->
+    <n-button
+      v-if="!auth.isLoggedIn"
+      @click="showLogin = true"
+      ghost
+      style="color: white"
+    >
+      <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Đăng Nhập
+    </n-button>
+
+    <!-- Modal Đăng Nhập -->
+    <n-modal
+      v-model:show="showLogin"
+      class="custom-card"
+      preset="card"
+      style="width: 400px"
+      title="ĐĂNG NHẬP TÀI KHOẢN"
+      :bordered="false"
+      size="small"
+      :segmented="segmented"
+    >
+      <div class="row mb-1">
+        <div
+          class="d-sm-flex justify-content-sm-between align-items-sm-center mb-2 mb-sm-2"
+        >
+          <span style="color: red; font-size: medium"
+            >Bạn chưa có tài khoản?</span
+          >
+          <n-button @click="openRegisterModal" type="error" ghost>
+            Đăng ký ngay
+          </n-button>
+        </div>
+        <!-- Form đăng nhập -->
+        <n-form
+          @submit.prevent="handleLoginSubmit"
+          @keyup.enter="handleLoginSubmit"
+        >
+          <n-form-item label="Username hoặc Email:">
+            <n-input
+              v-model:value="usernameOrEmail"
+              type="text"
+              placeholder="Nhập username hoặc email"
+            />
+          </n-form-item>
+          <div v-if="errorsLogin.username_or_email" class="error">
+            {{ errorsLogin.username_or_email[0] }}
+          </div>
+          <n-form-item label="Password:">
+            <n-input
+              v-model:value="password"
+              type="password"
+              placeholder="******"
+            />
+          </n-form-item>
+          <div v-if="errorsLogin.password" class="error">
+            {{ errorsLogin.password[0] }}
+          </div>
+          <n-button
+            block
+            type="primary"
+            @click="handleLoginSubmit"
+            html-type="submit"
+          >
+            Đăng Nhập
+          </n-button>
+        </n-form>
+      </div>
+    </n-modal>
+
+    <div class="profile m-0 p-0" v-if="auth.isLoggedIn">
+      <span class="me-2 text-danger">
+        {{ 'Welcome, ' + auth.user.nickname }}
+      </span>
+      <n-dropdown :options="options" @select="handleSelect">
+        <n-button type="error"><i class="fa-regular fa-user"></i></n-button>
+      </n-dropdown>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive } from 'vue';
-import axios from 'axios';
-import { message } from 'ant-design-vue';
+import { useMessage } from 'naive-ui';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/auth';
+const auth = useAuthStore();
+
+const router = useRouter();
+
 const showRegister = ref(false);
+const showLogin = ref(false);
 const users = reactive({
   username: '',
   name: '',
@@ -72,6 +166,12 @@ const users = reactive({
   department_id: 2,
 });
 const loading = ref(false);
+const errors = ref({});
+const errorsLogin = ref({});
+const usernameOrEmail = ref('');
+const password = ref('');
+const message = useMessage();
+
 const formFields = [
   {
     label: 'Tên Tài khoản',
@@ -124,49 +224,151 @@ const formFields = [
     required: true,
   },
 ];
-const errors = ref({});
 
 function handleRegisterSubmit() {
   loading.value = true;
   axios
-    .post('http://127.0.0.1:8000/api/users', users)
+    .post('http://127.0.0.1:8000/api/register', users)
     .then((res) => {
       if (res.status === 200) {
         message.success('Tạo tài khoản thành công!');
+        resetRegisterForm();
         closeRegisterModal();
       }
     })
     .catch((err) => {
-      console.log('lỗi từ backend', err);
-      console.error('Lỗi từ backend:', err.response.data.errors); // In ra lỗi để kiểm tra
+      console.log('lỗi dăng ký', err);
       errors.value = err.response.data.errors;
-      console.log('lỗi', errors.value);
     })
     .finally(() => {
       loading.value = false;
     });
 }
 
-const openLoginModal = () => {
-  // Implement logic to open login modal
+const handleLoginSubmit = async () => {
+  try {
+    const response = await axios.post('http://127.0.0.1:8000/api/auth/login', {
+      username_or_email: usernameOrEmail.value,
+      password: password.value,
+    });
+    const accessToken = response.data.access_token;
+    const user = response.data.user;
+    const isAdmin = response.data.isAdmin;
+    auth.login(user, isAdmin, accessToken);
+    // console.log("dữ liệu trả về", response)
+    message.success('Đăng nhập thành công!');
+    resetLoginForm();
+    closeLoginModal();
+    router.push({ name: 'home' });
+  } catch (error) {
+    console.log('lỗi backend', error);
+    if (error.response && error.response.data && error.response.data.errors) {
+      errorsLogin.value = error.response.data.errors;
+      // console.log('lỗi', errorsLogin.value);
+    } else {
+      errorsLogin.value = {};
+    }
+    if (error.response && error.response.status === 401) {
+      message.warning('Tài khoản hoặc mật khẩu không chính xác');
+    }  else if ( error.response.status===403){
+      message.error(error.response.data.message);
+      resetLoginForm();
+      closeLoginModal();
+    } else {
+      message.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+    }
+  }
 };
 
-const closeRegisterModal = () => {
+function openLoginModal() {
   showRegister.value = false;
-  resetRegisterForm();
-};
+  showLogin.value = true;
+}
 
-const resetRegisterForm = () => {
+function openRegisterModal() {
+  showLogin.value = false;
+  showRegister.value = true;
+}
+
+function closeRegisterModal() {
+  showRegister.value = false;
+  // resetRegisterForm();
+}
+
+function closeLoginModal() {
+  showLogin.value = false;
+  // resetLoginForm();
+}
+
+function resetRegisterForm() {
   Object.keys(users).forEach((key) => {
     users[key] = key === 'status_id' || key === 'department_id' ? 2 : '';
   });
-  errors.value = {}; // Clear errors as well
-};
+  errors.value = {};
+}
+
+function resetLoginForm() {
+  usernameOrEmail.value = '';
+  password.value = '';
+  errorsLogin.value = {};
+}
 
 const segmented = reactive({
-  content: 'true',
+  content: true,
   footer: 'soft',
 });
+
+import { h } from 'vue';
+import { NIcon } from 'naive-ui';
+import {
+  Settings as SettingsIcon,
+  LogOutOutline as LogoutIcon,
+  PersonCircleOutline as UserIcon,
+} from '@vicons/ionicons5';
+
+function renderIcon(icon) {
+  return () => {
+    return h(NIcon, null, {
+      default: () => h(icon),
+    });
+  };
+}
+
+const options = [
+  {
+    label: 'Profile',
+    key: 'profile',
+    icon: renderIcon(UserIcon),
+  },
+  {
+    label: 'Settings',
+    key: 'settings',
+    icon: renderIcon(SettingsIcon),
+  },
+  {
+    label: 'Logout',
+    key: 'logout',
+    icon: renderIcon(LogoutIcon),
+  },
+];
+
+function handleSelect(key) {
+  switch (key) {
+    case 'profile':
+      router.push({ name: 'profile' });
+      break;
+    case 'settings':
+      router.push({ name: 'settings' });
+      break;
+    case 'logout':
+      auth.logout();
+      router.push({ name: 'home' });
+      break;
+    default:
+      router.push({ name: 'home' });
+      break;
+  }
+}
 </script>
 
 <style scoped>

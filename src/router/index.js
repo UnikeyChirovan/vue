@@ -6,6 +6,7 @@ import contact from './contact';
 import maps from './maps';
 import settings from './settings';
 import stories from './stories';
+import profile from './profile';
 
 const routes = [
   ...admin,
@@ -15,6 +16,7 @@ const routes = [
   ...maps,
   ...settings,
   ...stories,
+  ...profile,
 ];
 const router = createRouter({
   history: createWebHistory(),

@@ -1,5 +1,6 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import router from './router';
 import axios from 'axios';
 window.axios = axios;
@@ -31,13 +32,13 @@ import {
   NFormItem,
   NForm,
   NCheckbox,
+  NDropdown,
 } from 'naive-ui';
 import App from './App.vue';
 
 import './reset.css';
 import './static/fontawesome-free-6.6.0-web/css/all.min.css';
 import 'ant-design-vue/dist/antd.css';
-// import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-grid.min.css';
 import 'bootstrap/dist/css/bootstrap-utilities.min.css';
 import './mystyle.css';
@@ -54,11 +55,15 @@ const naive = create({
     NFormItem,
     NForm,
     NCheckbox,
+    NDropdown,
   ],
 });
 
+const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
+
 const app = createApp(App);
-app.use(createPinia());
+app.use(pinia);
 app.use(router);
 app.use(Input);
 app.use(Button);

@@ -77,7 +77,7 @@
 </template>
 <script setup>
 import { onMounted, ref, reactive } from 'vue';
-import { useMenu } from '../../../store/use-menu';
+import { useMenu } from '../../../stores/use-menu';
 import { useRouter } from 'vue-router';
 import { message } from 'ant-design-vue';
 const users_status = ref([]);
@@ -165,7 +165,9 @@ const formFields = ref([
 ]);
 const getUsersCreate = async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api/users/create');
+    const response = await axios.get(
+      'http://127.0.0.1:8000/api/auth/users/create'
+    );
     users_status.value = response.data.users_status;
     departments.value = response.data.departments;
   } catch (error) {
@@ -178,7 +180,7 @@ const filterOption = (input, option) => {
 };
 const createUsers = () => {
   axios
-    .post('http://127.0.0.1:8000/api/users', users)
+    .post('http://127.0.0.1:8000/api/auth/users/', users)
     .then((res) => {
       if (res.status == 200) {
         message.success('Tạo tài khoản thành công!');

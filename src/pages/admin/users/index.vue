@@ -50,7 +50,7 @@
 </template>
 <script setup>
 import { RouterLink } from 'vue-router';
-import { useMenu } from '../../../store/use-menu';
+import { useMenu } from '../../../stores/use-menu';
 import { onMounted, ref, computed } from 'vue';
 import { message } from 'ant-design-vue';
 const users = ref([]);
@@ -119,7 +119,7 @@ const columns = [
 ];
 const getUsers = async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api/users');
+    const response = await axios.get('http://127.0.0.1:8000/api/auth/users');
     users.value = response.data;
   } catch (error) {
     console.error(error);
@@ -130,12 +130,12 @@ const userIdToDelete = ref(null);
 
 const deleteUsers = (id) => {
   userIdToDelete.value = id;
-  isModalVisible.value = true; // Hiển thị modal
+  isModalVisible.value = true; 
 };
 
 const handleOk = () => {
   axios
-    .delete(`http://127.0.0.1:8000/api/users/${userIdToDelete.value}`)
+    .delete(`http://127.0.0.1:8000/api/auth/users/${userIdToDelete.value}`)
     .then((res) => {
       if (res.status == 200) {
         message.success('Xóa tài khoản thành công');
