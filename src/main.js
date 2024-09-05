@@ -4,6 +4,8 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import router from './router';
 import axios from 'axios';
 window.axios = axios;
+axios.defaults.withCredentials = true;
+
 
 import {
   Input,

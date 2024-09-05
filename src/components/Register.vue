@@ -48,9 +48,9 @@
               :allow-clear="field.allowClear"
             />
           </n-form-item>
-          <!-- <div v-if="errors[field.model]" class="error">
+          <div v-if="errors[field.model]" class="error">
             {{ errors[field.model][0] }}
-          </div> -->
+          </div>
         </n-form>
         <n-button
           block
@@ -227,23 +227,32 @@ const formFields = [
 
 function handleRegisterSubmit() {
   loading.value = true;
-  axios
-    .post('http://127.0.0.1:8000/api/register', users)
+  
+  // Gọi API đăng ký
+  axios.post('http://127.0.0.1:8000/api/register', users)
     .then((res) => {
+      console.log("user: ", users);
+      console.log(res)
       if (res.status === 200) {
-        message.success('Tạo tài khoản thành công!');
+        message.success(res.data.message);
         resetRegisterForm();
         closeRegisterModal();
       }
     })
     .catch((err) => {
-      console.log('lỗi dăng ký', err);
-      errors.value = err.response.data.errors;
+      if (err.response && err.response.status === 422) {
+        console.log('Lỗi validation:', err.response.data.errors); // Hiển thị chi tiết lỗi validation
+        errors.value = err.response.data.errors;
+      } else {
+        console.log('Lỗi đăng ký', err); // Hiển thị lỗi khác nếu có
+      }
     })
     .finally(() => {
       loading.value = false;
     });
 }
+
+
 
 const handleLoginSubmit = async () => {
   try {
@@ -255,7 +264,7 @@ const handleLoginSubmit = async () => {
     const user = response.data.user;
     const isAdmin = response.data.isAdmin;
     auth.login(user, isAdmin, accessToken);
-    // console.log("dữ liệu trả về", response)
+    console.log("dữ liệu trả về", response)
     message.success('Đăng nhập thành công!');
     resetLoginForm();
     closeLoginModal();
@@ -264,7 +273,7 @@ const handleLoginSubmit = async () => {
     console.log('lỗi backend', error);
     if (error.response && error.response.data && error.response.data.errors) {
       errorsLogin.value = error.response.data.errors;
-      // console.log('lỗi', errorsLogin.value);
+      console.log('lỗi', errorsLogin.value);
     } else {
       errorsLogin.value = {};
     }
@@ -361,14 +370,17 @@ function handleSelect(key) {
       router.push({ name: 'settings' });
       break;
     case 'logout':
-      auth.logout();
-      router.push({ name: 'home' });
+      const authStore = useAuthStore();
+      authStore.logout().then(() => {
+        router.push({ name: 'home' });
+      });
       break;
     default:
       router.push({ name: 'home' });
       break;
   }
 }
+
 </script>
 
 <style scoped>
