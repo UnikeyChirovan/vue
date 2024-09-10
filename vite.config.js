@@ -14,6 +14,8 @@ export default defineConfig({
     }),
   ],
   server: {
+    host: '127.0.0.1',
+    // host: 'selorson.com',
     port: 8080,
   },
 });

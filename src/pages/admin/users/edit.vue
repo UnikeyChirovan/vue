@@ -137,6 +137,7 @@ import { useRoute } from 'vue-router';
 import { message } from 'ant-design-vue';
 import { useMenu } from '../../../stores/use-menu';
 import dayjs from 'dayjs';
+import axiosInstance from '../../../axiosInterceptor';
 
 const router = useRouter();
 const route = useRoute();
@@ -235,9 +236,10 @@ const formFields = [
 ];
 
 const getUsersEdit = () => {
-  axios
-    .get(`http://127.0.0.1:8000/api/auth/users/${route.params.id}/edit`)
+  axiosInstance
+    .get(`/apiauth/users/${route.params.id}/edit`)
     .then((response) => {
+      console.log("edit user:", response);
       users.username = response.data.users.username;
       users.name = response.data.users.name;
       users.nickname = response.data.users.nickname;
@@ -265,8 +267,8 @@ const getUsersEdit = () => {
 };
 
 const updateUsers = () => {
-  axios
-    .put(`http://127.0.0.1:8000/api/auth/users/${route.params.id}`, users)
+  axiosInstance
+    .put(`/auth/users/${route.params.id}`, users)
     .then((response) => {
       if (response.status == 200) {
         message.success('Cập nhật thành công!');

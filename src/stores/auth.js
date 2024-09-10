@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import axios from 'axios';
+import axiosInstance from '../axiosInterceptor';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -16,25 +16,27 @@ export const useAuthStore = defineStore('auth', {
       this.user = userData;
     },
     async logout() {
-      try {
-        const token = this.accessToken; 
+  try {
+    const token = this.accessToken; 
 
-        await axios.post('http://127.0.0.1:8000/api/auth/logout', {}, {
-          headers: {
-            'Authorization': `Bearer ${token}` 
-          }
-        });
-
-        this.isLoggedIn = false;
-        this.isAdmin = false;
-        this.user = null;
-        this.accessToken = null;
-
-        sessionStorage.clear(); 
-      } catch (error) {
-        console.error('Đăng xuất thất bại:', error);
+    await axiosInstance.post('/auth/logout', {}, {
+      headers: {
+        'Authorization': `Bearer ${token}`
       }
-    },
+    });
+
+    this.isLoggedIn = false;
+    this.isAdmin = false;
+    this.user = null;
+    this.accessToken = null;
+
+    // Xóa session storage và cookies
+    sessionStorage.clear();
+  } catch (error) {
+    console.error('Đăng xuất thất bại:', error);
+  }
+}
+
 
   },
   persist: {

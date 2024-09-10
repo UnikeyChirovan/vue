@@ -149,6 +149,7 @@ import { ref, reactive } from 'vue';
 import { useMessage } from 'naive-ui';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
+import axiosInstance from '../axiosInterceptor';
 const auth = useAuthStore();
 
 const router = useRouter();
@@ -251,20 +252,57 @@ function handleRegisterSubmit() {
       loading.value = false;
     });
 }
+// // Old
+// const handleLoginSubmit = async () => {
+//   try {
+//     const response = await axios.post('http://127.0.0.1:8000/api/auth/login', {
+//       username_or_email: usernameOrEmail.value,
+//       password: password.value,
+//     });
+//     const accessToken = response.data.access_token;
+//     const user = response.data.user;
+//     const isAdmin = response.data.isAdmin;
+//     auth.login(user, isAdmin, accessToken);
+//     console.log("dữ liệu trả về", response)
+//     message.success('Đăng nhập thành công!');
+//     resetLoginForm();
+//     closeLoginModal();
+//     router.push({ name: 'home' });
+  // } catch (error) {
+  //   console.log('lỗi backend', error);
+  //   if (error.response && error.response.data && error.response.data.errors) {
+  //     errorsLogin.value = error.response.data.errors;
+  //     console.log('lỗi', errorsLogin.value);
+  //   } else {
+  //     errorsLogin.value = {};
+  //   }
+  //   if (error.response && error.response.status === 401) {
+  //     message.warning('Tài khoản hoặc mật khẩu không chính xác');
+  //   }  else if ( error.response.status===403){
+  //     message.error(error.response.data.message);
+  //     resetLoginForm();
+  //     closeLoginModal();
+  //   } else {
+  //     message.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+  //   }
+  // }
+// };
 
-
-
+// new login
 const handleLoginSubmit = async () => {
   try {
     const response = await axios.post('http://127.0.0.1:8000/api/auth/login', {
       username_or_email: usernameOrEmail.value,
       password: password.value,
     });
+
     const accessToken = response.data.access_token;
     const user = response.data.user;
     const isAdmin = response.data.isAdmin;
+
+    // Lưu thông tin người dùng và access token
     auth.login(user, isAdmin, accessToken);
-    console.log("dữ liệu trả về", response)
+
     message.success('Đăng nhập thành công!');
     resetLoginForm();
     closeLoginModal();
@@ -279,7 +317,7 @@ const handleLoginSubmit = async () => {
     }
     if (error.response && error.response.status === 401) {
       message.warning('Tài khoản hoặc mật khẩu không chính xác');
-    }  else if ( error.response.status===403){
+    } else if (error.response.status === 403) {
       message.error(error.response.data.message);
       resetLoginForm();
       closeLoginModal();
@@ -288,6 +326,8 @@ const handleLoginSubmit = async () => {
     }
   }
 };
+
+
 
 function openLoginModal() {
   showRegister.value = false;
@@ -361,7 +401,9 @@ const options = [
   },
 ];
 
-function handleSelect(key) {
+async function handleSelect(key) {
+  const authStore = useAuthStore();
+
   switch (key) {
     case 'profile':
       router.push({ name: 'profile' });
@@ -370,16 +412,19 @@ function handleSelect(key) {
       router.push({ name: 'settings' });
       break;
     case 'logout':
-      const authStore = useAuthStore();
-      authStore.logout().then(() => {
-        router.push({ name: 'home' });
-      });
+      try {
+        await authStore.logout(); // Đợi quá trình logout hoàn thành
+        router.push({ name: 'home' }); // Sau đó chuyển hướng về home
+      } catch (error) {
+        console.error('Lỗi khi đăng xuất:', error); // Xử lý lỗi nếu có
+      }
       break;
     default:
       router.push({ name: 'home' });
       break;
   }
 }
+
 
 </script>
 
