@@ -80,7 +80,7 @@ import { onMounted, ref, reactive } from 'vue';
 import { useMenu } from '../../../stores/use-menu';
 import { useRouter } from 'vue-router';
 import { message } from 'ant-design-vue';
-import axiosInstance from '../../../axiosInterceptor';
+import api from '../../../axiosInterceptor';
 const users_status = ref([]);
 const departments = ref([]);
 const errors = ref({});
@@ -166,8 +166,8 @@ const formFields = ref([
 ]);
 const getUsersCreate = async () => {
   try {
-    const response = await axiosInstance.get(
-      'auth/users/create'
+    const response = await api.get(
+      '/auth/users/create'
     );
     users_status.value = response.data.users_status;
     departments.value = response.data.departments;
@@ -180,7 +180,7 @@ const filterOption = (input, option) => {
   return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0;
 };
 const createUsers = () => {
-  axiosInstance
+  api
     .post('/auth/users/', users)
     .then((res) => {
       if (res.status == 200) {

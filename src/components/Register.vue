@@ -149,7 +149,6 @@ import { ref, reactive } from 'vue';
 import { useMessage } from 'naive-ui';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
-import axiosInstance from '../axiosInterceptor';
 const auth = useAuthStore();
 
 const router = useRouter();
@@ -413,10 +412,11 @@ async function handleSelect(key) {
       break;
     case 'logout':
       try {
-        await authStore.logout(); // Đợi quá trình logout hoàn thành
-        router.push({ name: 'home' }); // Sau đó chuyển hướng về home
+        await authStore.logout(); 
+        router.push({ name: 'home' });
+        message.success('Đăng xuất thành công, hẹn gặp lại!')
       } catch (error) {
-        console.error('Lỗi khi đăng xuất:', error); // Xử lý lỗi nếu có
+        message.error("Xin lỗi về sự bất tiện")
       }
       break;
     default:

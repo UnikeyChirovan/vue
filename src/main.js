@@ -3,7 +3,7 @@ import { createPinia } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import router from './router';
 import axios from 'axios';
-import './axiosInterceptor';
+import api from './axiosInterceptor';
 window.axios = axios;
 axios.defaults.withCredentials = true;
 
@@ -84,3 +84,4 @@ app.use(naive);
 
 app.mount('#app');
 app.config.globalProperties.$message = message;
+app.config.globalProperties.$api = api;

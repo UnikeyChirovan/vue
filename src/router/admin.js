@@ -3,6 +3,7 @@ const admin = [
     path: '/admin',
     name: 'admin',
     component: () => import('../layouts/admin.vue'),
+    meta: { requiresAuth: true },
     children: [
       // Quản Lý Users
       {

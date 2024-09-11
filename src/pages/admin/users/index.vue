@@ -53,7 +53,7 @@ import { RouterLink } from 'vue-router';
 import { useMenu } from '../../../stores/use-menu';
 import { onMounted, ref, computed } from 'vue';
 import { message } from 'ant-design-vue';
-import axiosInstance from '../../../axiosInterceptor';
+import api from '../../../axiosInterceptor';
 const users = ref([]);
 const isMobile = ref(window.innerWidth < 600);
 const scrollOptions = computed(() => {
@@ -120,7 +120,7 @@ const columns = [
 ];
 const getUsers = async () => {
   try {
-    const response = await axiosInstance.get('/auth/users');
+    const response = await api.get('/auth/users');
     users.value = response.data;
   } catch (error) {
     console.error(error);
@@ -138,7 +138,7 @@ const deleteUsers = (id) => {
 };
 
 const handleOk = () => {
-  axiosInstance
+  api
     .delete(`/auth/users/${userIdToDelete.value}`)
     .then((res) => {
       if (res.status == 200) {
