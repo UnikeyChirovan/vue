@@ -31,7 +31,7 @@
       </div>
       <div class="col-sm-3 d-none d-sm-flex justify-content-center justify-content-sm-end">
         <n-space>
-          <Register />
+          <TheAuth />
         </n-space>
       </div>
       <div class="col-1 d-flex d-sm-none align-items-center justify-content-center">
@@ -53,7 +53,7 @@
 import { ref, reactive } from 'vue';
 import TheMenu from './TheMenu.vue';
 import { useAuthStore } from '../stores/auth';
-import Register from './Register.vue';
+import TheAuth from './TheAuth.vue';
 
 const authStore = useAuthStore();  // Không cần lưu cục bộ isLoggedIn và isAdmin
 

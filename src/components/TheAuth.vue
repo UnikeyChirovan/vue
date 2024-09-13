@@ -121,6 +121,16 @@
           <div v-if="errorsLogin.password" class="error">
             {{ errorsLogin.password[0] }}
           </div>
+          <div class="row mb-2">
+            <div class="col-12 col-sm-6">
+              <n-checkbox v-model:checked="value">
+                Remember me
+              </n-checkbox>
+            </div>
+            <div class="col-12 col-sm-6 d-sm-flex justify-content-sm-center">
+              <a href="">Forgot your password?</a>
+            </div>
+          </div>
           <n-button
             block
             type="primary"
@@ -132,7 +142,6 @@
         </n-form>
       </div>
     </n-modal>
-
     <div class="profile m-0 p-0" v-if="auth.isLoggedIn">
       <span class="me-2 text-danger">
         {{ 'Welcome, ' + auth.user.nickname }}
@@ -142,6 +151,7 @@
       </n-dropdown>
     </div>
   </div>
+
 </template>
 
 <script setup>
@@ -162,7 +172,7 @@ const users = reactive({
   password: '',
   password_confirmation: '',
   nickname: '',
-  status_id: 1,
+  status_id: 5,
   department_id: 2,
 });
 const loading = ref(false);
@@ -251,43 +261,6 @@ function handleRegisterSubmit() {
       loading.value = false;
     });
 }
-// // Old
-// const handleLoginSubmit = async () => {
-//   try {
-//     const response = await axios.post('http://127.0.0.1:8000/api/auth/login', {
-//       username_or_email: usernameOrEmail.value,
-//       password: password.value,
-//     });
-//     const accessToken = response.data.access_token;
-//     const user = response.data.user;
-//     const isAdmin = response.data.isAdmin;
-//     auth.login(user, isAdmin, accessToken);
-//     console.log("dữ liệu trả về", response)
-//     message.success('Đăng nhập thành công!');
-//     resetLoginForm();
-//     closeLoginModal();
-//     router.push({ name: 'home' });
-  // } catch (error) {
-  //   console.log('lỗi backend', error);
-  //   if (error.response && error.response.data && error.response.data.errors) {
-  //     errorsLogin.value = error.response.data.errors;
-  //     console.log('lỗi', errorsLogin.value);
-  //   } else {
-  //     errorsLogin.value = {};
-  //   }
-  //   if (error.response && error.response.status === 401) {
-  //     message.warning('Tài khoản hoặc mật khẩu không chính xác');
-  //   }  else if ( error.response.status===403){
-  //     message.error(error.response.data.message);
-  //     resetLoginForm();
-  //     closeLoginModal();
-  //   } else {
-  //     message.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
-  //   }
-  // }
-// };
-
-// new login
 const handleLoginSubmit = async () => {
   try {
     const response = await axios.post('http://127.0.0.1:8000/api/auth/login', {
@@ -299,7 +272,10 @@ const handleLoginSubmit = async () => {
     const user = response.data.user;
     const isAdmin = response.data.isAdmin;
 
-    // Lưu thông tin người dùng và access token
+    // if (!user.email_verified_at) {
+    //   message.warning('Vui lòng xác minh email của bạn trước khi đăng nhập.');
+    //   router.push({ name: 'home' });
+    // }
     auth.login(user, isAdmin, accessToken);
 
     message.success('Đăng nhập thành công!');

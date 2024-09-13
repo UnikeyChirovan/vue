@@ -36,6 +36,7 @@ import {
   NForm,
   NCheckbox,
   NDropdown,
+  NAnchorLink
 } from 'naive-ui';
 import App from './App.vue';
 
@@ -59,6 +60,7 @@ const naive = create({
     NForm,
     NCheckbox,
     NDropdown,
+    NAnchorLink
   ],
 });
 
