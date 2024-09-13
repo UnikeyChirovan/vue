@@ -326,7 +326,7 @@ function closeLoginModal() {
 
 function resetRegisterForm() {
   Object.keys(users).forEach((key) => {
-    users[key] = key === 'status_id' || key === 'department_id' ? 2 : '';
+    users[key] = key === 'status_id' ? 5 : key === 'department_id' ? 2 : '';
   });
   errors.value = {};
 }
