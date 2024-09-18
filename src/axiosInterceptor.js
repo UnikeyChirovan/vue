@@ -36,44 +36,28 @@ api.interceptors.response.use(
     const authStore = useAuthStore();
     const originalRequest = error.config;
 
-    // Kiểm tra nếu lỗi là 401 (Unauthorized)
     if (error.response && error.response.status === 401) {
-      // Nếu request ban đầu không phải là yêu cầu refresh token
       if (!originalRequest._retry && originalRequest.url !== '/auth/refresh') {
         originalRequest._retry = true;
         try {
-          // Gọi API để làm mới access token
           const response = await api.post('/auth/refresh');
-
-          // Lưu lại token mới vào store
           const newAccessToken = response.data.access_token;
           authStore.accessToken = newAccessToken;
-
-          // Gán lại token vào request và gửi lại
           originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
           return api(originalRequest);
         } catch (refreshError) {
-          // Nếu refresh token không hợp lệ hoặc có lỗi, người dùng cần đăng xuất
-          console.error('Làm mới token thất bại:', refreshError);
-          authStore.logout(); // Đăng xuất người dùng
-          return Promise.reject(refreshError);
+          if (refreshError.response && refreshError.response.status === 403) {
+            await authStore.forceLogout();
+            return Promise.reject(refreshError);
+          }
         }
       }
-
-      // Nếu token làm mới không hợp lệ hoặc quá trình refresh thất bại, yêu cầu logout
-      if (originalRequest.url === '/auth/logout') {
-        console.log('Token đã hết hạn, đăng xuất người dùng.');
-        authStore.logout();
-      }
-    }
-
-    // Nếu request là 405 Method Not Allowed (sai phương thức)
-    if (error.response && error.response.status === 405) {
-      console.error('Phương thức không hợp lệ:', error);
     }
 
     return Promise.reject(error);
   }
 );
+
+
 
 export default api;

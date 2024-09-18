@@ -167,7 +167,7 @@ const formFields = ref([
 const getUsersCreate = async () => {
   try {
     const response = await api.get(
-      '/auth/users/create'
+      '/users/create'
     );
     users_status.value = response.data.users_status;
     departments.value = response.data.departments;
@@ -181,7 +181,7 @@ const filterOption = (input, option) => {
 };
 const createUsers = () => {
   api
-    .post('/auth/users/', users)
+    .post('/users/', users)
     .then((res) => {
       if (res.status == 200) {
         message.success('Tạo tài khoản thành công!');

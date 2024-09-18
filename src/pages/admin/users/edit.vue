@@ -237,7 +237,7 @@ const formFields = [
 
 const getUsersEdit = () => {
   api
-    .get(`/auth/users/${route.params.id}/edit`)
+    .get(`/users/${route.params.id}/edit`)
     .then((response) => {
       console.log("edit user:", response);
       users.username = response.data.users.username;
@@ -268,7 +268,7 @@ const getUsersEdit = () => {
 
 const updateUsers = () => {
   api
-    .put(`/auth/users/${route.params.id}`, users)
+    .put(`/users/${route.params.id}`, users)
     .then((response) => {
       if (response.status == 200) {
         message.success('Cập nhật thành công!');

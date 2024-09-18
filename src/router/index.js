@@ -9,6 +9,8 @@ import maps from './maps';
 import settings from './settings';
 import stories from './stories';
 import profile from './profile';
+import PasswordReset from './passwordreset';
+import PasswordResetRequest from './PasswordResetRequest';
 
 const routes = [
   ...admin,
@@ -19,6 +21,8 @@ const routes = [
   ...settings,
   ...stories,
   ...profile,
+  ...PasswordReset,
+  ...PasswordResetRequest,
 ];
 const router = createRouter({
   history: createWebHistory(),
@@ -27,24 +31,14 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
+
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     next({ name: 'home' });
-  } else if (authStore.isLoggedIn && authStore.accessToken) {
-    try {
-      await api.get('/auth/check-session', {
-        headers: {
-          Authorization: `Bearer ${authStore.accessToken}`,
-        },
-      });
-      next();
-    } catch (error) {
-      authStore.logout();
-      next({ name: 'home' });
-    }
   } else {
     next();
   }
 });
+
 
 
 export default router;

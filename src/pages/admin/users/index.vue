@@ -120,7 +120,7 @@ const columns = [
 ];
 const getUsers = async () => {
   try {
-    const response = await api.get('/auth/users');
+    const response = await api.get('/users');
     users.value = response.data;
   } catch (error) {
     console.error(error);
@@ -139,7 +139,7 @@ const deleteUsers = (id) => {
 
 const handleOk = () => {
   api
-    .delete(`/auth/users/${userIdToDelete.value}`)
+    .delete(`/users/${userIdToDelete.value}`)
     .then((res) => {
       if (res.status == 200) {
         message.success('Xóa tài khoản thành công');
