@@ -3,7 +3,7 @@ import { createPinia } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import router from './router';
 import axios from 'axios';
-import api from './axiosInterceptor';
+import api from './services/axiosInterceptor';
 window.axios = axios;
 axios.defaults.withCredentials = true;
 
@@ -22,6 +22,7 @@ import {
   Checkbox,
   Modal,
   Layout,
+  DatePicker
 } from 'ant-design-vue';
 import {
   create,
@@ -36,7 +37,9 @@ import {
   NForm,
   NCheckbox,
   NDropdown,
-  NAnchorLink
+  NAnchorLink,
+  NUpload,
+  NRate,
 } from 'naive-ui';
 import App from './App.vue';
 
@@ -60,7 +63,9 @@ const naive = create({
     NForm,
     NCheckbox,
     NDropdown,
-    NAnchorLink
+    NAnchorLink,
+    NUpload,
+    NRate
   ],
 });
 
@@ -82,6 +87,7 @@ app.use(Select);
 app.use(Checkbox);
 app.use(Modal);
 app.use(Layout);
+app.use(DatePicker);
 app.use(naive);
 
 app.mount('#app');

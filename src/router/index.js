@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
-import api from '../axiosInterceptor';
+// import api from '../services/axiosInterceptor';
 import admin from './admin';
 import home from './home';
 import about from './about';

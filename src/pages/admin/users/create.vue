@@ -80,7 +80,7 @@ import { onMounted, ref, reactive } from 'vue';
 import { useMenu } from '../../../stores/use-menu';
 import { useRouter } from 'vue-router';
 import { message } from 'ant-design-vue';
-import api from '../../../axiosInterceptor';
+import api from '../../../services/axiosInterceptor';
 const users_status = ref([]);
 const departments = ref([]);
 const errors = ref({});
@@ -144,7 +144,7 @@ const formFields = ref([
     options: departments,
     allowClear: true,
     required: true,
-    customRender: true, // Nếu bạn muốn render thêm nút bên cạnh
+    customRender: true, 
     style: { display: 'flex' },
   },
   {

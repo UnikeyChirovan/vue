@@ -137,7 +137,7 @@ import { useRoute } from 'vue-router';
 import { message } from 'ant-design-vue';
 import { useMenu } from '../../../stores/use-menu';
 import dayjs from 'dayjs';
-import api from '../../../axiosInterceptor';
+import api from '../../../services/axiosInterceptor';
 
 const router = useRouter();
 const route = useRoute();

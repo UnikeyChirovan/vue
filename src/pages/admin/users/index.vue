@@ -53,7 +53,7 @@ import { RouterLink } from 'vue-router';
 import { useMenu } from '../../../stores/use-menu';
 import { onMounted, ref, computed } from 'vue';
 import { message } from 'ant-design-vue';
-import api from '../../../axiosInterceptor';
+import api from '../../../services/axiosInterceptor';
 const users = ref([]);
 const isMobile = ref(window.innerWidth < 600);
 const scrollOptions = computed(() => {

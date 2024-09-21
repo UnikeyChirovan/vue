@@ -244,8 +244,8 @@
     // Gọi API đăng ký
     axios.post('http://127.0.0.1:8000/api/auth/register', users)
       .then((res) => {
-        console.log("user: ", users);
-        console.log(res)
+        // console.log("user: ", users);
+        // console.log(res)
         if (res.status === 200) {
           message.success(res.data.message);
           resetRegisterForm();
@@ -254,10 +254,10 @@
       })
       .catch((err) => {
         if (err.response && err.response.status === 422) {
-          console.log('Lỗi validation:', err.response.data.errors); // Hiển thị chi tiết lỗi validation
+          // console.log('Lỗi validation:', err.response.data.errors);
           errors.value = err.response.data.errors;
         } else {
-          console.log('Lỗi đăng ký', err); // Hiển thị lỗi khác nếu có
+          // console.log('Lỗi đăng ký', err);
         }
       })
       .finally(() => {
@@ -271,22 +271,21 @@
         password: password.value,
         rememberMe: rememberMe.value,
       });
-      console.log('dữ liệu', response)
+      // console.log('dữ liệu', response)
       const accessToken = response.data.access_token;
       const user = response.data.user;
       const isAdmin = response.data.isAdmin;
-      // const rememberMe = response.data.rememberMe;
-      auth.login(user, isAdmin, accessToken, rememberMe.value);
+      auth.login(user, isAdmin, accessToken);
       message.success('Đăng nhập thành công!');
       resetLoginForm();
       closeLoginModal();
       router.push({ name: 'home' });
     } catch (error) {
-      console.log('Lỗi backend', error);
+      // console.log('Lỗi backend', error);
       if (error.response) {
         if (error.response.data && error.response.data.errors) {
           errorsLogin.value = error.response.data.errors;
-          console.log('Lỗi chi tiết:', errorsLogin.value);
+          // console.log('Lỗi chi tiết:', errorsLogin.value);
         } else {
           errorsLogin.value = {};
         }
@@ -383,15 +382,14 @@
 
     switch (key) {
       case 'profile':
-        router.push({ name: 'profile' });
+        router.push({ name: 'profile-info' });
         break;
       case 'settings':
         router.push({ name: 'settings' });
         break;
       case 'logout':
         try {
-          await authStore.logout(); 
-          router.push({ name: 'home' });
+          await authStore.logout();
           message.success('Đăng xuất thành công, hẹn gặp lại!')
         } catch (error) {
           message.error("Xin lỗi về sự bất tiện")

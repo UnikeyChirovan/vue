@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { useAuthStore } from './stores/auth'; // Import store Pinia để quản lý trạng thái
+import { useAuthStore } from '../stores/auth'; // Import store Pinia để quản lý trạng thái
+
 
 // Tạo một instance mới của Axios
 const api = axios.create({

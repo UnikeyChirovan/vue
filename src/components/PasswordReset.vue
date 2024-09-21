@@ -19,7 +19,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useMessage } from 'naive-ui';
 import { GlassesOutline } from '@vicons/ionicons5';
-import api from '../axiosInterceptor';
+import api from '../services/axiosInterceptor';
 
 const route = useRoute();
 const router = useRouter();

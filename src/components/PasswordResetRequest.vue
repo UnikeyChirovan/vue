@@ -14,7 +14,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useMessage } from 'naive-ui';
-import api from '../axiosInterceptor';
+import api from '..//services/axiosInterceptor';
 const email = ref('');
 const loading = ref(false);
 const message = useMessage();

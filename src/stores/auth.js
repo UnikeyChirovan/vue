@@ -1,12 +1,11 @@
-import axios from 'axios';
 import { defineStore } from 'pinia';
-import api from '../axiosInterceptor';
+import api from '../services/axiosInterceptor';
+import router from '../router';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     isLoggedIn: false,
     isAdmin: false,
-    rememberMe: false,
     user: null,
     accessToken: null,
   }),
@@ -30,39 +29,31 @@ export const useAuthStore = defineStore('auth', {
 
         this.isLoggedIn = false;
         this.isAdmin = false;
-        this.rememberMe = false;
         this.user = null;
         this.accessToken = null;
         localStorage.clear();
+        router.push({ name: 'home' });
       } catch (error) {
         console.error('Đăng xuất thất bại:', error);
       }
     },
-    // Thêm hàm forceLogout
     async forceLogout() {
       try {
-        // Lấy user_id từ user trong auth store
         const userId = this.user.id;
-        
-        // Gửi yêu cầu tới API force-logout
         await api.post('/auth/force-logout', { user_id: userId });
-
-        // Xóa trạng thái người dùng
         this.isLoggedIn = false;
         this.isAdmin = false;
-        this.rememberMe = false;
         this.user = null;
         this.accessToken = null;
         localStorage.clear();
-        
-        console.log('Đã cưỡng chế đăng xuất và xóa thông tin thiết bị');
+        router.push({ name: 'home' });
       } catch (error) {
-        console.error('Cưỡng chế đăng xuất thất bại:', error);
+        console.log(error)
       }
     }
   },
   persist: {
     storage: localStorage,
-    paths: ['isLoggedIn', 'user', 'isAdmin', 'accessToken', 'rememberMe'],
+    paths: ['isLoggedIn', 'user', 'isAdmin', 'accessToken'],
   },
 });
