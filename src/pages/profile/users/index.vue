@@ -5,13 +5,13 @@
         <n-upload
           ref="uploadCoverRef"
           :action="uploadCoverUrl"
+          :headers="uploadHeaders"
           show-upload-list="false"
           accept="image/*"
-          :on-success="handleCoverUploadSuccess"
           :before-upload="beforeUpload"
         >
           <div class="cover" @click="handleCoverClick">
-            <img v-if="coverUrl" :src="coverUrl" alt="cover" />
+            <img v-if="coverUrl" :src="coverUrl" alt="cover" class="img-cover" />
             <div v-else class="upload-prompt">Nhấn để tải ảnh bìa lên</div>
           </div>
         </n-upload>
@@ -49,18 +49,19 @@
     <n-upload
       ref="uploadRef"
       :action="uploadAvatarUrl"
+      :headers="uploadHeaders"
       show-upload-list="false"
       accept="image/*"
-      :on-success="handleUploadSuccess"
       :before-upload="beforeUpload"
     >
       <div class="avatar" @click="handleAvatarClick">
-        <img v-if="avatarUrl" :src="avatarUrl" alt="avatar" />
+        <img v-if="avatarUrl" :src="avatarUrl" alt="avatar" class="img-cover" />
         <div v-else class="upload-prompt">Nhấn để tải avatar lên</div>
       </div>
     </n-upload>
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
@@ -70,10 +71,14 @@ import { useAuthStore } from "../../../stores/auth.js";
 import { useMenuProfile } from "../../../stores/use-menu-profile.js";
 import dayjs from 'dayjs';
 
+
+const backendUrl = "http://127.0.0.1:8000"
+const authStore = useAuthStore();
+const uploadHeaders = computed(() => ({
+  Authorization: `Bearer ${authStore.accessToken}`,
+}));
 const uploadCoverUrl = `${api.defaults.baseURL}/link/upload/cover`;
 const uploadAvatarUrl = `${api.defaults.baseURL}/link/upload/avatar`;
-
-const authStore = useAuthStore();
 const id = authStore.user?.id;
 const users = ref({});
 const avatarUrl = ref(null); 
@@ -93,6 +98,12 @@ const getProfile = async () => {
   try {
     const response = await api.get(`/profile/${id}`);
     users.value = response.data;
+    if (users.value.avatar) {
+      avatarUrl.value = `${backendUrl}/storage/avatars/${id}/${users.value.avatar}`;
+    }
+    if (users.value.cover) {
+      coverUrl.value = `${backendUrl}/storage/covers/${id}/${users.value.cover}`;
+    }
   } catch (error) {
     console.error(error);
     if(error.response && error.response.status === 429){
@@ -107,24 +118,6 @@ const beforeUpload = (file) => {
     message.error("Vui lòng chọn một tệp hình ảnh!");
   }
   return isImage;
-};
-
-const handleUploadSuccess = (response, file) => {
-  if (response.url) { 
-    avatarUrl.value = response.url;
-    message.success("Tải avatar thành công!");
-  } else {
-    message.error("Không nhận được URL từ server!");
-  }
-};
-
-const handleCoverUploadSuccess = (response, file) => {
-  if (response.url) { 
-    coverUrl.value = response.url;
-    message.success("Tải ảnh bìa thành công!");
-  } else {
-    message.error("Không nhận được URL từ server!");
-  }
 };
 
 const handleAvatarClick = () => {
@@ -236,4 +229,14 @@ onMounted(() => {
   object-fit: cover;
   border-radius: 50%;
 }
+
+.img-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 </style>

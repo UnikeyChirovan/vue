@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '../stores/auth'; // Import store Pinia để quản lý trạng thái
 
-
 // Tạo một instance mới của Axios
 const api = axios.create({
   baseURL: 'http://127.0.0.1:8000/api',
@@ -20,6 +19,10 @@ api.interceptors.request.use(
     if (authStore.isLoggedIn && authStore.accessToken) {
       config.headers['Authorization'] = `Bearer ${authStore.accessToken}`;
     }
+
+    // if (config.headers['Content-Type'] === 'multipart/form-data') {
+    //   delete config.headers['Content-Type'];
+    // }
 
     return config;
   },
@@ -58,7 +61,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-
 
 export default api;
