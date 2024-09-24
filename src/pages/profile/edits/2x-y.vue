@@ -3,6 +3,7 @@
     <a-card title="Cập nhật Tài khoản" style="width: 100%">
       <div class="row mb-3">
         <div class="col-12 col-sm-3 mb-3">
+          <!-- Avatar Section -->
           <div class="row mb-4">
             <div class="col-12 d-flex justify-content-center mb-3">
               <div
@@ -30,6 +31,8 @@
               </a-button>
             </div>
           </div>
+
+          <!-- Cover Section -->
           <div class="row">
             <div class="col-12 d-flex justify-content-center mb-3">
               <div
@@ -59,6 +62,8 @@
             </div>
           </div>
         </div>
+
+        <!-- Rest of the form fields remain unchanged -->
         <div class="col-12 col-sm-4 mb-3">
           <div
             v-for="(field, index) in formFields"
@@ -175,10 +180,10 @@
 <script setup>
 import { ref, reactive, onMounted, onBeforeUnmount } from 'vue';
 import { useAuthStore } from '../../../stores/auth';
-import { useProfileStore } from '../../../stores/profile';
 import { useRouter } from 'vue-router';
 import { message } from 'ant-design-vue';
 import { useMenuProfile } from '../../../stores/use-menu-profile';
+import { useProfileStore } from '../../../stores/profile';
 import api from '../../../services/axiosInterceptor';
 import dayjs from 'dayjs';
 
@@ -186,6 +191,7 @@ const authStore = useAuthStore();
 const profileStore = useProfileStore();
 const id = authStore.user?.id;
 const router = useRouter();
+
 const users = reactive({
   username: '',
   name: '',
@@ -203,8 +209,10 @@ const users = reactive({
   birthday: null,
   login_at: '',
   change_password_at: '',
-  avatar_position: 0,
-  cover_position: 0,
+  avatar_position_x: 0,
+  avatar_position_y: 0,
+  cover_position_x: 0,
+  cover_position_y: 0,
 });
 
 const errors = ref({});
@@ -330,28 +338,41 @@ const formFields_2 = [
     component: 'a-checkbox',
   },
 ];
+
 const avatarUrl = ref(null);
 const coverUrl = ref(null);
+
+// Dragging State
 const isEditingAvatar = ref(false);
 const isEditingCover = ref(false);
 const dragging = ref(false);
-const dragType = ref(null); 
+const dragType = ref(null); // 'avatar' or 'cover'
+let startX = 0;
 let startY = 0;
-let initialPosition = 0;
-let originalAvatarPosition = 0;
-let originalCoverPosition = 0;
+let initialPosX = 0;
+let initialPosY = 0;
+
+let originalAvatarPos = { x: 0, y: 0 };
+let originalCoverPos = { x: 0, y: 0 };
+
 const avatarStyle = ref({
-  transform: 'translateY(0px)',
+  transform: 'translate(0px, 0px)',
+});
+const coverStyle = ref({
+  transform: 'translate(0px, 0px)',
 });
 
-const coverStyle = ref({
-  transform: 'translateY(0px)',
-});
+// Toggle Editing Modes
 const toggleAvatarEditing = () => {
   if (isEditingAvatar.value) {
+    // Save avatar position
     savePosition('avatar');
   } else {
-    originalAvatarPosition = users.avatar_position;
+    // Store original position before editing
+    originalAvatarPos = {
+      x: users.avatar_position_x,
+      y: users.avatar_position_y,
+    };
   }
   isEditingAvatar.value = !isEditingAvatar.value;
 };
@@ -361,15 +382,37 @@ const toggleCoverEditing = () => {
     // Save cover position
     savePosition('cover');
   } else {
-    originalCoverPosition = users.cover_position;
+    // Store original position before editing
+    originalCoverPos = {
+      x: users.cover_position_x,
+      y: users.cover_position_y,
+    };
   }
   isEditingCover.value = !isEditingCover.value;
 };
+
+// Start Dragging
 const startDrag = (event, type) => {
   dragging.value = true;
   dragType.value = type;
-  startY = event.type === 'mousedown' ? event.clientY : event.touches[0].clientY;
-  initialPosition = type === 'avatar' ? users.avatar_position : users.cover_position;
+
+  if (event.type === 'mousedown') {
+    startX = event.clientX;
+    startY = event.clientY;
+  } else if (event.type === 'touchstart') {
+    startX = event.touches[0].clientX;
+    startY = event.touches[0].clientY;
+  }
+
+  if (type === 'avatar') {
+    initialPosX = users.avatar_position_x;
+    initialPosY = users.avatar_position_y;
+  } else if (type === 'cover') {
+    initialPosX = users.cover_position_x;
+    initialPosY = users.cover_position_y;
+  }
+
+  // Add event listeners for mousemove and mouseup
   window.addEventListener('mousemove', onDrag);
   window.addEventListener('mouseup', stopDrag);
   window.addEventListener('touchmove', onDrag);
@@ -377,41 +420,48 @@ const startDrag = (event, type) => {
   window.addEventListener('keydown', onKeyDown);
 };
 
+// Handle Dragging
 const onDrag = (event) => {
   if (!dragging.value) return;
-  const currentY = event.type.startsWith('mouse')
-    ? event.clientY
-    : event.touches[0].clientY;
+
+  let currentX, currentY;
+  if (event.type.startsWith('mouse')) {
+    currentX = event.clientX;
+    currentY = event.clientY;
+  } else if (event.type.startsWith('touch')) {
+    currentX = event.touches[0].clientX;
+    currentY = event.touches[0].clientY;
+  }
+
+  const deltaX = currentX - startX;
   const deltaY = currentY - startY;
+  startX = currentX;
   startY = currentY;
 
   if (dragType.value === 'avatar') {
-    users.avatar_position += deltaY;
-    avatarStyle.value.transform = `translateY(${users.avatar_position}px)`;
-    profileStore.updatePosition({ 
-      avatar_position: users.avatar_position, 
-      cover_position: users.cover_position 
-    });
+    users.avatar_position_x += deltaX;
+    users.avatar_position_y += deltaY;
+    avatarStyle.value.transform = `translate(${users.avatar_position_x}px, ${users.avatar_position_y}px)`;
   } else if (dragType.value === 'cover') {
-    users.cover_position += deltaY;
-    coverStyle.value.transform = `translateY(${users.cover_position}px)`;
-    profileStore.updatePosition({ 
-      avatar_position: users.avatar_position, 
-      cover_position: users.cover_position 
-    });
+    users.cover_position_x += deltaX;
+    users.cover_position_y += deltaY;
+    coverStyle.value.transform = `translate(${users.cover_position_x}px, ${users.cover_position_y}px)`;
   }
 };
 
-
+// Handle ESC Key
 const onKeyDown = (event) => {
   if (event.key === 'Escape' && dragging.value) {
     cancelDrag();
   }
 };
 
+// Stop Dragging
 const stopDrag = () => {
   dragging.value = false;
   dragType.value = null;
+
+  // Remove event listeners
   window.removeEventListener('mousemove', onDrag);
   window.removeEventListener('mouseup', stopDrag);
   window.removeEventListener('touchmove', onDrag);
@@ -419,25 +469,32 @@ const stopDrag = () => {
   window.removeEventListener('keydown', onKeyDown);
 };
 
+// Cancel Drag and Revert Position
 const cancelDrag = () => {
   if (dragType.value === 'avatar') {
-    users.avatar_position = originalAvatarPosition;
-    avatarStyle.value.transform = `translateY(${users.avatar_position}px)`;
+    users.avatar_position_x = originalAvatarPos.x;
+    users.avatar_position_y = originalAvatarPos.y;
+    avatarStyle.value.transform = `translate(${users.avatar_position_x}px, ${users.avatar_position_y}px)`;
   } else if (dragType.value === 'cover') {
-    users.cover_position = originalCoverPosition;
-    coverStyle.value.transform = `translateY(${users.cover_position}px)`;
+    users.cover_position_x = originalCoverPos.x;
+    users.cover_position_y = originalCoverPos.y;
+    coverStyle.value.transform = `translate(${users.cover_position_x}px, ${users.cover_position_y}px)`;
   }
   stopDrag();
   message.info('Thao tác kéo đã bị hủy và vị trí đã được khôi phục.');
 };
+
+// Save Position to Backend (sử dụng API mới)
 const savePosition = (type) => {
   const payload = {
-    avatar_position: users.avatar_position,
-    cover_position: users.cover_position,
+    avatar_position_x: users.avatar_position_x,
+    avatar_position_y: users.avatar_position_y,
+    cover_position_x: users.cover_position_x,
+    cover_position_y: users.cover_position_y,
   };
 
   api
-    .put(`/profile/${id}/position`, payload) 
+    .put(`/profile/${id}/position`, payload) // Sử dụng API mới
     .then((response) => {
       if (response.status === 200) {
         message.success(`Vị trí ${type === 'avatar' ? 'Avatar' : 'Cover'} đã được lưu!`);
@@ -450,14 +507,16 @@ const savePosition = (type) => {
     });
 };
 
+// Upload URLs and Headers
 const backendUrl = "http://127.0.0.1:8000";
 
 const deleteAvatar = async () => {
   try {
     await api.delete(`/link/${id}/avatar`);
     avatarUrl.value = null;
-    users.avatar_position = 0;
-    avatarStyle.value.transform = 'translateY(0px)';
+    users.avatar_position_x = 0;
+    users.avatar_position_y = 0;
+    avatarStyle.value.transform = 'translate(0px, 0px)';
     message.success('Avatar đã được xóa thành công!');
   } catch (error) {
     console.error('Lỗi khi xóa avatar:', error);
@@ -469,8 +528,9 @@ const deleteCover = async () => {
   try {
     await api.delete(`/link/${id}/cover`);
     coverUrl.value = null;
-    users.cover_position = 0;
-    coverStyle.value.transform = 'translateY(0px)';
+    users.cover_position_x = 0;
+    users.cover_position_y = 0;
+    coverStyle.value.transform = 'translate(0px, 0px)';
     message.success('Hình nền đã được xóa thành công!');
   } catch (error) {
     console.error('Lỗi khi xóa hình nền:', error);
@@ -478,6 +538,7 @@ const deleteCover = async () => {
   }
 };
 
+// Fetch user data for editing
 const getUsersEdit = () => {
   api
     .get(`/profile/${id}/edit`)
@@ -494,8 +555,12 @@ const getUsersEdit = () => {
       users.biography = data.biography;
       users.hobbies = data.hobbies;
       users.birthday = data.birthday ? dayjs(data.birthday) : null;
-      users.avatar_position = data.avatar_position || 0;
-      users.cover_position = data.cover_position || 0;
+      users.avatar_position_x = data.avatar_position_x || 0;
+      users.avatar_position_y = data.avatar_position_y || 0;
+      users.cover_position_x = data.cover_position_x || 0;
+      users.cover_position_y = data.cover_position_y || 0;
+
+      // Cập nhật avatarUrl và coverUrl từ dữ liệu API
       if (data.avatar) {
         avatarUrl.value = `${backendUrl}/storage/avatars/${id}/${data.avatar}`;
       }
@@ -503,14 +568,16 @@ const getUsersEdit = () => {
         coverUrl.value = `${backendUrl}/storage/covers/${id}/${data.cover}`;
       }
 
-      avatarStyle.value.transform = `translateY(${users.avatar_position}px)`;
-      coverStyle.value.transform = `translateY(${users.cover_position}px)`;
+      // Cập nhật styles dựa trên vị trí
+      avatarStyle.value.transform = `translate(${users.avatar_position_x}px, ${users.avatar_position_y}px)`;
+      coverStyle.value.transform = `translate(${users.cover_position_x}px, ${users.cover_position_y}px)`;
     })
     .catch((error) => {
       console.error('Lỗi khi lấy dữ liệu người dùng:', error);
     });
 };
 
+// Update user data
 const updateUsers = () => {
   const payload = { ...users };
 
@@ -540,6 +607,7 @@ const updateUsers = () => {
     });
 };
 
+// Filter options for select
 const filterOption = (input, option) => {
   return option.label.toLowerCase().includes(input.toLowerCase());
 };
@@ -549,6 +617,7 @@ onMounted(() => {
   getUsersEdit();
 });
 onBeforeUnmount(() => {
+  // Đảm bảo rằng các sự kiện được loại bỏ khi component bị hủy
   window.removeEventListener('mousemove', onDrag);
   window.removeEventListener('mouseup', stopDrag);
   window.removeEventListener('touchmove', onDrag);
@@ -557,6 +626,7 @@ onBeforeUnmount(() => {
 });
 </script>
 <style scoped>
+/* Các style hiện tại */
 
 .select-danger {
   border: 1px solid red;
@@ -565,12 +635,14 @@ onBeforeUnmount(() => {
 .input-danger {
   border-color: red;
 }
+
+/* Custom Avatar Styles */
 .custom-avatar {
   width: 150px;
   height: 150px;
   border-radius: 50%;
   overflow: hidden;
-  border: 4px solid #4fb233; 
+  border: 4px solid #4fb233; /* Màu viền tùy chỉnh */
   position: relative;
   user-select: none;
 }
@@ -578,55 +650,48 @@ onBeforeUnmount(() => {
 .img-avatar {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.2s ease;
-  
+  /* Giữ ảnh nằm trong khung sau khi di chuyển */
 }
 
 .custom-cover {
-  width: 250px;
-  height: calc(2 * (250px / 6.07)); 
-  overflow: hidden;  
+  width: 250px; /* Chiều rộng cố định của khung mini */
+  height: calc(250px / 2.78); /* Chiều cao được tính theo tỷ lệ 2.78:1 */
+  overflow: hidden;  /* Ẩn phần vượt quá của ảnh */
   position: relative;
   border: 4px solid #4fb233;
   user-select: none;
-  display: flex;
-  justify-content: center; 
-  align-items: center; 
 }
 
 .img-cover-custom {
-  width: 100%; 
-  height: auto; 
-  object-fit: contain;
+  width: 100%;
+  height: auto; /* Để ảnh tự điều chỉnh theo chiều rộng */
+  object-fit: contain; /* Giữ toàn bộ ảnh trong khung */
+  position: absolute;
+  top: 50%; /* Đặt ảnh ở giữa theo chiều dọc */
+  left: 0;
+  transform: translateY(-50%); /* Căn giữa ảnh theo chiều dọc */
   transition: transform 0.2s ease;
 }
+
+/* Lớp phủ che 25% từ trên xuống và 25% từ dưới lên */
 .custom-cover::before,
 .custom-cover::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  height: 25%; 
-  background-color: rgba(0, 0, 0, 0.5); 
-  z-index: 1;
+  height: 25%; /* Chiều cao của lớp phủ */
+  background-color: rgba(0, 0, 0, 0.3); /* Màu của lớp phủ với độ trong suốt */
+  z-index: 1; /* Đảm bảo lớp phủ nằm trên ảnh */
 }
 
 .custom-cover::before {
-  top: 0;
+  top: 0; /* Lớp phủ từ trên xuống */
 }
+
 .custom-cover::after {
-  bottom: 0;
-}
-.ms-2 {
-  margin-left: 0.5rem;
-}
-.img-avatar,
-.img-cover-custom {
-  transition: transform 0.2s ease;
-}
-.custom-avatar.grabbing,
-.custom-cover.grabbing {
-  cursor: grabbing;
+  bottom: 0; /* Lớp phủ từ dưới lên */
 }
 </style>

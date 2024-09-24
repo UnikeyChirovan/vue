@@ -10,8 +10,8 @@
           accept="image/*"
           :before-upload="beforeUpload"
         >
-          <div @click="handleCoverClick" class="image-wrapper">
-            <img v-if="coverUrl" :src="coverUrl" alt="cover" class="img-cover" :style="coverStyle"/>
+          <div class="cover" @click="handleCoverClick">
+            <img v-if="coverUrl" :src="coverUrl" alt="cover" class="img-cover" />
             <div v-else class="upload-prompt">Nhấn để tải ảnh bìa lên</div>
           </div>
         </n-upload>
@@ -54,7 +54,7 @@
       :before-upload="beforeUpload"
     >
       <div class="avatar" @click="handleAvatarClick">
-        <img v-if="avatarUrl" :src="avatarUrl" alt="avatar" class="img-avatar" :style="avatarStyle" />
+        <img v-if="avatarUrl" :src="avatarUrl" alt="avatar" class="img-cover" />
         <div v-else class="upload-prompt">Nhấn để tải avatar lên</div>
       </div>
     </n-upload>
@@ -68,12 +68,10 @@ import { useMessage } from 'naive-ui';
 import api from '../../../services/axiosInterceptor.js';
 import { useAuthStore } from "../../../stores/auth.js";
 import { useMenuProfile } from "../../../stores/use-menu-profile.js";
-import { useProfileStore } from "../../../stores/profile.js";
 import dayjs from 'dayjs';
 
 
 const backendUrl = "http://127.0.0.1:8000"
-const profileStore = useProfileStore();
 const authStore = useAuthStore();
 const uploadHeaders = computed(() => ({
   Authorization: `Bearer ${authStore.accessToken}`,
@@ -95,27 +93,16 @@ const formattedBirthday = computed(() => {
   return '';
 });
 
-const avatarStyle = ref({
-  transform: 'translateY(0px)',
-});
-const coverStyle = ref({
-  transform: 'translateY(0px)',
-});
 const getProfile = async () => {
   try {
-    await profileStore.fetchProfile(id);
-    users.value = profileStore.users;
-
+    const response = await api.get(`/profile/${id}`);
+    users.value = response.data;
     if (users.value.avatar) {
       avatarUrl.value = `${backendUrl}/storage/avatars/${id}/${users.value.avatar}`;
     }
     if (users.value.cover) {
       coverUrl.value = `${backendUrl}/storage/covers/${id}/${users.value.cover}`;
     }
-
-    // Cập nhật styles dựa trên vị trí và phóng to
-    avatarStyle.value.transform = `translateY(${users.value.avatar_position * 2.5}px)`;
-    coverStyle.value.transform = `translateY(${users.value.cover_position * 2.5}px)`;
   } catch (error) {
     console.error(error);
     if(error.response && error.response.status === 429){
@@ -162,14 +149,16 @@ onMounted(() => {
     margin: 0;
     padding: 0;
 
-    // .header {
-    //   height: 30vh;
-    //   position: relative;
-    //   display: flex;
-    //   justify-content: center;
-    //   align-items: center;
-    //   overflow: hidden;
-    // }
+    .header {
+      height: 30vh;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+
 
     .sidebar {
       // background-color: rgb(215, 203, 66);
@@ -196,34 +185,25 @@ onMounted(() => {
   }
 }
 
-.header {
-  height: 30vh; 
-  background-color: red; 
-  overflow: hidden; 
-  position: relative;
+.cover {
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: lightgray;
+  cursor: pointer;
+  overflow: hidden;
 }
 
-.image-wrapper {
-  width: 100%; 
-  height: 100%; 
+.cover img {
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: auto;
+  object-fit: contain; /* Đảm bảo hình ảnh không bị méo */
+  transform: translate(-50%, -50%); /* Căn giữa theo chiều ngang và dọc */
 }
-
-.img-cover {
-  width: 100%; 
-  height: 100%; 
-  position: absolute;  
-  object-fit: cover; 
-  clip-path: inset(0); /* Chỉ hiển thị phần được cắt */
-}
-
-
-// .img-cover {
-//   width: 100%;
-//   height: 100%;
-//   position: absolute; 
-//   object-fit: cover;
-//   object-position: center; /* Căn giữa hình ảnh */
-// }
 
 .upload-prompt {
   color: white;
@@ -245,7 +225,6 @@ onMounted(() => {
   z-index: 10;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s ease; /* Thêm transition */
 }
 
 .avatar img {
@@ -256,18 +235,16 @@ onMounted(() => {
 }
 
 .img-cover {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
-
 .dem{
-  height: 2vh;
-  box-sizing: border-box;
-  background-color: green;
+    height: 2vh;
+    box-sizing: border-box;
+    background-color: green;
 }
 </style>
-

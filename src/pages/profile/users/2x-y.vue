@@ -10,8 +10,8 @@
           accept="image/*"
           :before-upload="beforeUpload"
         >
-          <div @click="handleCoverClick" class="image-wrapper">
-            <img v-if="coverUrl" :src="coverUrl" alt="cover" class="img-cover" :style="coverStyle"/>
+          <div class="cover" @click="handleCoverClick" >
+            <img v-if="coverUrl" :src="coverUrl" alt="cover" class="img-cover" :style="coverStyle" />
             <div v-else class="upload-prompt">Nhấn để tải ảnh bìa lên</div>
           </div>
         </n-upload>
@@ -53,8 +53,8 @@
       accept="image/*"
       :before-upload="beforeUpload"
     >
-      <div class="avatar" @click="handleAvatarClick">
-        <img v-if="avatarUrl" :src="avatarUrl" alt="avatar" class="img-avatar" :style="avatarStyle" />
+      <div class="avatar" @click="handleAvatarClick" >
+        <img v-if="avatarUrl" :src="avatarUrl" alt="avatar" class="img-cover" :style="avatarStyle" />
         <div v-else class="upload-prompt">Nhấn để tải avatar lên</div>
       </div>
     </n-upload>
@@ -73,8 +73,8 @@ import dayjs from 'dayjs';
 
 
 const backendUrl = "http://127.0.0.1:8000"
-const profileStore = useProfileStore();
 const authStore = useAuthStore();
+const profileStore = useProfileStore();
 const uploadHeaders = computed(() => ({
   Authorization: `Bearer ${authStore.accessToken}`,
 }));
@@ -95,12 +95,14 @@ const formattedBirthday = computed(() => {
   return '';
 });
 
+// Các biến để quản lý vị trí avatar và cover
 const avatarStyle = ref({
-  transform: 'translateY(0px)',
+  transform: 'translate(0px, 0px)',
 });
 const coverStyle = ref({
-  transform: 'translateY(0px)',
+  transform: 'translate(0px, 0px)',
 });
+
 const getProfile = async () => {
   try {
     await profileStore.fetchProfile(id);
@@ -113,9 +115,9 @@ const getProfile = async () => {
       coverUrl.value = `${backendUrl}/storage/covers/${id}/${users.value.cover}`;
     }
 
-    // Cập nhật styles dựa trên vị trí và phóng to
-    avatarStyle.value.transform = `translateY(${users.value.avatar_position * 2.5}px)`;
-    coverStyle.value.transform = `translateY(${users.value.cover_position * 2.5}px)`;
+    // Cập nhật styles dựa trên vị trí
+    avatarStyle.value.transform = `translate(${users.value.avatar_position_x}px, ${users.value.avatar_position_y}px)`;
+    coverStyle.value.transform = `translate(${users.value.cover_position_x}px, ${users.value.cover_position_y}px)`;
   } catch (error) {
     console.error(error);
     if(error.response && error.response.status === 429){
@@ -162,14 +164,16 @@ onMounted(() => {
     margin: 0;
     padding: 0;
 
-    // .header {
-    //   height: 30vh;
-    //   position: relative;
-    //   display: flex;
-    //   justify-content: center;
-    //   align-items: center;
-    //   overflow: hidden;
-    // }
+    .header {
+      height: 30vh;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+
 
     .sidebar {
       // background-color: rgb(215, 203, 66);
@@ -196,34 +200,23 @@ onMounted(() => {
   }
 }
 
-.header {
-  height: 30vh; 
-  background-color: red; 
-  overflow: hidden; 
-  position: relative;
+.cover {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: lightgray;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s ease; 
 }
 
-.image-wrapper {
-  width: 100%; 
-  height: 100%; 
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
-
-.img-cover {
-  width: 100%; 
-  height: 100%; 
-  position: absolute;  
-  object-fit: cover; 
-  clip-path: inset(0); /* Chỉ hiển thị phần được cắt */
-}
-
-
-// .img-cover {
-//   width: 100%;
-//   height: 100%;
-//   position: absolute; 
-//   object-fit: cover;
-//   object-position: center; /* Căn giữa hình ảnh */
-// }
 
 .upload-prompt {
   color: white;
@@ -245,7 +238,7 @@ onMounted(() => {
   z-index: 10;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.2s ease; /* Thêm transition */
+  transition: transform 0.2s ease; 
 }
 
 .avatar img {
@@ -256,18 +249,16 @@ onMounted(() => {
 }
 
 .img-cover {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
-
 .dem{
-  height: 2vh;
-  box-sizing: border-box;
-  background-color: green;
+    height: 2vh;
+    box-sizing: border-box;
+    background-color: green;
 }
 </style>
-

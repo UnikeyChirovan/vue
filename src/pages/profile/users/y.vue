@@ -10,7 +10,7 @@
           accept="image/*"
           :before-upload="beforeUpload"
         >
-          <div @click="handleCoverClick" class="image-wrapper">
+          <div class="cover" @click="handleCoverClick">
             <img v-if="coverUrl" :src="coverUrl" alt="cover" class="img-cover" :style="coverStyle"/>
             <div v-else class="upload-prompt">Nhấn để tải ảnh bìa lên</div>
           </div>
@@ -54,7 +54,7 @@
       :before-upload="beforeUpload"
     >
       <div class="avatar" @click="handleAvatarClick">
-        <img v-if="avatarUrl" :src="avatarUrl" alt="avatar" class="img-avatar" :style="avatarStyle" />
+        <img v-if="avatarUrl" :src="avatarUrl" alt="avatar" class="img-cover" :style="avatarStyle" />
         <div v-else class="upload-prompt">Nhấn để tải avatar lên</div>
       </div>
     </n-upload>
@@ -162,14 +162,14 @@ onMounted(() => {
     margin: 0;
     padding: 0;
 
-    // .header {
-    //   height: 30vh;
-    //   position: relative;
-    //   display: flex;
-    //   justify-content: center;
-    //   align-items: center;
-    //   overflow: hidden;
-    // }
+    .header {
+      height: 30vh;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
 
     .sidebar {
       // background-color: rgb(215, 203, 66);
@@ -196,34 +196,25 @@ onMounted(() => {
   }
 }
 
-.header {
-  height: 30vh; 
-  background-color: red; 
-  overflow: hidden; 
-  position: relative;
+.cover {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: lightgray;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s ease;
 }
 
-.image-wrapper {
-  width: 100%; 
-  height: 100%; 
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center; /* Căn giữa hình ảnh */
 }
 
-.img-cover {
-  width: 100%; 
-  height: 100%; 
-  position: absolute;  
-  object-fit: cover; 
-  clip-path: inset(0); /* Chỉ hiển thị phần được cắt */
-}
-
-
-// .img-cover {
-//   width: 100%;
-//   height: 100%;
-//   position: absolute; 
-//   object-fit: cover;
-//   object-position: center; /* Căn giữa hình ảnh */
-// }
 
 .upload-prompt {
   color: white;
