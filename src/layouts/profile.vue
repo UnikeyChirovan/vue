@@ -10,7 +10,7 @@
           <TheMenuProfile />
         </a-list>
       </div>
-      <div class="col-sm-10 col-12">
+      <div class="col-sm-10 col-12 m-0 p-0">
         <router-view></router-view>
       </div>
     </div>
@@ -18,15 +18,31 @@
       <div class="col-12 footer">Footer</div>
     </div>
   </div>
+  <CropperModal
+    v-if="isCropperModal"
+    @showModal="isCropperModal = false"
+  />
+
+  <ImageDisplay
+    v-if="isImageDisplay"
+  />
 </template>
+
 <script setup>
+import { useGeneralStore } from '../stores/general';
+import { storeToRefs } from 'pinia';
+const useGeneral = useGeneralStore();
+const { isCropperModal, isImageDisplay } = storeToRefs(useGeneral);
+
 import TheHeader from '../components/TheHeader.vue';
 import TheMenuProfile from '../components/TheMenuProfile.vue';
+import CropperModal from '../components/CropperModal.vue';
+import ImageDisplay from '../components/ImageDisplay.vue';
 </script>
+
 <style>
-    .footer {
-      height: 4vh;
-      background-color: lightcoral;
-      box-sizing: border-box;
-    }
+  .footer {
+    background-color: lightcoral;
+    box-sizing: border-box;
+  }
 </style>

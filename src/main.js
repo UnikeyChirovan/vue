@@ -4,6 +4,7 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import router from './router';
 import axios from 'axios';
 import api from './services/axiosInterceptor';
+// import 'default-passive-events'; // xử lý tự động passive là true
 window.axios = axios;
 axios.defaults.withCredentials = true;
 
@@ -40,6 +41,7 @@ import {
   NAnchorLink,
   NUpload,
   NRate,
+  NImage,
 } from 'naive-ui';
 import App from './App.vue';
 
@@ -65,7 +67,8 @@ const naive = create({
     NDropdown,
     NAnchorLink,
     NUpload,
-    NRate
+    NRate,
+    NImage
   ],
 });
 

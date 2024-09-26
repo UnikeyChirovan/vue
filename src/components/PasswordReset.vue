@@ -42,7 +42,7 @@ onMounted(() => {
 const handleSubmit = async () => {
     loading.value = true;
     try {
-        const response = await api.post('/password-reset', {
+        const response = await api.post('auth/password-reset', {
             token,
             email,
             password: password.value,

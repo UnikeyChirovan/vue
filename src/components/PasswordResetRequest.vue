@@ -23,7 +23,7 @@ const message = useMessage();
 const handleSubmit = async () => {
     loading.value = true;
     try {
-        const response = await api.post('/password-reset-request', { email: email.value });
+        const response = await api.post('auth/password-reset-request', { email: email.value });
         message.success(response.data.message);
         email.value = '';
     } catch (error) {
