@@ -1,32 +1,10 @@
 import { defineStore } from 'pinia';
 import api from '../services/axiosInterceptor';
 import { ref } from 'vue';
-
-// export const useProfileStore = defineStore('profile', {
-//   state: () => ({
-//     users: {},
-//     avatarUrl: '',  // Thêm thuộc tính này để lưu đường dẫn ảnh
-//   }),
-//   actions: {
-//     async fetchProfile(id) {
-//       try {
-//         const response = await api.get(`/profile/${id}`);
-//         this.users = response.data;
-//       } catch (error) {
-//         console.error('Error fetching profile:', error);
-//       }
-//     },
-//     updatePosition(payload) {
-//       this.users.cover_position = payload.cover_position;
-//     },
-//     updateAvatarUrl(url) {  // Thêm hành động để cập nhật đường dẫn ảnh
-//       this.avatarUrl = url;
-//     },
-//   },
-// });
 export const useProfileStore = defineStore('profile', () => {
   const avatarUrl = ref('');
   const coverUrl = ref('');
+  const cover_position = ref(0); // Dùng để lưu vị trí cover
   const users = ref({});
   const backendUrl = "http://127.0.0.1:8000";
 
@@ -34,6 +12,11 @@ export const useProfileStore = defineStore('profile', () => {
     try {
       const response = await api.get(`/profile/${id}`);
       users.value = response.data;
+
+      if (users.value.cover_position !== undefined) {
+        cover_position.value = users.value.cover_position;
+      }
+
       if (users.value.avatar) {
         avatarUrl.value = `${backendUrl}/storage/avatars/${id}/${users.value.avatar}`;
       }
@@ -44,17 +27,26 @@ export const useProfileStore = defineStore('profile', () => {
       console.error(error);
     }
   };
-
-  const updateAvatarUrl = (newUrl) => {
-    avatarUrl.value = `${backendUrl}${newUrl}`;
+    const updateAvatarUrl = (newUrl) => {
+    avatarUrl.value = newUrl.startsWith('http') ? newUrl : `${backendUrl}${newUrl}`;
+  };
+  // Cập nhật vị trí của cover
+  const updateCoverPosition = (position) => {
+    cover_position.value = Number(position);
+    users.value.cover_position = Number(position);
+  };
+  const updateCoverUrl = (newUrl) => {
+    coverUrl.value = newUrl.startsWith('http') ? newUrl : `${backendUrl}${newUrl}`;
   };
 
   return {
-    users,
     avatarUrl,
     coverUrl,
+    cover_position,
+    users,
     getProfile,
     updateAvatarUrl,
+    updateCoverPosition,
+    updateCoverUrl,
   };
 });
-

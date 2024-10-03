@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
+import { CkeditorPlugin } from '@ckeditor/ckeditor5-vue'; 
 import router from './router';
 import axios from 'axios';
 import api from './services/axiosInterceptor';
@@ -42,6 +43,14 @@ import {
   NUpload,
   NRate,
   NImage,
+  NSlider,
+  NTimeline,
+  NCollapse,
+  NDivider,
+  NTimelineItem,
+  NCollapseItem,
+  NIconWrapper,
+  NEllipsis,
 } from 'naive-ui';
 import App from './App.vue';
 
@@ -68,7 +77,15 @@ const naive = create({
     NAnchorLink,
     NUpload,
     NRate,
-    NImage
+    NImage,
+    NSlider,
+    NTimeline,
+    NCollapse,
+    NDivider,
+    NTimelineItem,
+    NCollapseItem,
+    NIconWrapper,
+    NEllipsis
   ],
 });
 
@@ -92,6 +109,8 @@ app.use(Modal);
 app.use(Layout);
 app.use(DatePicker);
 app.use(naive);
+app.use( CkeditorPlugin );
+
 
 app.mount('#app');
 app.config.globalProperties.$message = message;

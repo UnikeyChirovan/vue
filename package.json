@@ -10,10 +10,12 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-vue": "^7.2.0",
     "@vicons/ionicons5": "^0.12.0",
     "ant-design-vue": "^3.2.20",
     "axios": "^1.7.4",
     "bootstrap": "^5.3.3",
+    "ckeditor5": "^43.1.1",
     "dayjs": "^1.11.13",
     "default-passive-events": "^2.0.0",
     "naive-ui": "^2.39.0",
@@ -21,10 +23,10 @@
     "pinia-plugin-persistedstate": "^4.0.0-alpha.4",
     "vue": "^3.4.37",
     "vue-advanced-cropper": "^2.8.8",
-    "vue-material-design-icons": "^5.2.0",
     "vue-router": "^4.4.3"
   },
   "devDependencies": {
+    "@vicons/fluent": "^0.12.0",
     "@vitejs/plugin-vue": "^5.1.2",
     "lodash": "^4.17.19",
     "postcss": "^8.4.18",

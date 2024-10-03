@@ -378,7 +378,7 @@
   ];
 
   async function handleSelect(key) {
-    const authStore = useAuthStore();
+    // const authStore = useAuthStore();
 
     switch (key) {
       case 'profile':
@@ -389,7 +389,7 @@
         break;
       case 'logout':
         try {
-          await authStore.logout();
+          await auth.logout();
           message.success('Đăng xuất thành công, hẹn gặp lại!')
         } catch (error) {
           message.error("Xin lỗi về sự bất tiện")
