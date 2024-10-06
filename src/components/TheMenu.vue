@@ -9,9 +9,9 @@
         <span><i class="fa-solid fa-user me-1"></i>Tài Khoản</span>
       </RouterLink>
     </a-menu-item>
-    <a-menu-item key="admin-roles">
-      <RouterLink :to="{ name: 'admin-roles' }">
-        <span><i class="fa-solid fa-tag me-1"></i>Vai Trò</span>
+    <a-menu-item key="admin-stories">
+      <RouterLink :to="{ name: 'admin-stories' }">
+        <span><i class="fa-solid fa-tag me-1"></i>Chapters</span>
       </RouterLink>
     </a-menu-item>
     <a-menu-item key="admin-settings">

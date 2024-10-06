@@ -24,7 +24,9 @@ import {
   Checkbox,
   Modal,
   Layout,
-  DatePicker
+  DatePicker,
+  Radio,
+  Upload,
 } from 'ant-design-vue';
 import {
   create,
@@ -116,6 +118,8 @@ app.use(Checkbox);
 app.use(Modal);
 app.use(Layout);
 app.use(DatePicker);
+app.use(Radio);
+app.use(Upload);
 app.use(naive);
 app.use( CkeditorPlugin );
 
