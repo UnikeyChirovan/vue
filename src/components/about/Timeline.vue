@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h2 class="text-center">Một Chút Sự Kiện</h2>
+    <h2 class="text-center">Đôi Dòng Lịch Sử</h2>
     <p class="text-center mb-4">
      Ngót nghét cũng 15 năm kể từ khi tập tành viết những dòng đầu tiên, nơi đây chứa đựng khao khát đam mê của tuổi trẻ, và nỗi đau, niềm vui, niềm hi vọng lúc trưởng thành.
     </p>

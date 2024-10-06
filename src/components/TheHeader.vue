@@ -8,7 +8,7 @@
         <span @click="showDrawer()"><i class="fa-solid fa-bars"></i></span>
       </div>
       <div class="col-10 col-sm-9 d-flex align-items-center justify-content-center justify-content-sm-start">
-        <img src="../assets/logo.png" alt="logo" height="32" width="34" class="me-1" />
+        <img src="../assets/img/logo.png" alt="logo" height="32" width="34" class="me-1" />
         <div class="align-item-center justify-content-center">
           <ul class="m-0 p-0 d-sm-flex">
             <template v-for="item in listItem" :key="item.name">

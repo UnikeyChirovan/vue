@@ -5,13 +5,13 @@ export const useAboutStore = defineStore('about', {
     state: () => ({
         teamMembers: [],
         timeline: [],
-        customerStories: [],
+        visionMissionValues: [], // Thay thế customerStories bằng visionMissionValues
     }),
     actions: {
         fetchData() {
-                this.teamMembers = [
-                    { name: 'Phạm Hữu Hoàng Anh', position: 'Người Viết Sách' },
-                ];
+            this.teamMembers = [
+                { name: 'Phạm Hữu Hoàng Anh', position: 'Người Viết Sách' },
+            ];
 
             // Dữ liệu mẫu cho timeline
             this.timeline = [
@@ -24,13 +24,27 @@ export const useAboutStore = defineStore('about', {
                 { year: 2025, details: ["Coming soon..."] }
             ];
 
-            // Dữ liệu mẫu cho câu chuyện khách hàng
-            this.customerStories = [
-                { customer: 'Công ty X', story: 'Sản phẩm đã giúp chúng tôi tăng doanh thu 30%' },
-                { customer: 'Công ty Y', story: 'Dịch vụ khách hàng tuyệt vời và sản phẩm chất lượng.' },
-                { customer: 'Công ty Z', story: 'Hợp tác lâu dài và đáng tin cậy.' },
-                // Thêm nhiều câu chuyện khác nếu cần
+            // Dữ liệu mới cho Tầm nhìn, Sứ mệnh và Giá trị cốt lõi
+            this.visionMissionValues = [
+                { 
+                    title: 'Tầm nhìn', 
+                    content: 'Trở thành một nền tảng truyện sáng tạo và đậm chất cá nhân, nơi mỗi câu chữ đều truyền tải đam mê, trải nghiệm và sự kiên trì. Selorson Tales không chỉ là một không gian để đọc truyện mà còn là nơi kết nối cảm xúc và trí tưởng tượng của độc giả, thúc đẩy sự sáng tạo và sự đồng cảm trong cộng đồng yêu truyện.' 
+                },
+                { 
+                    title: 'Sứ mệnh', 
+                    content: 'Mang đến những câu chuyện chân thực và đầy cảm xúc, phản ánh hành trình trưởng thành và khám phá bản thân của tác giả. Tạo ra một trải nghiệm đọc truyện không chỉ cuốn hút, mà còn gần gũi và đáng nhớ. Đồng thời, xây dựng một không gian tương tác thân thiện, nơi tác giả và độc giả cùng nhau phát triển, chia sẻ ý tưởng và góp phần tạo nên những tác phẩm có giá trị.' 
+                },
+                { 
+                    title: 'Giá trị cốt lõi', 
+                    content: [
+                        'Đam mê và Sáng tạo: Mỗi câu chuyện đều xuất phát từ niềm đam mê mãnh liệt, khao khát khám phá và sự sáng tạo không ngừng nghỉ.',
+                        'Chân thực và Kiên trì: Mỗi tác phẩm đều phản ánh trung thực về hành trình cá nhân của tác giả, với sự kiên định vượt qua khó khăn để theo đuổi và hoàn thiện ước mơ.',
+                        'Kết nối và Đồng cảm: Tạo ra sự kết nối sâu sắc giữa tác giả và độc giả, với sự cởi mở lắng nghe và chia sẻ để cùng nhau phát triển.',
+                        'Tôn trọng và Cống hiến: Mỗi lời góp ý, mỗi phản hồi đều được trân trọng, như một phần quan trọng để xây dựng một cộng đồng đọc truyện vững mạnh và tích cực.'
+                    ] 
+                }
             ];
+
         },
     },
 });

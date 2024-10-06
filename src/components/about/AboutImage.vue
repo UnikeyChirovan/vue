@@ -1,7 +1,7 @@
 <template>
   <div class="about-image-container">
     <img 
-      src="../../assets/intro6.png" 
+      src="../../assets/img/intro6.png" 
       alt="Về Selorson Tales" 
       class="about-image"
     />

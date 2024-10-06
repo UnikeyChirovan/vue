@@ -343,8 +343,8 @@ const saveNewCover = () => {
   }
 
   const formData = new FormData();
-  formData.append('file', newCoverFile.value); // Gắn file ảnh
-  formData.append('position', cover_position.value); // Gắn vị trí cover
+  formData.append('file', newCoverFile.value); 
+  formData.append('position', cover_position.value); 
 
   api.post(`link/upload/cover`, formData, {
     headers: {
@@ -378,11 +378,11 @@ const handleSelect = (key) => {
       break;
     case 'changecover':
       showChange.value = true;
-      showEdit.value = false; // Đảm bảo modal "Sửa Hình" không hiển thị
+      showEdit.value = false;
       break;
     case 'settingcover':
       showEdit.value = true;
-      showChange.value = false; // Đảm bảo modal "Thay Hình" không hiển thị
+      showChange.value = false; 
       break;
     default:
       break;
@@ -395,18 +395,19 @@ const saveEditedCover = () => {
   const payload = {
     position: cover_position.value, 
   };
-  api.put(`link/update/cover-position`, payload, {
+  api.patch(`link/update/cover-position`, payload, {
     headers: uploadHeaders,
   })
   .then(response => {
+    console.log(response)
     if (response.status === 200) {
       useProfile.updateCoverPosition(response.data.positionY);
-      showEditModal.value = false; 
+      showEdit.value = false; 
       message.success('Vị trí cover đã được lưu thành công!');
     }
   })
   .catch(error => {
-    // console.error('Error saving cover position:', error);
+    console.error('Error saving cover position:', error);
     message.error('Lưu vị trí cover thất bại!');
   });
 };
@@ -446,7 +447,6 @@ onBeforeUnmount(() => {
         top: 0;
         left: 0;
         width: 100%;
-        height: 100%;
         object-fit: cover;
       }
     }

@@ -30,7 +30,6 @@ export const useProfileStore = defineStore('profile', () => {
     const updateAvatarUrl = (newUrl) => {
     avatarUrl.value = newUrl.startsWith('http') ? newUrl : `${backendUrl}${newUrl}`;
   };
-  // Cập nhật vị trí của cover
   const updateCoverPosition = (position) => {
     cover_position.value = Number(position);
     users.value.cover_position = Number(position);

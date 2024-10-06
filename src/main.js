@@ -51,6 +51,10 @@ import {
   NCollapseItem,
   NIconWrapper,
   NEllipsis,
+  NGrid,
+  NGridItem,
+  NText,
+  NLayout,
 } from 'naive-ui';
 import App from './App.vue';
 
@@ -85,7 +89,11 @@ const naive = create({
     NTimelineItem,
     NCollapseItem,
     NIconWrapper,
-    NEllipsis
+    NEllipsis,
+    NGrid,
+    NGridItem,
+    NText,
+    NLayout
   ],
 });
 

@@ -7,9 +7,9 @@
     
     <Timeline :years="years" />
     
-    <CustomerStory v-for="story in customerStories" :key="story.customer" :story="story" />
+    <VisionMissionValues :visionMissionValues="visionMissionValues" />
     
-    <FAQ />
+    <!-- <FAQ /> -->
   </div>
 </template>
 
@@ -19,15 +19,15 @@ import { useAboutStore } from '../../stores/aboutStore';
 import AboutImage from '../../components/about/AboutImage.vue';
 import TeamMember from '../../components/about/TeamMember.vue';
 import Timeline from '../../components/about/Timeline.vue';
-import CustomerStory from '../../components/about/CustomerStory.vue';
-import FAQ from '../../components/about/FAQ.vue';
+import VisionMissionValues from '../../components/about/VisionMissionValues.vue';
+// import FAQ from '../../components/about/FAQ.vue';
 
 const aboutStore = useAboutStore();
 aboutStore.fetchData(); 
 
 const teamMembers = aboutStore.teamMembers;
 const years = aboutStore.timeline; // Assuming your timeline data is stored here
-const customerStories = aboutStore.customerStories;
+const visionMissionValues = aboutStore.visionMissionValues;
 </script>
 <style>
 body {
