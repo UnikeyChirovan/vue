@@ -61,8 +61,6 @@ import { useMenu } from '../../../stores/use-menu';
 import { onMounted, ref, computed } from 'vue';
 import { message } from 'ant-design-vue';
 import api from '../../../services/axiosInterceptor';
-
-// Khởi tạo biến lưu trữ danh sách chương và trạng thái màn hình
 const chapters = ref([]);
 const isMobile = ref(window.innerWidth < 600);
 const scrollOptions = computed(() => {
@@ -129,9 +127,10 @@ const handleOk = () => {
   api
     .delete(`/story/chapters/${chapterIdToDelete.value}`) // Đảm bảo đường dẫn đúng
     .then((res) => {
-      if (res.status === 200) {
+      console.log('dữ liệu', res)
+      if (res.status === 204) {
         message.success('Xóa chương thành công');
-        getChapters(); // Tải lại danh sách
+        getChapters(); 
       }
     })
     .catch((err) => {

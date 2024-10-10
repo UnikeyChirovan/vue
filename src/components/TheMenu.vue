@@ -14,6 +14,11 @@
         <span><i class="fa-solid fa-tag me-1"></i>Chapters</span>
       </RouterLink>
     </a-menu-item>
+    <a-menu-item key="admin-images">
+      <RouterLink :to="{ name: 'admin-images' }">
+        <span><i class="fa-solid fa-image me-1"></i>Background</span>
+      </RouterLink>
+    </a-menu-item>
     <a-menu-item key="admin-settings">
       <RouterLink :to="{ name: 'admin-settings' }">
         <span><i class="fa-solid fa-gear me-1"></i>Cài Đặt</span>

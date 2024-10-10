@@ -76,3 +76,12 @@ const showDrawerUser = () => {
   visible_user.value = true;
 };
 </script>
+<style scoped>
+.container-fluid{
+  margin: 0;
+  /* padding: 0; */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+</style>

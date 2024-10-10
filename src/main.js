@@ -57,6 +57,10 @@ import {
   NGridItem,
   NText,
   NLayout,
+  NInputNumber,
+  NColorPicker,
+  NRadio,
+  NRadioGroup, 
 } from 'naive-ui';
 import App from './App.vue';
 
@@ -95,7 +99,11 @@ const naive = create({
     NGrid,
     NGridItem,
     NText,
-    NLayout
+    NLayout,
+    NInputNumber,
+    NColorPicker,
+    NRadio,
+    NRadioGroup
   ],
 });
 

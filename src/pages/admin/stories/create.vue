@@ -7,12 +7,6 @@
         <input v-model="form.title" type="text" id="title" required class="form-control" />
       </div>
 
-      <!-- Author Input -->
-      <div class="mb-3">
-        <label for="author">Tác giả</label>
-        <input v-model="form.author" type="text" id="author" required class="form-control" />
-      </div>
-
       <!-- Chapter Number -->
       <div class="mb-3">
         <label for="chapterNumber">Chương số</label>
@@ -49,18 +43,29 @@
     >
       <p>Bạn có chắc chắn muốn xóa toàn bộ nội dung các đoạn không?</p>
     </a-modal>
+
+    <!-- Scroll Buttons -->
+    <ScrollButtons>
+      <template v-slot:top-button>
+        <a-button type="primary"><i class="fa-solid fa-arrow-down"></i></a-button>
+      </template>
+      <template v-slot:bottom-button>
+        <a-button type="primary"><i class="fa-solid fa-arrow-up"></i></a-button>
+      </template>
+    </ScrollButtons>
   </a-card>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useMenu } from '../../../stores/use-menu';
 import { message } from 'ant-design-vue';
 import api from '../../../services/axiosInterceptor';
+import ScrollButtons from '../../../components/ScrollButtons.vue';
 
 // Initialize the form structure
 const form = ref({
   title: '',
-  author: '',
   chapter_number: 1,
   content: [''], // Initial content section
 });
@@ -108,7 +113,11 @@ const handleFileUpload = (event) => {
 const submitForm = async () => {
   try {
     // Send the content sections and other details to the backend
-    await api.post('/story/chapters', form.value);
+    await api.post('/story/chapters', {
+      title: form.value.title,
+      chapter_number: form.value.chapter_number,
+      content: form.value.content,
+    });
     message.success('Chương đã được tạo thành công');
     // Reset form after successful submission
     resetForm();
@@ -122,7 +131,6 @@ const submitForm = async () => {
 const resetForm = () => {
   form.value = {
     title: '',
-    author: '',
     chapter_number: 1,
     content: [''], // Reset content to have one empty section
   };
@@ -132,6 +140,9 @@ const resetForm = () => {
 const handleCancelDelete = () => {
   isConfirmVisible.value = false; // Close the modal
 };
+onMounted(() => {
+  useMenu().onSelectedKey(['admin-stories']);
+});
 </script>
 
 <style scoped>

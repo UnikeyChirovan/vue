@@ -37,6 +37,22 @@ const admin = [
         name: 'admin-stories-edit',
         component: () => import('../pages/admin/stories/edit.vue'),
       },
+      // Quản lý Background
+      {
+        path: 'images',
+        name: 'admin-images',
+        component: () => import('../pages/admin/images/index.vue'),
+      },
+      {
+        path: 'images/create',
+        name: 'admin-images-create',
+        component: () => import('../pages/admin/images/create.vue'),
+      },
+      {
+        path: 'images/:id/edit',
+        name: 'admin-images-edit',
+        component: () => import('../pages/admin/images/edit.vue'),
+      },
       // Quản lý settings
       {
         path: 'settings',
