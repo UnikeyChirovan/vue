@@ -16,7 +16,12 @@
     </a-menu-item>
     <a-menu-item key="admin-images">
       <RouterLink :to="{ name: 'admin-images' }">
-        <span><i class="fa-solid fa-image me-1"></i>Background</span>
+        <span><i class="fa-solid fa-image me-1"></i>Backgrounds</span>
+      </RouterLink>
+    </a-menu-item>
+    <a-menu-item key="admin-contacts">
+      <RouterLink :to="{ name: 'admin-contacts' }">
+        <span><i class="fa-regular fa-paper-plane me-1"></i>Contacts</span>
       </RouterLink>
     </a-menu-item>
     <a-menu-item key="admin-settings">

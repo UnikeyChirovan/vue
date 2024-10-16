@@ -2,12 +2,14 @@
   <div class="background-image-container"></div>
   <TheHeader />
   <div class="container text-center">
-    <h2>{{ storyName }}</h2>
-    <p class="author-name"><em>{{ authorName }}</em></p>
+    <h1 class="mb-0">{{ storyName }}</h1>
+    <hr class="custom-hr" />
+    <h2 class="author-name" style="color: #2C9359FF;"><em>{{ authorName }}</em></h2>
+    
     <div class="d-flex justify-content-center my-3">
       <n-button
         @click="prevChapter"
-        :disabled="chapterStore.selectedChapter === 0"
+        :disabled="chapterStore.selectedChapter === chapterStore.chapterOptions[0]?.value"
         type="primary"
         class="mx-2"
       >
@@ -35,7 +37,7 @@
       <span class="snowflake">&#10052;</span>
       <span class="snowflake">&#10052;</span>
     </div>
-    <h3 class="chapter-title">{{ currentChapterTitle }}</h3>
+    <h3 class="chapter-title" style="font-size: 1.8rem; color: #CD0C10E6;">{{ currentChapterTitle }}</h3>
     <div v-if="chapterContent.length" class="chapter-content my-5">
       <p v-for="(paragraph, index) in chapterContent" :key="index" class="paragraph">{{ paragraph }}</p>
     </div>
@@ -47,7 +49,7 @@
     <div class="d-flex justify-content-center my-3">
       <n-button
         @click="prevChapter"
-        :disabled="chapterStore.selectedChapter === 0"
+        :disabled="chapterStore.selectedChapter === chapterStore.chapterOptions[0]?.value"
         type="primary"
         class="mx-2"
       >
@@ -186,6 +188,11 @@ onMounted(() => {
 
 
 <style scoped>
+@media only screen and (max-width: 780px) {
+  .custom-hr{
+    display: none;
+  }
+}
 body {
   will-change: filter;
 }
@@ -259,5 +266,35 @@ body {
 .paragraph {
   text-indent: 40px;
   margin-bottom: 1.2rem;
+}
+
+.custom-hr {
+  margin-top: -0.5rem;
+    height: 5px;
+    width: 60%; 
+    background-image: url('../../assets/img/gachchan.jpg');
+    background-repeat: repeat-x; 
+    background-size: contain; 
+    background-position: center;
+}
+h1 {
+  display: inline-block;
+  font-size: 4rem;
+  color: transparent;
+  background-color: teal;
+  background-image: linear-gradient(
+    to right,
+    rgb(255, 0, 0),
+    rgb(255, 165, 0),
+    rgb(255, 255, 0),
+    rgb(0, 255, 0),
+    rgb(144, 238, 144),
+    rgb(0, 0, 255),
+    rgb(75, 0, 130),
+    rgb(128, 0, 128),
+    rgb(255, 0, 191),
+    rgb(255, 0, 0)
+  );
+  -webkit-background-clip: text;
 }
 </style>

@@ -60,7 +60,11 @@ import {
   NInputNumber,
   NColorPicker,
   NRadio,
-  NRadioGroup, 
+  NRadioGroup,
+  NSwitch,
+  NSelect,
+  NDataTable,
+  NConfigProvider,
 } from 'naive-ui';
 import App from './App.vue';
 
@@ -103,7 +107,12 @@ const naive = create({
     NInputNumber,
     NColorPicker,
     NRadio,
-    NRadioGroup
+    NRadioGroup,
+    NSwitch,
+    NSelect,
+    NDataTable,
+    NConfigProvider,
+    NEllipsis,
   ],
 });
 

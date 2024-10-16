@@ -29,7 +29,7 @@ const teamMembers = aboutStore.teamMembers;
 const years = aboutStore.timeline; // Assuming your timeline data is stored here
 const visionMissionValues = aboutStore.visionMissionValues;
 </script>
-<style>
+<style scoped>
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f8f9fa;

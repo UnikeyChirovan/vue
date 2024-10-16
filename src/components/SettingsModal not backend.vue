@@ -9,7 +9,7 @@
           <i class="fa fa-adjust me-2"></i>
           <n-slider v-model:value="brightness" :min="0" :max="100" />
         </n-form-item>
-
+        
         <div class="d-flex justify-content-between align-items-center m-0 p-0">
           <span>
             <n-form-item label="Chế độ">
@@ -42,7 +42,7 @@
                 <label for="partial">Partial</label>
 
                 <input id="custom" name="screen-mode" type="radio" v-model="screenMode" value="custom" />
-                <label for="custom">Custom</label>
+                <label for="custom" >Custom</label>
               </div>
             </n-form-item>
           </span>
@@ -52,16 +52,15 @@
           <i class="fa fa-font me-2"></i>
           <n-select v-model:value="fontFamily" :options="fontOptions" />
         </n-form-item>
-
+        
         <n-form-item label="Cỡ chữ">
           <i class="fa fa-text-height me-2"></i>
           <n-slider v-model:value="fontSize" :min="12" :max="30" />
         </n-form-item>
 
         <n-form-item label="Hình nền">
-          <n-select v-model:value="selectedBackground" :options="backgroundOptions" @update:value="handleBackgroundSelection" />
+          <n-select v-model:value="backgroundImage" :options="backgroundOptions" />
         </n-form-item>
-
         <div class="row m-0 p-0">
           <div class="col-12 col-md-6">
             <n-form-item label="Kiểu nền">
@@ -80,7 +79,6 @@
               <n-slider v-model:value="backgroundOpacity" :min="0" :max="1" step="0.01" />
             </n-form-item>
           </div>
-
           <div class="col-12 col-md-6" v-if="screenMode === 'custom'">
             <n-form-item label="Nền tùy chỉnh">
               <n-radio-group v-model:value="customBackgroundStyle">
@@ -99,142 +97,80 @@
             </n-form-item>
           </div>
         </div>
-
         <n-form-item label="Chiều cao dòng">
           <n-icon size="30"><AutoFitHeight20Regular /></n-icon>
           <n-slider v-model:value="lineHeight" :min="1" :max="2" step="0.1" />
         </n-form-item>
-
         <n-button type="primary" @click="applySettings" style="width: 100%;">Áp dụng</n-button>
       </n-space>
     </n-modal>
   </div>
 </template>
-
 <script setup>
-  import { ref, onMounted, computed, watch } from 'vue';
-  import { useAuthStore } from '../stores/auth';
-  import { NButton, NModal, NSlider, NSwitch, NSelect, NColorPicker, NFormItem, NSpace, NRadioGroup } from 'naive-ui';
-  import AutoFitHeight20Regular from '@vicons/fluent/AutoFitHeight20Regular';
-  import api from '../services/axiosInterceptor';
-  import { useSettingsStore } from '../stores/useSettingsStore';
-  import { useRoute, onBeforeRouteLeave } from 'vue-router';
-  const route = useRoute();
+import { ref } from 'vue';
+import { NButton, NModal, NSlider, NSwitch, NSelect, NColorPicker, NFormItem, NSpace, NRadioGroup } from 'naive-ui';
+import AutoFitHeight20Regular from '@vicons/fluent/AutoFitHeight20Regular';
+import background1 from '../assets/img/1.jpg';
 
-const settingsStore = useSettingsStore();
-  const userId = useAuthStore().user?.id;
-  const showModal = ref(false);
-  const hasSettings  = ref(false);
-  const backgroundStoryId =  ref('');
-  const BaseURL = `http://127.0.0.1:8000`;
+const showModal = ref(false);
+const screenMode = ref('full');
+const backgroundStyle = ref('solid');
+const selectedGradient = ref('');
+const brightness = ref(100);
+const mode = ref('day');
+const yellowLightMode = ref(false);
+const fontFamily = ref('Arial');
+const fontSize = ref(20);
+const backgroundImage = ref('');
+const backgroundColor = ref('#ffffff');
+const lineHeight = ref(1.5);
+const customBackgroundStyle = ref('solid');
+const customBackgroundColor = ref('#ffffff');
+const customSelectedGradient = ref('');
+const backgroundOpacity = ref(1);
+const customBackgroundOpacity = ref(1);
 
+const fontOptions = [
+  { label: 'Arial', value: 'Arial' },
+  { label: 'Times New Roman', value: 'Times New Roman' },
+  { label: 'Courier New', value: 'Courier New' },
+];
 
+const gradientOptions = [
+  { label: 'Netflix', value: 'netflix' },
+  { label: 'Vine', value: 'vine' },
+  { label: 'Megatron', value: 'megatron' },
+];
 
-  const fontOptions = [
-    { label: 'Arial', value: 'Arial' },
-    { label: 'Times New Roman', value: 'Times New Roman' },
-    { label: 'Courier New', value: 'Courier New' },
-  ];
+const customGradientOptions = [
+  { label: 'Netflix', value: 'netflix' },
+  { label: 'Vine', value: 'vine' },
+  { label: 'Megatron', value: 'megatron' },
+];
 
-  const gradientOptions = [
-    { label: 'Netflix', value: 'netflix' },
-    { label: 'Vine', value: 'vine' },
-    { label: 'Megatron', value: 'megatron' },
-  ];
-
-  const customGradientOptions = [
-    { label: 'Netflix', value: 'netflix' },
-    { label: 'Vine', value: 'vine' },
-    { label: 'Megatron', value: 'megatron' },
-  ];
-
-  const backgroundOptions = ref([]);
-// Tạo hàm chung cho các computed properties
-const createComputedProperty = (key) => computed({
-  get: () => settingsStore[key],
-  set: (val) => settingsStore.updateSetting(key, val)
-});
-
-// Sử dụng hàm chung để tạo các computed properties
-const brightness = createComputedProperty('brightness');
-const mode = createComputedProperty('mode');
-const yellowLightMode = createComputedProperty('yellowLightMode');
-const screenMode = createComputedProperty('screenMode');
-const fontFamily = createComputedProperty('fontFamily');
-const fontSize = createComputedProperty('fontSize');
-const lineHeight = createComputedProperty('lineHeight');
-const backgroundColor = createComputedProperty('backgroundColor');
-const customBackgroundColor = createComputedProperty('customBackgroundColor');
-const backgroundStyle = createComputedProperty('backgroundStyle');
-const customBackgroundStyle = createComputedProperty('customBackgroundStyle');
-const customSelectedGradient = createComputedProperty('customSelectedGradient');
-const customBackgroundOpacity = createComputedProperty('customBackgroundOpacity');
-const selectedGradient = createComputedProperty('selectedGradient');
-const backgroundImage = createComputedProperty('backgroundImage');
-const backgroundOpacity = createComputedProperty('backgroundOpacity');
-const selectedBackground = createComputedProperty('selectedBackground');
-
-let initialSettings = {};
-
-// Khi khởi động hoặc khi người dùng mở modal, lưu lại giá trị ban đầu
-const saveInitialSettings = () => {
-  initialSettings = {
-    backgroundStoryId: backgroundStoryId.value,
-    fontFamily: fontFamily.value,
-    fontSize: fontSize.value,
-    lineHeight: lineHeight.value
-  };
-};
-const hasSettingsChanged = () => {
-  return (
-    backgroundStoryId.value !== initialSettings.backgroundStoryId ||
-    fontFamily.value !== initialSettings.fontFamily ||
-    fontSize.value !== initialSettings.fontSize ||
-    lineHeight.value !== initialSettings.lineHeight
-  );
-};
-const saveSettings = async () => {
-  if (!hasSettingsChanged()) return; 
-  
-  const settingsData = {
-    background_story_id: backgroundStoryId.value,
-    font_family: fontFamily.value,
-    font_size: fontSize.value,
-    line_height: lineHeight.value,
-  };
-  try {
-    if (hasSettings.value) {
-      await api.put('/story/settings', settingsData);
-    } else {
-      await api.post('/story/save-settings', settingsData);
-    }
-    saveInitialSettings();
-    fetchUserSettings(userId);
-  } catch (error) {
-    console.error('Error saving settings:', error);
-  }
-};
-
-
+const backgroundOptions = [
+  { label: 'Không', value: '' },
+  { label: 'Hình nền 1', value: background1 },
+  { label: 'Hình nền 2', value: 'background2.jpg' },
+];
 
   const applySettings = () => {
     const settings = {
-    brightness: settingsStore.brightness,
-    mode: settingsStore.mode,
-    yellowLightMode: settingsStore.yellowLightMode,
-    fontFamily: settingsStore.fontFamily,
-    fontSize: settingsStore.fontSize,
-    backgroundImage: settingsStore.backgroundImage,
-    backgroundColor: settingsStore.backgroundColor,
-    lineHeight: settingsStore.lineHeight,
-    backgroundStyle: settingsStore.backgroundStyle,
-    selectedGradient: settingsStore.selectedGradient,
-    customBackgroundStyle: settingsStore.customBackgroundStyle,
-    customBackgroundColor: settingsStore.customBackgroundColor,
-    customSelectedGradient: settingsStore.customSelectedGradient,
-    backgroundOpacity: settingsStore.backgroundOpacity,
-    customBackgroundOpacity: settingsStore.customBackgroundOpacity,
-    selectedBackground: settingsStore.selectedBackground,
+      brightness: brightness.value,
+      mode: mode.value,
+      yellowLightMode: yellowLightMode.value,
+      fontFamily: fontFamily.value,
+      fontSize: fontSize.value,
+      backgroundImage: backgroundImage.value,
+      backgroundColor: backgroundColor.value,
+      lineHeight: lineHeight.value,
+      backgroundStyle: backgroundStyle.value,
+      selectedGradient: selectedGradient.value,
+      customBackgroundStyle: customBackgroundStyle.value,
+      customBackgroundColor: customBackgroundColor.value,
+      customSelectedGradient: customSelectedGradient.value,
+      backgroundOpacity: backgroundOpacity.value,
+      customBackgroundOpacity: customBackgroundOpacity.value,
     };
 
     const contentContainer = document.querySelector('.chapter-content');
@@ -250,8 +186,8 @@ const saveSettings = async () => {
       storyContainer.style.backgroundColor = '';
       storyContainer.style.backgroundImage = '';
     };
-    if(route.path==='/stories'){
-          switch (screenMode.value) {
+
+    switch (screenMode.value) {
       case 'full':
         reset();
         backgroundImageContainer.style.width = '100%';
@@ -306,7 +242,7 @@ const saveSettings = async () => {
         }
         break;
     }
-    }
+
     if (contentContainer) {
       contentContainer.style.fontFamily = settings.fontFamily;
       contentContainer.style.fontSize = `${settings.fontSize}px`;
@@ -320,8 +256,6 @@ const saveSettings = async () => {
     }
 
     parentComponent.style.color = settings.mode === 'night' ? '#ffffff' : '#000000';
-    saveSettings();
-    console.log('hình ảnh', settings.backgroundImage)
     showModal.value = false;
   };
 
@@ -338,74 +272,8 @@ const saveSettings = async () => {
         return 'none';
     }
   };
-  const fetchBackgrounds = async () => {
-    try {
-      const response = await api.get('/story/backgrounds');
-      backgroundOptions.value = response.data.map((background) => ({
-        label: background.background_image_name,
-        value: background.background_image_path,
-        backgroundStoryId: background.id,
-      }));
-    } catch (error) {
-      console.error('Lỗi khi lấy danh sách hình nền:', error);
-    } 
-  };
-  const handleBackgroundSelection = (selectedValue) => {
-  const selected = backgroundOptions.value.find(option => option.value === selectedValue);
-  if (selected) {
-    backgroundStoryId.value = selected.backgroundStoryId; // Gán giá trị backgroundStoryId
-  }
-};
-  const fetchUserSettings = async (userId) => {
-    try {
-      const response = await api.get(`/story/${userId}/settings`);
-      const settings = response.data.settings;
-      fontFamily.value = settings.font_family;
-      fontSize.value = settings.font_size;
-      lineHeight.value = settings.line_height;
-      selectedBackground.value = settings.background_story?.background_image_name 
-      ? `${settings.background_story.background_image_name}` 
-      : '';
-      backgroundImage.value = settings.background_story?.background_image_path 
-      ? `${BaseURL}/storage/${settings.background_story.background_image_path}` 
-      : '';
-      hasSettings.value = true; 
-      settingsStore.saveSettings();
-    } catch (error) {
-      console.error('Lỗi khi lấy cài đặt người dùng:', error);
-    }
-  };
-
-  const resetSettings = () => {
-  const parentComponent = document.querySelector('body');
-  parentComponent.style.backgroundColor = '';
-  parentComponent.style.backgroundImage = '';
-  parentComponent.style.color = '';
-  parentComponent.style.filter = '';
-};
-
-
-onBeforeRouteLeave((to, from) => {
-  if (from.path === '/stories') {
-    resetSettings(); 
-  }
-});
-
-  onMounted(async () => {
-      const savedSettings = sessionStorage.getItem('user-settings');
-      await fetchBackgrounds();
-      if (savedSettings) {
-        settingsStore.loadSettings();
-      } else {
-        await fetchUserSettings(userId); 
-        settingsStore.saveSettings(); 
-      }
-      saveInitialSettings(); 
-      applySettings();
-  });
-
-
 </script>
+
 
 <style scoped>
 .settings-button {

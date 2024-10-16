@@ -53,6 +53,17 @@ const admin = [
         name: 'admin-images-edit',
         component: () => import('../pages/admin/images/edit.vue'),
       },
+      // Quản lý contacts
+      {
+        path: 'contacts',
+        name: 'admin-contacts',
+        component: () => import('../pages/admin/contacts/index.vue'),
+      },
+      {
+        path: 'contacts/:id/reply',
+        name: 'admin-contacts-reply',
+        component: () => import('../pages/admin/contacts/reply.vue'),
+      },
       // Quản lý settings
       {
         path: 'settings',

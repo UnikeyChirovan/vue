@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 /* form đăng ký */
 .n-form-item .n-form-item-feedback-wrapper {
   --n-feedback-height: 8px;
@@ -11,7 +12,7 @@
     --n-padding-bottom: 5px;
     --n-padding-left: 10px;
 }
-@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
 
 @media print {
 	body {

@@ -3,7 +3,7 @@
     <div class="row">
       <!-- Avatar và thông tin cơ bản -->
       <div class="col-md-4 info-left">
-        <img class="avatar" src="../../assets/users.jpg" alt="Avatar của {{ member.name }}" />
+        <img class="avatar" src="../../assets/img/users.jpg" alt="Avatar của {{ member.name }}" />
         <div class="basic-info">
           <h3>{{ member.name }}</h3>
           <hr />

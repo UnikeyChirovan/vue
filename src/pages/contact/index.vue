@@ -144,21 +144,6 @@ const defaultForm = () => {
 };
 
 
-  // const filterContacts = () => {
-  //     axios.get('http://localhost:8000/api/noauth/contacts', {
-  //         params: {
-  //             start_date: startDate.value,
-  //             end_date: endDate.value,
-  //         }
-  //     })
-  //     .then(response => {
-  //         console.log(response.data);
-  //     })
-  //     .catch(error => {
-  //         console.error(error);
-  //     });
-  // };
-
 const getInfo = () => {
   axios.get('http://127.0.0.1:8000/api/noauth/contact')
   .then((response)=>{
