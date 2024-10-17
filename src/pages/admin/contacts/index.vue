@@ -1,7 +1,7 @@
 <template>
   <a-card title="Danh sách Liên Hệ" style="width: 100%">
     <div class="row">
-      <div class="col-12">
+      <div class="col-12 m-0 p-0">
         <a-table :dataSource="contacts" :columns="columns" :scroll="scrollOptions">
           <template #bodyCell="{ column, index, record }">
             <template v-if="column.key === 'index'">

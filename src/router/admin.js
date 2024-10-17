@@ -64,6 +64,39 @@ const admin = [
         name: 'admin-contacts-reply',
         component: () => import('../pages/admin/contacts/reply.vue'),
       },
+      // Quản lý blacklist
+      {
+        path: 'blacklists',
+        name: 'admin-blacklists',
+        component: () => import('../pages/admin/blacklists/index.vue'),
+      },
+      // {
+      //   path: 'contacts/:id/reply',
+      //   name: 'admin-contacts-reply',
+      //   component: () => import('../pages/admin/contacts/reply.vue'),
+      // },
+      // Quản lý thông tin thiết bị
+      {
+        path: 'device-infos',
+        name: 'admin-device-infos',
+        component: () => import('../pages/admin/devices/index.vue'),
+      },
+      // {
+      //   path: 'contacts/:id/reply',
+      //   name: 'admin-contacts-reply',
+      //   component: () => import('../pages/admin/contacts/reply.vue'),
+      // },
+      // Quản lý request log
+      {
+        path: 'requests',
+        name: 'admin-requests',
+        component: () => import('../pages/admin/requests/index.vue'),
+      },
+      // {
+      //   path: 'contacts/:id/reply',
+      //   name: 'admin-contacts-reply',
+      //   component: () => import('../pages/admin/contacts/reply.vue'),
+      // },
       // Quản lý settings
       {
         path: 'settings',

@@ -6,7 +6,7 @@
   >
     <a-menu-item key="admin-users">
       <RouterLink :to="{ name: 'admin-users' }">
-        <span><i class="fa-solid fa-user me-1"></i>Tài Khoản</span>
+        <span><i class="fa-solid fa-user me-1"></i>Accounts</span>
       </RouterLink>
     </a-menu-item>
     <a-menu-item key="admin-stories">
@@ -24,9 +24,24 @@
         <span><i class="fa-regular fa-paper-plane me-1"></i>Contacts</span>
       </RouterLink>
     </a-menu-item>
+    <a-menu-item key="admin-blacklists">
+      <RouterLink :to="{ name: 'admin-blacklists' }">
+        <span><i class="fa-solid fa-ban me-1"></i>Blacklists</span>
+      </RouterLink>
+    </a-menu-item>
+    <a-menu-item key="admin-device-infos">
+      <RouterLink :to="{ name: 'admin-device-infos' }">
+        <span><i class="fa-solid fa-user-tag me-1"></i>Device Infos</span>
+      </RouterLink>
+    </a-menu-item>
+    <a-menu-item key="admin-requests">
+      <RouterLink :to="{ name: 'admin-requests' }">
+        <span><i class="fa-solid fa-list-ul me-1"></i>Requests</span>
+      </RouterLink>
+    </a-menu-item>
     <a-menu-item key="admin-settings">
       <RouterLink :to="{ name: 'admin-settings' }">
-        <span><i class="fa-solid fa-gear me-1"></i>Cài Đặt</span>
+        <span><i class="fa-solid fa-gear me-1"></i>Settings</span>
       </RouterLink>
     </a-menu-item>
   </a-menu>
