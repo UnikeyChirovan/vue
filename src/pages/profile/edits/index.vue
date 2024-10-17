@@ -3,7 +3,6 @@
     <a-card title="Cập nhật Tài khoản" style="width: 100%">
       <div class="row mb-3">
         <div class="col-12 col-sm-3 mb-3">
-          <!-- Avatar Section -->
           <div class="row mb-4">
             <div class="col-12 d-flex justify-content-center mb-3">
               <div class="custom-avatar">
@@ -17,15 +16,12 @@
               </a-button>
             </div>
           </div>
-
-          <!-- Cover Section -->
           <div class="row">
             <div class="col-12 d-flex justify-content-center mb-3">
               <div class="custom-cover">
                 <img :src="coverUrl || '../../../assets/cover.jpg'" alt="Cover" class="img-cover-custom" :style="{ transform: `translateY(${coverStyle}px)` }" />
               </div>         
             </div>
-
             <div class="col-12 d-flex justify-content-center">
               <a-button type="danger" class="ms-2" @click="deleteCover">
                 <i class="fa-solid fa-trash me-2"></i>
@@ -34,8 +30,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Rest of the form fields remain unchanged -->
         <div class="col-12 col-sm-4 mb-3">
           <div
             v-for="(field, index) in formFields"
@@ -140,7 +134,6 @@
               <span>Hủy</span>
             </router-link>
           </a-button>
-
           <a-button type="primary" html-type="submit">
             <span>Lưu</span>
           </a-button>
@@ -312,7 +305,6 @@ const formFields_2 = [
 const avatarUrl = ref(null);
 const coverUrl = ref(null);
 
-// Upload URLs and Headers
 const backendUrl = "http://127.0.0.1:8000";
 const deleteAvatar = async () => {
   try {
@@ -325,7 +317,6 @@ const deleteAvatar = async () => {
   }
 };
 
-// Method to delete cover
 const deleteCover = async () => {
   try {
     await api.delete(`/link/${id}/cover`);
@@ -337,7 +328,6 @@ const deleteCover = async () => {
   }
 };
 
-// Fetch user data for editing
 const getUsersEdit = () => {
   api
     .get(`/profile/${id}/edit`)
@@ -354,8 +344,6 @@ const getUsersEdit = () => {
       users.biography = data.biography;
       users.hobbies = data.hobbies;
       users.birthday = data.birthday ? dayjs(data.birthday) : null;
-
-      // Cập nhật avatarUrl và coverUrl từ dữ liệu API
       if (data.avatar) {
         avatarUrl.value = `${backendUrl}/storage/avatars/${id}/${data.avatar}`;
       }
@@ -368,7 +356,6 @@ const getUsersEdit = () => {
     });
 };
 
-// Update user data
 const updateUsers = () => {
   const payload = { ...users };
   
@@ -399,7 +386,6 @@ const updateUsers = () => {
 };
 
 
-// Filter options for select
 const filterOption = (input, option) => {
   return option.label.toLowerCase().includes(input.toLowerCase());
 };
@@ -411,7 +397,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Các style hiện tại */
 
 .select-danger {
   border: 1px solid red;
@@ -421,13 +406,12 @@ onMounted(() => {
   border-color: red;
 }
 
-/* Custom Avatar Styles */
 .custom-avatar {
   width: 150px;
   height: 150px;
   border-radius: 50%;
   overflow: hidden;
-  border: 4px solid #4fb233; /* Màu viền tùy chỉnh */
+  border: 4px solid #4fb233; 
 }
 
 .img-avatar {
@@ -436,43 +420,41 @@ onMounted(() => {
   object-fit: cover;
 }
 
-/* Custom Cover Styles */
+
 .custom-cover {
-  width: 250px; /* Chiều rộng cố định của khung mini */
-  height: calc(250px / 2.1); /* Chiều cao được tính theo tỷ lệ 2.78:1 */
-  overflow: hidden; /* Cắt phần ảnh dư */
+  width: 250px; 
+  height: calc(250px / 2.1);
+  overflow: hidden; 
   position: relative;
   border: 4px solid #4fb233;
 }
 
 .img-cover-custom {
-  width: 100%; /* Đảm bảo ảnh chiếm toàn bộ chiều rộng */
-  object-fit: cover; /* Phóng to ảnh để lấp đầy khung */
+  width: 100%;
+  object-fit: cover; 
   position: absolute;
   top: 25%;
   left: 0;
 }
 
-/* Lớp phủ che 25% từ trên xuống và 25% từ dưới lên */
 .custom-cover::before, .custom-cover::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  height: 25%; /* Chiều cao của lớp phủ */
-  background-color: rgba(0, 0, 0, 0.3); /* Màu của lớp phủ với độ trong suốt */
-  z-index: 1; /* Đảm bảo lớp phủ nằm trên ảnh */
+  height: 25%; 
+  background-color: rgba(0, 0, 0, 0.3); 
+  z-index: 1;
 }
 
 .custom-cover::before {
-  top: 0; /* Lớp phủ từ trên xuống */
+  top: 0;
 }
 
 .custom-cover::after {
-  bottom: 0; /* Lớp phủ từ dưới lên */
+  bottom: 0; 
 }
 
-/* Thêm khoảng cách giữa các nút */
 .ms-2 {
   margin-left: 0.5rem;
 }

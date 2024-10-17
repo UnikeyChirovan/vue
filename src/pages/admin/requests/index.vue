@@ -65,6 +65,7 @@
 import { onMounted, ref, computed } from 'vue';
 import { message } from 'ant-design-vue';
 import api from '../../../services/axiosInterceptor';
+import { useMenu } from '../../../stores/use-menu';
 
 const requestLogs = ref([]);
 const isMobile = ref(window.innerWidth < 600);
@@ -203,6 +204,7 @@ onMounted(() => {
   window.addEventListener('resize', () => {
     isMobile.value = window.innerWidth < 600;
   });
+  useMenu().onSelectedKey(['admin-requests']);
 });
 </script>
 

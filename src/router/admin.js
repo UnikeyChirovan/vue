@@ -28,7 +28,7 @@ const admin = [
         component: () => import('../pages/admin/stories/index.vue'),
       },
       {
-        path: 'stories/create',
+        path: 'stories/create/:lastIndex?',
         name: 'admin-stories-create',
         component: () => import('../pages/admin/stories/create.vue'),
       },

@@ -1,12 +1,10 @@
 <template>
   <div>
-    <!-- Button to scroll down -->
     <button class="scroll-button scroll-top" @click="scrollToBottom">
-      <slot name="top-button"></slot> <!-- Slot cho nút cuộn xuống -->
+      <slot name="top-button"></slot> 
     </button>
-    <!-- Button to scroll up -->
     <button class="scroll-button scroll-bottom" @click="scrollToTop">
-      <slot name="bottom-button"></slot> <!-- Slot cho nút cuộn lên -->
+      <slot name="bottom-button"></slot> 
     </button>
   </div>
 </template>

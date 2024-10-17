@@ -1,11 +1,10 @@
-// src/store/aboutStore.js
 import { defineStore } from 'pinia';
 
 export const useAboutStore = defineStore('about', {
     state: () => ({
         teamMembers: [],
         timeline: [],
-        visionMissionValues: [], // Thay thế customerStories bằng visionMissionValues
+        visionMissionValues: [], 
     }),
     actions: {
         fetchData() {
@@ -13,7 +12,6 @@ export const useAboutStore = defineStore('about', {
                 { name: 'Phạm Hữu Hoàng Anh', position: 'Người Viết Sách' },
             ];
 
-            // Dữ liệu mẫu cho timeline
             this.timeline = [
                 { year: 2009, details: ["Những nét bút đầu tiên", "và đó là sự khởi đầu với những điều nhỏ bé..."] },
                 { year: 2010, details: ["Gõ những trang word đầu tiên", "tới khoảng giữa năm học lớp 10, tôi đã in được 2 quyển sách, bây giờ vẫn còn nhưng hơi tơi tả"] },
@@ -24,7 +22,6 @@ export const useAboutStore = defineStore('about', {
                 { year: 2025, details: ["Coming soon..."] }
             ];
 
-            // Dữ liệu mới cho Tầm nhìn, Sứ mệnh và Giá trị cốt lõi
             this.visionMissionValues = [
                 { 
                     title: 'Tầm nhìn', 

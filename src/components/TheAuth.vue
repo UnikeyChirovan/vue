@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- Nút Đăng Ký -->
     <n-button
       v-if="!auth.isLoggedIn"
       @click="showRegister = true"
@@ -10,8 +9,6 @@
     >
       <i class="fa-solid fa-user-plus me-2"></i> Đăng Ký
     </n-button>
-
-    <!-- Modal Đăng Ký -->
     <n-modal
       v-model:show="showRegister"
       class="custom-card"
@@ -33,7 +30,6 @@
             Đăng nhập ngay
           </n-button>
         </div>
-        <!-- Form đăng ký -->
         <n-form
           @submit.prevent="handleRegisterSubmit"
           v-for="(field, index) in formFields"
@@ -64,8 +60,6 @@
         </n-button>
       </div>
     </n-modal>
-
-    <!-- Nút Đăng Nhập -->
     <n-button
       v-if="!auth.isLoggedIn"
       @click="showLogin = true"
@@ -74,8 +68,6 @@
     >
       <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Đăng Nhập
     </n-button>
-
-    <!-- Modal Đăng Nhập -->
     <n-modal
       v-model:show="showLogin"
       class="custom-card"
@@ -97,7 +89,6 @@
             Đăng ký ngay
           </n-button>
         </div>
-        <!-- Form đăng nhập -->
         <n-form
           @submit.prevent="handleLoginSubmit"
           @keyup.enter="handleLoginSubmit"
@@ -240,12 +231,8 @@
 
   function handleRegisterSubmit() {
     loading.value = true;
-    
-    // Gọi API đăng ký
     axios.post('http://127.0.0.1:8000/api/auth/register', users)
       .then((res) => {
-        // console.log("user: ", users);
-        // console.log(res)
         if (res.status === 200) {
           message.success(res.data.message);
           resetRegisterForm();
@@ -254,10 +241,8 @@
       })
       .catch((err) => {
         if (err.response && err.response.status === 422) {
-          // console.log('Lỗi validation:', err.response.data.errors);
           errors.value = err.response.data.errors;
         } else {
-          // console.log('Lỗi đăng ký', err);
         }
       })
       .finally(() => {
@@ -271,7 +256,6 @@
         password: password.value,
         rememberMe: rememberMe.value,
       });
-      // console.log('dữ liệu', response)
       const accessToken = response.data.access_token;
       const user = response.data.user;
       const isAdmin = response.data.isAdmin;
@@ -281,11 +265,9 @@
       closeLoginModal();
       router.push({ name: 'home' });
     } catch (error) {
-      // console.log('Lỗi backend', error);
       if (error.response) {
         if (error.response.data && error.response.data.errors) {
           errorsLogin.value = error.response.data.errors;
-          // console.log('Lỗi chi tiết:', errorsLogin.value);
         } else {
           errorsLogin.value = {};
         }
@@ -303,8 +285,6 @@
       }
     }
   };
-
-
   function openLoginModal() {
     showRegister.value = false;
     showLogin.value = true;

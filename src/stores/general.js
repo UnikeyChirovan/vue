@@ -4,7 +4,7 @@ export const useGeneralStore = defineStore('general', {
     isPostOverlay: false,
     isCropperModal: false,
     isImageDisplay: null,
-    avatarUpdated: false, // Trạng thái avatar được cập nhật
+    avatarUpdated: false, 
   }),
   actions: {
     setAvatarUpdated(value) {

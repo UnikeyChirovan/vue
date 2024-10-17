@@ -55,7 +55,6 @@ const scrollOptions = computed(() => {
   return isMobile.value ? { x: 1200 } : { x: 576 };
 });
 
-// Định nghĩa cột cho bảng
 const columns = [
   {
     title: '#',
@@ -100,7 +99,6 @@ const columns = [
   },
 ];
 
-// Hàm lấy danh sách liên hệ từ server
 const getContacts = async () => {
   try {
     const response = await api.get('/noauth/contacts');
@@ -110,7 +108,6 @@ const getContacts = async () => {
   }
 };
 
-// Modal xác nhận xóa
 const isModalVisible = ref(false);
 const contactIdToDelete = ref(null);
 
@@ -119,7 +116,6 @@ const deleteContact = (id) => {
   isModalVisible.value = true; 
 };
 
-// Xác nhận xóa liên hệ
 const handleOk = () => {
   api
     .delete(`/noauth/contacts/${contactIdToDelete.value}`)
@@ -137,7 +133,6 @@ const handleOk = () => {
     });
 };
 
-// Hủy bỏ xóa
 const handleCancel = () => {
   isModalVisible.value = false;
 };

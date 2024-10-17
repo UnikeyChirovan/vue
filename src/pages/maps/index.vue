@@ -2,27 +2,20 @@
   <TheHeader />
   <n-layout>
     <div class="container">
-      <!-- Phần giới thiệu -->
       <div class="gioi-thieu">
         <h1>Chào Mừng Đến Với Bản Đồ Thế Giới Selorson</h1>
         <p>Selorson là một thế giới rộng lớn, huyền bí, và đầy những vùng đất chưa được khám phá. Bản đồ này sẽ giúp bạn khám phá từ toàn bộ thế giới đến những vùng đất cụ thể, mỗi vùng đều ẩn chứa những câu chuyện, nền văn hóa và truyền thuyết riêng.</p>
       </div>
-
-      <!-- Bản đồ thế giới Selorson -->
       <div class="map-container">
         <h2>Selorson World's Map</h2>
         <p>Khám phá toàn bộ thế giới Selorson từ các đỉnh núi cao nhất đến những đại dương sâu thẳm.</p>
         <img src="../../assets/img/map.jpg" alt="Bản Đồ Thế Giới Selorson" class="map-image" />
       </div>
-
-      <!-- Bản đồ Annamland -->
       <div class="map-container">
         <h2>Annamland</h2>
         <p>Annamland là một trong những vùng đất cổ xưa nhất, với những cánh rừng bí ẩn và những thành phố bị lãng quên từ lâu, của những con người chân chất và kiên cường.</p>
         <img src="../../assets/img/annamland.jpg" alt="Bản Đồ Annamland" class="map-image" />
       </div>
-
-      <!-- Bản đồ Skyland -->
       <div class="map-container">
         <h2>Bản Đồ Vùng Đất Skyland</h2>
         <p>Skyland, vùng đất trên những đám mây, nơi ở linh thiêng của các vị thần. Vùng đất này chứa đựng những bí ẩn của trời cao và phép thuật cổ xưa.</p>

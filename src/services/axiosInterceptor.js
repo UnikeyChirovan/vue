@@ -1,7 +1,6 @@
 import axios from 'axios';
-import { useAuthStore } from '../stores/auth'; // Import store Pinia để quản lý trạng thái
+import { useAuthStore } from '../stores/auth'; 
 
-// Tạo một instance mới của Axios
 const api = axios.create({
   baseURL: 'http://127.0.0.1:8000/api',
   withCredentials: true,
@@ -11,7 +10,6 @@ const api = axios.create({
   },
 });
 
-// Axios interceptor cho mỗi request
 api.interceptors.request.use(
   async (config) => {
     const authStore = useAuthStore();
@@ -20,10 +18,6 @@ api.interceptors.request.use(
       config.headers['Authorization'] = `Bearer ${authStore.accessToken}`;
     }
 
-    // if (config.headers['Content-Type'] === 'multipart/form-data') {
-    //   delete config.headers['Content-Type'];
-    // }
-
     return config;
   },
   (error) => {
@@ -31,7 +25,6 @@ api.interceptors.request.use(
   }
 );
 
-// Axios interceptor cho mỗi response
 api.interceptors.response.use(
   (response) => {
     return response;

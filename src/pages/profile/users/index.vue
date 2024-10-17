@@ -125,7 +125,6 @@
       </p>
     </div>
 
-
     <div class="skills-section card">
       <h2>Skills</h2>
       <ul class="skills-list">
@@ -220,6 +219,7 @@ const fetchProfile = async () => {
   onMounted(() => {
     useMenuProfile().onSelectedKey(['profile-info']);
     fetchProfile();
+    getLastChapter();
   });
   //
   import { h } from "vue";
@@ -228,12 +228,10 @@ import {
   Pencil, Eye, CloudUpload
 } from "@vicons/ionicons5";
 
-// Hàm render icon
 function renderIcon(icon) {
   return () => h(NIcon, null, { default: () => h(icon) });
 }
 
-// Khai báo các tùy chọn của dropdown
 const options = [
   {
     label: "Coi Hình",
@@ -252,13 +250,11 @@ const options = [
   }
 ];
 
-// Biến reactive
 
 const uploadHeaders = {
   Authorization: `Bearer ${authStore.accessToken}`,
 };
 
-//cover
 const dragging = ref(false); 
 let startY = 0;
 let originalCoverPosition = 0;
@@ -272,7 +268,7 @@ const coverPosition = computed({
     return cover_position.value;
   },
   set(value) {
-    cover_position.value = value; // Cập nhật vị trí từ slider
+    cover_position.value = value;
     coverStyle.value.transform = `translateY(${cover_position.value}px)`;
   },
 });
@@ -322,17 +318,15 @@ const cancelDrag = () => {
   stopDrag();
   message.info('Thao tác kéo đã bị hủy và vị trí đã được khôi phục.');
 };
-const newCoverFile = ref(null); // Sử dụng ref để theo dõi tệp hình ảnh
+const newCoverFile = ref(null); 
 
-// Hàm lưu hình mới và vị trí cover
 const handleUpload = ({ file }) => {
   const reader = new FileReader();
   reader.onload = (event) => {
     newCoverUrl.value = event.target.result;
             // console.log('New cover URL set:', newCoverUrl.value);
   };
-  // Lưu trữ file gốc để sử dụng sau
-  newCoverFile.value = file.file; // Lưu tệp gốc
+  newCoverFile.value = file.file; 
   reader.readAsDataURL(file.file);
 };
 
@@ -412,6 +406,16 @@ const saveEditedCover = () => {
   });
 };
 
+const getLastChapter = () => {
+  api.get(`/story/user-chapter/${id}`)
+    .then(() => {
+      console.log('Fetch successful');
+    })
+    .catch(error => {
+      console.error('Error fetching the chapter:', error);
+    });
+};
+
 
 onBeforeUnmount(() => {
   window.removeEventListener('mousemove', onDrag);
@@ -451,7 +455,6 @@ onBeforeUnmount(() => {
       }
     }
 
-    /* Nút chỉnh sửa cover */
     .edit-cover-btn {
       position: absolute;
       top: 10px;
@@ -473,7 +476,7 @@ onBeforeUnmount(() => {
     height: 200px;
     border-radius: 50%;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
-    z-index: 10;
+    z-index: 9;
 
     .avatar-img {
       width: 100%;
@@ -498,7 +501,6 @@ onBeforeUnmount(() => {
     }
   }
 
-  /* User Info Section */
   .user-info {
     text-align: center;
     padding: 10px 20px 20px;
@@ -559,7 +561,6 @@ onBeforeUnmount(() => {
     }
   }
 
-  /* About Section */
   .about-section {
     margin: 20px 0;
     padding: 20px;
@@ -573,7 +574,6 @@ onBeforeUnmount(() => {
     }
   }
 
-  /* Skills Section */
   .skills-section {
     margin: 20px 0;
     padding: 20px;
@@ -624,7 +624,6 @@ onBeforeUnmount(() => {
     }
   }
 
-  /* Portfolio Section */
   .portfolio-section {
     margin: 20px 0;
     padding: 20px;
@@ -669,7 +668,7 @@ onBeforeUnmount(() => {
     }
   }
 
-  /* Footer Section */
+
   .footer {
     text-align: center;
     padding: 10px 0;
@@ -682,7 +681,7 @@ onBeforeUnmount(() => {
   }
 }
 
-/* Cover Edit */
+
 .custom-cover {
   width: 100%;
   height: auto;
@@ -704,7 +703,7 @@ onBeforeUnmount(() => {
   }
 }
 
-/* Upload and Save Buttons */
+
 .upload-container {
   position: absolute;
   top: 10px;
@@ -724,7 +723,7 @@ onBeforeUnmount(() => {
   max-width: 30%;
 }
 
-/* Slider */
+
 .slider-container {
   position: absolute;
   right: 20px;

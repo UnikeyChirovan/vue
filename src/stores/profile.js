@@ -4,7 +4,7 @@ import { ref } from 'vue';
 export const useProfileStore = defineStore('profile', () => {
   const avatarUrl = ref('');
   const coverUrl = ref('');
-  const cover_position = ref(0); // Dùng để lưu vị trí cover
+  const cover_position = ref(0); 
   const users = ref({});
   const backendUrl = "http://127.0.0.1:8000";
 

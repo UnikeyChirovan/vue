@@ -250,7 +250,13 @@ const saveSettings = async () => {
       storyContainer.style.backgroundColor = '';
       storyContainer.style.backgroundImage = '';
     };
+    const resetImg = () => {
+      backgroundImageContainer.style.backgroundImage = 'none';
+    }
     if(route.path==='/stories'){
+      if (settings.selectedBackground === 'none') {
+        reset();
+      } else
           switch (screenMode.value) {
       case 'full':
         reset();

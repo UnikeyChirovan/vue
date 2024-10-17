@@ -60,18 +60,12 @@ const submitForm = async () => {
       message: responseMessage.value,
     };
     const response = await api.post('/noauth/reply-email', formData);
-
-    // Thành công, lưu trạng thái vào sessionStorage
     sessionStorage.setItem(`replyStatus-${route.params.id}`, 'success');
-
     messagenaive.success(response.data.message);
     router.push({ name: 'admin-contacts' });
   } catch (error) {
     console.error(error);
-
-    // Thất bại, lưu trạng thái vào sessionStorage
     sessionStorage.setItem(`replyStatus-${route.params.id}`, 'error');
-
     messagenaive.error('Phản hồi không thành công!');
   }
 };

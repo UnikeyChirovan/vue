@@ -4,23 +4,18 @@
       <div class="col-12">
         <a-table :dataSource="blacklist" :columns="columns" :scroll="scrollOptions">
           <template #bodyCell="{ column, index, record }">
-            <!-- Hiển thị chỉ số -->
             <template v-if="column.key === 'index'">
               <span>{{ index + 1 }}</span>
             </template>
-            <!-- Hiển thị địa chỉ IP -->
             <template v-if="column.key === 'ip_address'">
               <span>{{ record.ip_address }}</span>
             </template>
-            <!-- Hiển thị thông tin user agent -->
             <template v-if="column.key === 'user_agent'">
               <span>{{ record.user_agent }}</span>
             </template>
-            <!-- Hiển thị lý do -->
             <template v-if="column.key === 'reason'">
               <span>{{ record.reason }}</span>
             </template>
-            <!-- Hiển thị công cụ xóa -->
             <template v-if="column.key === 'action'">
               <a-button type="primary" danger @click="confirmDelete(record.id)">
                 <i class="fa-solid fa-trash"></i> Xóa
@@ -30,7 +25,6 @@
         </a-table>
       </div>
     </div>
-    <!-- Modal xác nhận xóa -->
     <a-modal
       v-model:visible="isModalVisible"
       title="Xác nhận xóa"
@@ -41,19 +35,16 @@
     </a-modal>
   </a-card>
 </template>
-
 <script setup>
 import { onMounted, ref, computed } from 'vue';
 import { message } from 'ant-design-vue';
 import api from '../../../services/axiosInterceptor';
-
+import { useMenu } from '../../../stores/use-menu';
 const blacklist = ref([]);
 const isMobile = ref(window.innerWidth < 600);
 const scrollOptions = computed(() => {
   return isMobile.value ? { x: 1200 } : { x: 576 };
 });
-
-// Cấu hình cột cho bảng
 const columns = [
   {
     title: '#',
@@ -85,11 +76,8 @@ const columns = [
     align: 'center',
   },
 ];
-
 const isModalVisible = ref(false);
 const idToDelete = ref(null);
-
-// Lấy danh sách blacklist từ API
 const getBlacklist = async () => {
   try {
     const response = await api.get('/users/blacklist');
@@ -101,45 +89,37 @@ const getBlacklist = async () => {
     }
   }
 };
-
-// Hàm xác nhận xóa
 const confirmDelete = (id) => {
   idToDelete.value = id;
   isModalVisible.value = true;
 };
-
-// Hàm xử lý xóa blacklist
 const handleDelete = () => {
   api
     .delete(`users/blacklist/${idToDelete.value}`)
     .then((res) => {
       if (res.status === 204) {
         message.success('Xóa blacklist thành công');
-        getBlacklist();  // Cập nhật lại danh sách blacklist
+        getBlacklist(); 
       }
     })
     .catch((err) => {
       message.error('Lỗi khi xóa');
     })
     .finally(() => {
-      isModalVisible.value = false; // Đóng modal
+      isModalVisible.value = false; 
     });
 };
-
-// Hủy xóa
 const handleCancel = () => {
-  isModalVisible.value = false; // Đóng modal
+  isModalVisible.value = false;
 };
-
-// Khi component được khởi tạo
 onMounted(() => {
   getBlacklist();
   window.addEventListener('resize', () => {
     isMobile.value = window.innerWidth < 600;
   });
+  useMenu().onSelectedKey(['admin-blacklists']);
 });
 </script>
-
 <style scoped>
 .container {
   max-width: 800px;

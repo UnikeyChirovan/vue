@@ -48,11 +48,11 @@ const handleSubmit = async () => {
             password: password.value,
             password_confirmation: password_confirmation.value
         });
-        console.log('Response:', response.data); // Log phản hồi từ server
+        // console.log('Response:', response.data); 
         message.success(response.data.message);
         router.push({ name: 'home' });
     } catch (error) {
-        console.error('Error:', error); // Log lỗi nhận được từ server
+        // console.error('Error:', error); 
         if (error.response && error.response.data && error.response.data.message) {
             message.error(error.response.data.message);
         } else {
