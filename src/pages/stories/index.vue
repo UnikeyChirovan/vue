@@ -82,6 +82,7 @@
       <a-button type="primary"><i class="fa-solid fa-arrow-up"></i></a-button>
     </template>
   </ScrollButtons>
+  <TheFooter/>
 </template>
 
 <script setup>
@@ -92,6 +93,7 @@ import TheHeader from '../../components/TheHeader.vue';
 import api from '../../services/axiosInterceptor';
 import SettingsModal from '../../components/SettingsModal.vue';
 import ScrollButtons from '../../components/ScrollButtons.vue';
+import TheFooter from '../../components/TheFooter.vue';
 
 const chapterStore = useChapterStore();
 const storyName = ref('');

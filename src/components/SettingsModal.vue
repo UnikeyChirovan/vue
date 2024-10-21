@@ -327,7 +327,7 @@ const saveSettings = async () => {
 
     parentComponent.style.color = settings.mode === 'night' ? '#ffffff' : '#000000';
     saveSettings();
-    console.log('hình ảnh', settings.backgroundImage)
+    // console.log('hình ảnh', settings.backgroundImage)
     showModal.value = false;
   };
 
@@ -353,7 +353,7 @@ const saveSettings = async () => {
         backgroundStoryId: background.id,
       }));
     } catch (error) {
-      console.error('Lỗi khi lấy danh sách hình nền:', error);
+      // console.error('Lỗi khi lấy danh sách hình nền:', error);
     } 
   };
   const handleBackgroundSelection = (selectedValue) => {

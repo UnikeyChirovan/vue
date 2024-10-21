@@ -14,9 +14,9 @@
         <router-view></router-view>
       </div>
     </div>
-    <div class="row">
+    <!-- <div class="row">
       <div class="col-12 footer">Footer</div>
-    </div>
+    </div> -->
   </div>
   <CropperModal
     v-if="isCropperModal"
@@ -26,6 +26,7 @@
   <ImageDisplay
     v-if="isImageDisplay"
   />
+  <TheFooter/>
 </template>
 
 <script setup>
@@ -35,14 +36,11 @@ const useGeneral = useGeneralStore();
 const { isCropperModal, isImageDisplay } = storeToRefs(useGeneral);
 
 import TheHeader from '../components/TheHeader.vue';
+import TheFooter from '../components/TheFooter.vue';
 import TheMenuProfile from '../components/TheMenuProfile.vue';
 import CropperModal from '../components/CropperModal.vue';
 import ImageDisplay from '../components/ImageDisplay.vue';
 </script>
 
 <style>
-  .footer {
-    background-color: lightcoral;
-    box-sizing: border-box;
-  }
 </style>

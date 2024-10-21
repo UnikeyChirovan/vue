@@ -64,12 +64,14 @@
 
     </div>
   </div>
+  <TheFooter/>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, nextTick } from 'vue';
 import CKEditor from '../../components/CKEditor.vue';
 import TheHeader from '../../components/TheHeader.vue';
+import TheFooter from '../../components/TheFooter.vue';
 import axios from 'axios';
 import { useMessage } from 'naive-ui';
 const messagenaive = useMessage();
@@ -134,7 +136,7 @@ const defaultForm = () => {
 
   axios.post('http://127.0.0.1:8000/api/noauth/contact', formData)
     .then(response => {
-      console.log(response)
+      // console.log(response)
       messagenaive.success(response.data.message)
       defaultForm();
     })
@@ -147,7 +149,7 @@ const defaultForm = () => {
 const getInfo = () => {
   axios.get('http://127.0.0.1:8000/api/noauth/contact')
   .then((response)=>{
-    console.log(response)
+    // console.log(response)
     webInfo.value = response.data
   })
   .catch((err)=>{

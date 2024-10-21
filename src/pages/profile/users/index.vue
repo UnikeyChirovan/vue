@@ -161,11 +161,6 @@
         </div>
       </div>
     </div>
-
-
-    <div class="footer">
-      <p>&copy; 2024 John Doe. All rights reserved.</p>
-    </div>
   </div>
 </template>
 
@@ -669,16 +664,6 @@ onBeforeUnmount(() => {
   }
 
 
-  .footer {
-    text-align: center;
-    padding: 10px 0;
-    background-color: #282c34;
-    color: #fff;
-
-    p {
-      margin: 0;
-    }
-  }
 }
 
 

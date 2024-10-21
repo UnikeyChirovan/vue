@@ -11,10 +11,12 @@
     
     <!-- <FAQ /> -->
   </div>
+  <TheFooter/>
 </template>
 
 <script setup>
 import TheHeader from '../../components/TheHeader.vue';
+import TheFooter from '../../components/TheFooter.vue';
 import { useAboutStore } from '../../stores/aboutStore';
 import AboutImage from '../../components/about/AboutImage.vue';
 import TeamMember from '../../components/about/TeamMember.vue';
