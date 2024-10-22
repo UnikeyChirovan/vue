@@ -11,7 +11,8 @@
     <button class="prev-btn" @click="prevSlide">Prev</button>
     <button class="next-btn" @click="nextSlide">Next</button>
   </section>
-<section class="feature-section" ref="featureSection" data-aos="fade-up">
+  <Notification/>
+  <section class="feature-section" ref="featureSection" data-aos="fade-up">
     <h2 class="feature-section-title">Dấu Ấn Hôm Nay</h2>
     <div class="feature-grid">
       <div 
@@ -31,23 +32,22 @@
         </n-icon>
         <h3 class="feature-title">{{ feature.title }}</h3>
         <p class="feature-description">{{ feature.description }}</p>
-<p v-if="voteResults.totalVotes > 0" class="feature-percentage">
-  {{ (Math.round((voteResults.votesByChoice[index + 1] || 0) / voteResults.totalVotes * 100 * 100) / 100).toFixed(2).replace(/\.00$/, '') }}%
-</p>
+        <p v-if="voteResults.totalVotes > 0" class="feature-percentage">
+          {{ (Math.round((voteResults.votesByChoice[index + 1] || 0) / voteResults.totalVotes * 100 * 100) / 100).toFixed(2).replace(/\.00$/, '') }}%
+        </p>
       </div>
     </div>
   </section>
-<section class="future-projects-section" data-aos="fade-in">
-  <h2 class="future-projects-title">Dự Án Tương Lai</h2>
-  <div class="future-projects-carousel">
-    <div class="future-project-item" v-for="project in futureProjects" :key="project.name">
-      <h3 class="future-project-name">{{ project.name }}</h3>
-      <span class="future-project-timeline">Dự kiến: {{ project.timeline }}</span>
-      <p class="future-project-description">{{ project.description }}</p>
+  <section class="future-projects-section" data-aos="fade-in">
+    <h2 class="future-projects-title">Dự Án Tương Lai</h2>
+    <div class="future-projects-carousel">
+      <div class="future-project-item" v-for="project in futureProjects" :key="project.name">
+        <h3 class="future-project-name">{{ project.name }}</h3>
+        <span class="future-project-timeline">Dự kiến: {{ project.timeline }}</span>
+        <p class="future-project-description">{{ project.description }}</p>
+      </div>
     </div>
-  </div>
-</section>
-
+  </section>
   <section class="video-section" data-aos="zoom-in">
     <h2 class="section-title">Cho Lần Đầu Gặp Gỡ</h2>
     <div class="video-container">
@@ -74,6 +74,7 @@ import {Rocket} from '@vicons/ionicons5';
 import { useMessage } from 'naive-ui';
 import { useAuthStore } from '../../stores/auth';
 import { useVoteStore } from '../../stores/vote';
+import Notification from '../../components/Notification.vue';
 const voteStore = useVoteStore(); 
 const authStore = useAuthStore();
 const message = useMessage();
@@ -255,6 +256,7 @@ body {
   color: white;
   text-align: center;
   transition: background-image 1s ease-in-out;
+  margin-bottom: 0px;
 }
 
 .hero-overlay {
@@ -385,7 +387,7 @@ p.feature-percentage {
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
   margin-bottom: 0px;
   bottom: 10px;
-  left: 50%; /* Căn giữa */
+  left: 50%; 
   transform: translateX(-50%);
 }
 

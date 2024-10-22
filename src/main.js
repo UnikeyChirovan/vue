@@ -65,6 +65,9 @@ import {
   NSelect,
   NDataTable,
   NConfigProvider,
+  NCarousel,
+  NAlert,
+  NCarouselItem,
 } from 'naive-ui';
 import App from './App.vue';
 
@@ -113,6 +116,9 @@ const naive = create({
     NDataTable,
     NConfigProvider,
     NEllipsis,
+    NCarousel,
+    NCarouselItem,
+    NAlert,
   ],
 });
 

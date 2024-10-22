@@ -5,6 +5,22 @@ const admin = [
     component: () => import('../layouts/admin.vue'),
     meta: { requiresAuth: true },
     children: [
+      // Quản Lý NewsLetters
+      {
+        path: 'news',
+        name: 'admin-news',
+        component: () => import('../pages/admin/news/index.vue'),
+      },
+      {
+        path: 'news/create',
+        name: 'admin-news-create',
+        component: () => import('../pages/admin/news/create.vue'),
+      },
+      {
+        path: 'news/:id/edit',
+        name: 'admin-news-edit',
+        component: () => import('../pages/admin/news/edit.vue'),
+      },
       // Quản Lý Users
       {
         path: 'users',
@@ -20,6 +36,17 @@ const admin = [
         path: 'users/:id/edit',
         name: 'admin-users-edit',
         component: () => import('../pages/admin/users/edit.vue'),
+      },
+      // Quản Lý Gửi Mail Đăng Ký
+      {
+        path: 'infos',
+        name: 'admin-infos',
+        component: () => import('../pages/admin/infos/index.vue'),
+      },
+      {
+        path: 'infos/create',
+        name: 'admin-infos-create',
+        component: () => import('../pages/admin/infos/create.vue'),
       },
       // Quản lý stories
       {

@@ -75,10 +75,12 @@
                 </n-space>
               </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3 newsletter-form">
               <h5 class="text-uppercase text-white">Đăng Ký Nhận Tin</h5>
-              <n-input placeholder="Nhập email của bạn" />
-              <n-button type="primary" class="mt-2">Đăng ký</n-button>
+              <form @submit.prevent="subscribeToNewsletter">
+                <input v-model="email" placeholder="Nhập email của bạn" class="newsletter-input" />
+                <button type="submit" class="newsletter-button mt-2">Đăng ký</button>
+              </form>
             </div>
           </div>
         </div>
@@ -99,6 +101,8 @@ import { Star, Rocket } from '@vicons/ionicons5';
 import Handshake20Filled from '@vicons/fluent/Handshake20Filled';
 import Sigma from '@vicons/carbon/Sigma';
 import api from '../services/axiosInterceptor'; 
+import { useMessage } from 'naive-ui';
+const message = useMessage();
 
 const voteResults = ref({
   votesByChoice: {}
@@ -118,6 +122,22 @@ const getVoteResults = async () => {
     totalVotes.value = response.data.total_users_voted || 0;
   } catch (error) {
     console.error('Lỗi khi lấy kết quả vote:', error);
+  }
+};
+const email = ref('');
+
+const subscribeToNewsletter = async () => {
+  if (!email.value) {
+    message.warning('Vui lòng nhập email');
+    return;
+  }
+
+  try {
+    const response = await api.post('/newsletter/subscribe', { email: email.value });
+    message.success(response.data.success);
+    email.value = '';
+  } catch (error) {
+    message.error(error.response.data.error || 'Có lỗi xảy ra!');
   }
 };
 
@@ -144,6 +164,38 @@ a:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.newsletter-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  color: black; 
+}
+
+.newsletter-input::placeholder {
+  color: #999;
+}
+
+.newsletter-button {
+  max-width: 50%;
+  background-color: #28a745; 
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.newsletter-button:hover {
+  background-color: #218838; 
+}
+
+.mt-2 {
+  margin-top: 10px;
 }
 
 

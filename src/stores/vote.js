@@ -10,7 +10,6 @@ export const useVoteStore = defineStore('vote', {
     async getUserVote() {
       try {
         const response = await api.get('/vote/getUserVote');
-        console.log('kết quả get vote:', response)
         if (response.data.vote) {
           this.userVoteChoice = parseInt(response.data.vote.choice);
         }

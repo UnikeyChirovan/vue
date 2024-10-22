@@ -9,6 +9,16 @@
         <span><i class="fa-solid fa-user me-1"></i>Accounts</span>
       </RouterLink>
     </a-menu-item>
+    <a-menu-item key="admin-news">
+      <RouterLink :to="{ name: 'admin-news' }">
+        <span><i class="fa-solid fa-bell me-1"></i> Notification</span>
+      </RouterLink>
+    </a-menu-item>
+    <a-menu-item key="admin-infos">
+      <RouterLink :to="{ name: 'admin-infos' }">
+        <span><i class="fa-solid fa-envelope me-1"></i>Newsletters</span>
+      </RouterLink>
+    </a-menu-item>
     <a-menu-item key="admin-stories">
       <RouterLink :to="{ name: 'admin-stories' }">
         <span><i class="fa-solid fa-tag me-1"></i>Chapters</span>
