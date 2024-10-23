@@ -1,5 +1,6 @@
 <template>
   <div class="container-fluid team-member-container">
+    <div class="title-text"><h2 class="text-uppercase">Một Chút Về Selorson Tales</h2></div>
     <div class="row">
       <!-- Avatar và thông tin cơ bản -->
       <div class="col-md-4 info-left">
@@ -132,6 +133,7 @@ const formattedIntroduction = `
 <style scoped>
 /* Container setup */
 .team-member-container {
+  margin-top: 0px;
   padding: 40px 20px;
   background-color: #f8f9fa;
 }
@@ -216,6 +218,12 @@ hr {
 }
 
 
+.title-text {
+  margin-top: 0px; 
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+}
 
 /* Animation for text from right */
 @keyframes slideInFromRight {

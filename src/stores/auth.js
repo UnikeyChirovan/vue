@@ -32,6 +32,7 @@ export const useAuthStore = defineStore('auth', {
         this.user = null;
         this.accessToken = null;
         localStorage.clear();
+        sessionStorage.clear(); 
         router.push({ name: 'home' });
       } catch (error) {
         console.error('Đăng xuất thất bại:', error);
@@ -46,6 +47,7 @@ export const useAuthStore = defineStore('auth', {
         this.user = null;
         this.accessToken = null;
         localStorage.clear();
+        sessionStorage.clear(); 
         router.push({ name: 'home' });
       } catch (error) {
         console.log(error)

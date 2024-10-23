@@ -99,7 +99,7 @@ onBeforeUnmount(() => {
 }
 
 .section-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: bold;
   color: #2c3e50;
   margin-bottom: 30px;

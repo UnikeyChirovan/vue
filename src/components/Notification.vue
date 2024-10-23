@@ -5,7 +5,7 @@
         <button class="control-button h-90" @click="prevNotification">Trước</button>
       </div>
       <div class="col-12 col-md-10">
-        <h2 class="notification-title">Theo Dòng Sự Kiện</h2>
+        <h2 class="notification-title text-uppercase">Theo Dòng Sự Kiện</h2>
         <div class="carousel">
           <div class="carousel-item" v-for="(notification, index) in notifications" :key="notification.id" :class="{ active: index === currentIndex }">
             <div class="notification-content" v-if="currentNotification">
@@ -101,7 +101,7 @@ onMounted(() => {
 .notification-container {
   width: 100%;
   margin: auto;
-  background-color: rgba(220, 197, 223, 0.6);
+  background-color: #D2E9E9;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
   margin-top: 0;
@@ -113,7 +113,7 @@ onMounted(() => {
   text-align: center;
   color: #2c3e50;
   margin-bottom: 10px;
-  font-size: 2.5rem;
+  font-size: 2rem;
 }
 
 .carousel {

@@ -12,8 +12,27 @@
     <button class="next-btn" @click="nextSlide">Next</button>
   </section>
   <Notification/>
-  <section class="feature-section" ref="featureSection" data-aos="fade-up">
-    <h2 class="feature-section-title">Dấu Ấn Hôm Nay</h2>
+  <section class="future-projects-section" ref="futureSection" data-aos="fade-in">
+    <h2 class="future-projects-title text-uppercase">Dự Án Tương Lai</h2>
+    <div class="future-projects-carousel">
+      <div class="future-project-item" v-for="project in futureProjects" :key="project.name">
+        <h3 class="future-project-name">{{ project.name }}</h3>
+        <span class="future-project-timeline">Dự kiến: {{ project.timeline }}</span>
+        <p class="future-project-description">{{ project.description }}</p>
+      </div>
+    </div>
+  </section>
+  <section class="video-section" data-aos="zoom-in">
+    <h2 class="section-title text-uppercase">Cho Lần Đầu Gặp Gỡ</h2>
+    <div class="video-container">
+      <video controls>
+        <source src="#!" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </section>
+    <section class="feature-section" data-aos="fade-up">
+    <h2 class="feature-section-title text-uppercase">Dấu Ấn Hôm Nay</h2>
     <div class="feature-grid">
       <div 
         class="feature-item" 
@@ -30,31 +49,12 @@
         <n-icon size="64" :class="feature.iconClass">
           <component :is="feature.icon" />
         </n-icon>
-        <h3 class="feature-title">{{ feature.title }}</h3>
+        <h3 class="feature-title ">{{ feature.title }}</h3>
         <p class="feature-description">{{ feature.description }}</p>
         <p v-if="voteResults.totalVotes > 0" class="feature-percentage">
           {{ (Math.round((voteResults.votesByChoice[index + 1] || 0) / voteResults.totalVotes * 100 * 100) / 100).toFixed(2).replace(/\.00$/, '') }}%
         </p>
       </div>
-    </div>
-  </section>
-  <section class="future-projects-section" data-aos="fade-in">
-    <h2 class="future-projects-title">Dự Án Tương Lai</h2>
-    <div class="future-projects-carousel">
-      <div class="future-project-item" v-for="project in futureProjects" :key="project.name">
-        <h3 class="future-project-name">{{ project.name }}</h3>
-        <span class="future-project-timeline">Dự kiến: {{ project.timeline }}</span>
-        <p class="future-project-description">{{ project.description }}</p>
-      </div>
-    </div>
-  </section>
-  <section class="video-section" data-aos="zoom-in">
-    <h2 class="section-title">Cho Lần Đầu Gặp Gỡ</h2>
-    <div class="video-container">
-      <video controls>
-        <source src="#!" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
     </div>
   </section>
   <TheFooter/>
@@ -175,9 +175,9 @@ const handleButtonClick = () => {
   }
 }; 
 
-const featureSection = ref(null);
+const futureSection = ref(null);
 const scrollToFeatures = () => {
-  featureSection.value.scrollIntoView({ behavior: 'smooth' });
+  futureSection.value.scrollIntoView({ behavior: 'smooth' });
 };
 const goToContacts = () => {
    router.push({ name: 'contact' });
@@ -265,7 +265,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: #C4DFDF;
 }
 
 .hero-content {
@@ -290,6 +290,7 @@ body {
 
 .hero-description {
   font-size: 1.8rem;
+  color: #804F37;
   margin-bottom: 30px;
   line-height: 1.5;
 }
@@ -321,8 +322,8 @@ body {
 }
 
 .feature-section {
-  padding: 100px 50px;
-  background-color: #f5f7fa;
+  padding: 40px 50px;
+  background-color: #F8F6F4;
   text-align: center;
 }
 
@@ -344,7 +345,7 @@ body {
 }
 
 .feature-section-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   margin-bottom: 50px;
   color: #34495e;
 }
@@ -393,13 +394,13 @@ p.feature-percentage {
 
 
 .future-projects-section {
-  padding: 80px 50px;
-  background-color: #e8f1f2;
+  padding: 40px 50px;
+  background-color: #E3F4F4;
   text-align: center;
 }
 
 .future-projects-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   margin-bottom: 50px;
   color: #34495e;
 }
@@ -446,28 +447,30 @@ p.feature-percentage {
 
 
 .section-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   margin-bottom: 50px;
   color: #34495e;
   text-align: center;
 }
 
 .video-section {
-  position: relative;
-  height: 400px;
-  overflow: hidden;
+  padding: 40px 50px;
+  background-color: #e8f1f2;
 }
 
 .video-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  height: 100%;
 }
 
 video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 50%; /* Hoặc tùy chỉnh kích thước video */
+  height: auto;
+  object-fit: cover; /* Giữ tỉ lệ của video */
 }
+
 
 n-button {
   transition: all 0.3s ease;

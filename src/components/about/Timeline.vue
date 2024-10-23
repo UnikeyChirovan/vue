@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h2 class="text-center">Đôi Dòng Lịch Sử</h2>
+    <h2 class="text-center text-uppercase mt-3">Đôi Dòng Lịch Sử</h2>
     <p class="text-center mb-4">
      Ngót nghét cũng 15 năm kể từ khi tập tành viết những dòng đầu tiên, nơi đây chứa đựng khao khát đam mê của tuổi trẻ, và nỗi đau, niềm vui, niềm hi vọng lúc trưởng thành.
     </p>
@@ -82,7 +82,7 @@ const nextPage = () => {
 }
 
 h2 {
-  font-size: 24px;
+  font-size: 2rem;
   font-weight: bold;
   margin-bottom: 16px;
 }

@@ -61,16 +61,16 @@
               <div class="col-12 text-md-right mt-2">
                 <n-space style="display: flex; justify-content: space-between;">
                   <n-button ghost text>
-                    <i class="fab fa-facebook-f" style="font-size: 30px; color: #1877F2;"></i>
+                    <i class="fab fa-facebook-f" style="font-size: 20px; color: #1877F2;"></i>
                   </n-button>
                   <n-button ghost text>
-                    <i class="fab fa-twitter" style="font-size: 30px; color: #1DA1F2;"></i>
+                    <i class="fab fa-twitter" style="font-size: 20px; color: #1DA1F2;"></i>
                   </n-button>
                   <n-button ghost text>
-                    <i class="fab fa-instagram" style="font-size: 30px; background: radial-gradient(circle at 30% 30%, #F58529, #DD2A7B, #8134AF, #515BD4); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                    <i class="fab fa-instagram" style="font-size: 20px; background: radial-gradient(circle at 30% 30%, #F58529, #DD2A7B, #8134AF, #515BD4); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
                   </n-button>
                   <n-button ghost text>
-                    <i class="fab fa-youtube" style="font-size: 30px; color: #FF0000;"></i>
+                    <i class="fab fa-youtube" style="font-size: 20px; color: #FF0000;"></i>
                   </n-button>
                 </n-space>
               </div>

@@ -42,7 +42,7 @@
         </n-icon-wrapper>
       </template></n-slider>
     </n-space>
-
+    <n-button @click="cancelChange" class="cancel-button" type="error">Hủy</n-button>
     <n-button @click="saveNewCover" class="save-button" type="info">Lưu</n-button>
   </div>
   <div class="cover-edit" v-if="showEdit">
@@ -52,6 +52,7 @@
     <n-space class="slider-container">
       <n-slider v-model:value="coverPosition" :min="-1000" :max="0" vertical />
     </n-space>
+    <n-button @click="cancelEdit" class="cancel-button" type="error">Hủy</n-button>
     <n-button @click="saveEditedCover" class="save-button" type="info">Lưu</n-button>
   </div>
 
@@ -352,6 +353,17 @@ const saveNewCover = () => {
     // console.error('Error saving new cover:', error);
     message.error('Lưu hình cover thất bại!');
   });
+};
+const cancelChange = () => {
+  showChange.value = false;
+  newCoverUrl.value = null; // Xóa hình ảnh mới đã chọn
+  message.info('Đã hủy thao tác thay đổi hình cover.');
+};
+
+const cancelEdit = () => {
+  showEdit.value = false;
+  cover_position.value = originalCoverPosition; // Đặt lại vị trí cover ban đầu
+  message.info('Đã hủy thao tác chỉnh sửa hình cover.');
 };
 
 
@@ -702,10 +714,18 @@ onBeforeUnmount(() => {
 
 .save-button {
   position: absolute;
-  bottom: 10px;
-  right: 50px;
-  width: 20%;
-  max-width: 30%;
+  bottom: 3.5rem;
+  right: 3rem;
+  width: 15%;
+  max-width: 20%;
+}
+
+.cancel-button {
+  position: absolute;
+  bottom: 1rem;
+  right: 3rem;
+  width: 15%;
+  max-width: 20%;
 }
 
 

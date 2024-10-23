@@ -3,7 +3,7 @@
   <div class="container mt-5">
     <div class="row">
       <div class="col-md-8">
-        <h1 class='text-center' style="color: red;">TRANG LIÊN HỆ QUẢN TRỊ</h1>
+        <h2 class="title">TRANG LIÊN HỆ QUẢN TRỊ</h2>
         <form @submit.prevent="submitForm" class="mt-4" style="position: relative;">
             <div class="row">
               <div class="col-12">
@@ -31,12 +31,12 @@
               </div>
             </div>
             <div class="button-submit">
-              <button type="submit" class="btn btn-primary">Gửi</button>
+              <button type="submit" class="btn btn-primary">Gởi</button>
             </div>
           </form>
       </div>
         <div class="col-md-4">
-          <h1 class="text-center mb-3" style="color: red;">{{ webInfo.webname }}</h1>
+          <h2 class="title mb-3">{{ webInfo.webname }}</h2>
           <div class="contact-info mt-4">
             <p><strong>Địa chỉ:</strong> {{ webInfo.address }}</p>
             <p><strong>Điện thoại:</strong> {{ webInfo.phone }}</p>
@@ -166,9 +166,7 @@ const getInfo = () => {
 } */
 input {
   min-width: 40%;
-  /* border-radius: 5px; */
   border: none;
-  /* border-right: 2px solid #000;  */
   border-bottom: 2px solid #000; 
 }
 
@@ -176,6 +174,11 @@ input {
   position: absolute;
   bottom: 10px; 
   right: 30px;   
+}
+.title {
+  text-align: center;
+  color: red;
+  font-size: 2rem;
 }
 
 </style>

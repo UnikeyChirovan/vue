@@ -48,32 +48,22 @@
           </span>
         </div>
 
-        <n-form-item label="Font chữ">
-          <i class="fa fa-font me-2"></i>
-          <n-select v-model:value="fontFamily" :options="fontOptions" />
-        </n-form-item>
-
-        <n-form-item label="Cỡ chữ">
-          <i class="fa fa-text-height me-2"></i>
-          <n-slider v-model:value="fontSize" :min="12" :max="30" />
-        </n-form-item>
-
         <n-form-item label="Hình nền">
-          <n-select v-model:value="selectedBackground" :options="backgroundOptions" @update:value="handleBackgroundSelection" />
+          <n-select v-model:value="selectedBackground" :options="backgroundOptions" @update:value="handleBackgroundSelection" :disabled="mode === 'night'" />
         </n-form-item>
 
         <div class="row m-0 p-0">
           <div class="col-12 col-md-6">
             <n-form-item label="Kiểu nền">
-              <n-radio-group v-model:value="backgroundStyle">
+              <n-radio-group v-model:value="backgroundStyle" :disabled="mode === 'night'">
                 <n-radio label="Đơn sắc" value="solid">Đơn sắc</n-radio>
                 <n-radio label="Dải màu" value="gradient">Dải màu</n-radio>
               </n-radio-group>
             </n-form-item>
-            <n-form-item v-if="backgroundStyle === 'solid'" label="Màu nền">
-              <n-color-picker v-model:value="backgroundColor" />
+            <n-form-item v-if="backgroundStyle === 'solid'" label="Màu nền" :disabled="mode === 'night'">
+              <n-color-picker v-model:value="backgroundColor" :disabled="mode === 'night'"/>
             </n-form-item>
-            <n-form-item v-if="backgroundStyle === 'gradient'" label="Dải màu">
+            <n-form-item v-if="backgroundStyle === 'gradient'" label="Dải màu" :disabled="mode === 'night'">
               <n-select v-model:value="selectedGradient" :options="gradientOptions" />
             </n-form-item>
             <n-form-item v-if="backgroundStyle === 'gradient'" label="Độ trong suốt dải màu">
@@ -83,22 +73,31 @@
 
           <div class="col-12 col-md-6" v-if="screenMode === 'custom'">
             <n-form-item label="Nền tùy chỉnh">
-              <n-radio-group v-model:value="customBackgroundStyle">
+              <n-radio-group v-model:value="customBackgroundStyle" :disabled="mode === 'night'">
                 <n-radio label="Đơn sắc" value="solid">Đơn sắc</n-radio>
                 <n-radio label="Dải màu" value="gradient">Dải màu</n-radio>
               </n-radio-group>
             </n-form-item>
-            <n-form-item v-if="customBackgroundStyle === 'solid'" label="Màu nền">
-              <n-color-picker v-model:value="customBackgroundColor" />
+            <n-form-item v-if="customBackgroundStyle === 'solid'" label="Màu nền" :disabled="mode === 'night'">
+              <n-color-picker v-model:value="customBackgroundColor" :disabled="mode === 'night'" />
             </n-form-item>
-            <n-form-item v-if="customBackgroundStyle === 'gradient'" label="Dải màu">
+            <n-form-item v-if="customBackgroundStyle === 'gradient'" label="Dải màu" :disabled="mode === 'night'">
               <n-select v-model:value="customSelectedGradient" :options="customGradientOptions" />
             </n-form-item>
-            <n-form-item v-if="customBackgroundStyle === 'gradient'" label="Độ trong suốt dải màu">
+            <n-form-item v-if="customBackgroundStyle === 'gradient'" label="Độ trong suốt dải màu" :disabled="mode === 'night'">
               <n-slider v-model:value="customBackgroundOpacity" :min="0" :max="1" step="0.01" />
             </n-form-item>
           </div>
         </div>
+        <n-form-item label="Font chữ">
+          <i class="fa fa-font me-2"></i>
+          <n-select v-model:value="fontFamily" :options="fontOptions" />
+        </n-form-item>
+
+        <n-form-item label="Cỡ chữ">
+          <i class="fa fa-text-height me-2"></i>
+          <n-slider v-model:value="fontSize" :min="12" :max="30" />
+        </n-form-item>
 
         <n-form-item label="Chiều cao dòng">
           <n-icon size="30"><AutoFitHeight20Regular /></n-icon>
