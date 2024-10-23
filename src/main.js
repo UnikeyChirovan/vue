@@ -68,6 +68,8 @@ import {
   NCarousel,
   NAlert,
   NCarouselItem,
+  NList,
+  NListItem,
 } from 'naive-ui';
 import App from './App.vue';
 
@@ -119,6 +121,8 @@ const naive = create({
     NCarousel,
     NCarouselItem,
     NAlert,
+    NList,
+    NListItem,
   ],
 });
 

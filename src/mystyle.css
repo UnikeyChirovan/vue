@@ -7,6 +7,12 @@
 .n-form-item.n-form-item--medium-size.n-form-item--top-labelled {
   --n-label-height: 8px !important;
 }
+
+.n-dropdown-menu {
+  background-color: #eeefe0 !important; /* Thay đổi màu nền */
+  border: 1px solid #ddd !important; /* Thay đổi màu viền nếu cần */
+}
+
 .n-card > .n-card-header {
 	  --n-padding-top: 5px;
     --n-padding-bottom: 5px;

@@ -74,6 +74,7 @@
     </div>
   </div>
   <SettingsModal/>
+  <TableofContent/>
   <ScrollButtons>
     <template v-slot:top-button>
       <a-button type="primary"><i class="fa-solid fa-arrow-down"></i></a-button>
@@ -93,6 +94,7 @@ import TheHeader from '../../components/TheHeader.vue';
 import api from '../../services/axiosInterceptor';
 import SettingsModal from '../../components/SettingsModal.vue';
 import ScrollButtons from '../../components/ScrollButtons.vue';
+import TableofContent from '../../components/TableofContent.vue';
 import TheFooter from '../../components/TheFooter.vue';
 
 const chapterStore = useChapterStore();
@@ -143,6 +145,7 @@ const fetchChaptersList = async () => {
     const response = await api.get('/story/chapters');
     const options = response.data.map((chapter) => ({
       label: `Chương ${chapter.chapter_number}`,
+      title: chapter.title,
       value: chapter.id,
     }));
     chapterStore.setChapterOptions(options);
