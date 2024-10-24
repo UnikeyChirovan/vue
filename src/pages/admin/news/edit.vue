@@ -75,7 +75,7 @@ const removeParagraph = (index) => {
   form.value.content.splice(index, 1);
 }
 
-// Gửi cập nhật text
+// Gởi cập nhật text
 const submitText = async () => {
   const formData = new FormData();
   formData.append('title', form.value.title);

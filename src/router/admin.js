@@ -37,7 +37,7 @@ const admin = [
         name: 'admin-users-edit',
         component: () => import('../pages/admin/users/edit.vue'),
       },
-      // Quản Lý Gửi Mail Đăng Ký
+      // Quản Lý Gởi Mail Đăng Ký
       {
         path: 'infos',
         name: 'admin-infos',
@@ -64,6 +64,38 @@ const admin = [
         name: 'admin-stories-edit',
         component: () => import('../pages/admin/stories/edit.vue'),
       },
+      // Quản lý contents
+      {
+        path: 'contents',
+        name: 'admin-contents',
+        component: () => import('../pages/admin/contents/index.vue'),
+      },
+      {
+        path: 'contents/create/:lastIndex?',
+        name: 'admin-contents-create',
+        component: () => import('../pages/admin/contents/create.vue'),
+      },
+      {
+        path: 'contents/:id/edit',
+        name: 'admin-contents-edit',
+        component: () => import('../pages/admin/contents/edit.vue'),
+      },
+      // Quản lý danh mục
+      {
+        path: 'categories',
+        name: 'admin-categories',
+        component: () => import('../pages/admin/categories/index.vue'),
+      },
+      {
+        path: 'categories/create/:lastIndex?',
+        name: 'admin-categories-create',
+        component: () => import('../pages/admin/categories/create.vue'),
+      },
+      {
+        path: 'categories/:id/edit',
+        name: 'admin-categories-edit',
+        component: () => import('../pages/admin/categories/edit.vue'),
+      },
       // Quản lý Background
       {
         path: 'images',
@@ -79,6 +111,22 @@ const admin = [
         path: 'images/:id/edit',
         name: 'admin-images-edit',
         component: () => import('../pages/admin/images/edit.vue'),
+      },
+      // Quản lý hình ảnh
+      {
+        path: 'images-manager',
+        name: 'admin-images-manager',
+        component: () => import('../pages/admin/images-manager/index.vue'),
+      },
+      {
+        path: 'images-manager/create',
+        name: 'admin-images-manager-create',
+        component: () => import('../pages/admin/images-manager/create.vue'),
+      },
+      {
+        path: 'images-manager/:id/edit',
+        name: 'admin-images-manager-edit',
+        component: () => import('../pages/admin/images-manager/edit.vue'),
       },
       // Quản lý contacts
       {

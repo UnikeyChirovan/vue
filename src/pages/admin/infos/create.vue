@@ -14,7 +14,7 @@
         <n-input v-model:value="formValue.content" placeholder="Nhập nội dung" type="textarea" />
       </n-form-item>
 
-      <n-button type="primary" @click="submitForm">Gửi thông báo</n-button>
+      <n-button type="primary" @click="submitForm">Gởi thông báo</n-button>
     </n-form>
   </n-card>
 

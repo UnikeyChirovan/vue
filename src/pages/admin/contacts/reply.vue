@@ -29,7 +29,7 @@
         <CKEditor v-model="responseMessage" />
       </div>
       <div class="button-submit">
-        <button type="submit" class="btn btn-primary">Gửi</button>
+        <button type="submit" class="btn btn-primary">Gởi</button>
       </div>
     </form>
   </div>

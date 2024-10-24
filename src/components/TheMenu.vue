@@ -19,9 +19,24 @@
         <span><i class="fa-solid fa-envelope me-1"></i>Newsletters</span>
       </RouterLink>
     </a-menu-item>
+    <a-menu-item key="admin-contents">
+      <RouterLink :to="{ name: 'admin-contents' }">
+        <span><i class="fa-solid fa-file-lines me-1"></i>Contents</span>
+      </RouterLink>
+    </a-menu-item>
+    <a-menu-item key="admin-categories">
+      <RouterLink :to="{ name: 'admin-categories' }">
+        <span><i class="fa-solid fa-list me-1"></i>Categories</span>
+      </RouterLink>
+    </a-menu-item>
     <a-menu-item key="admin-stories">
       <RouterLink :to="{ name: 'admin-stories' }">
         <span><i class="fa-solid fa-tag me-1"></i>Chapters</span>
+      </RouterLink>
+    </a-menu-item>
+    <a-menu-item key="admin-images-manager">
+      <RouterLink :to="{ name: 'admin-images-manager' }">
+        <span><i class="fa-solid fa-images me-1"></i>Images</span>
       </RouterLink>
     </a-menu-item>
     <a-menu-item key="admin-images">

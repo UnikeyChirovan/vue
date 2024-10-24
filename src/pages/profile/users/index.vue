@@ -125,43 +125,6 @@
         {{ users.biography }}
       </p>
     </div>
-
-    <div class="skills-section card">
-      <h2>Skills</h2>
-      <ul class="skills-list">
-        <li><i class="fas fa-check-circle"></i> JavaScript</li>
-        <li><i class="fas fa-check-circle"></i> Vue.js</li>
-        <li><i class="fas fa-check-circle"></i> HTML & CSS</li>
-      </ul>
-
-      <div class="skill-chart">
-        <div class="chart">85%</div>
-        <div class="chart">90%</div>
-        <div class="chart">80%</div>
-      </div>
-    </div>
-
-
-    <div class="portfolio-section">
-      <h2>Portfolio</h2>
-      <div class="projects">
-        <div class="project">
-          <img src="https://via.placeholder.com/400x300" alt="Project Image" />
-          <div class="project-info">
-            <h3>Project Title 1</h3>
-            <p>Short description of the project.</p>
-          </div>
-        </div>
-
-        <div class="project">
-          <img src="https://via.placeholder.com/400x300" alt="Project Image" />
-          <div class="project-info">
-            <h3>Project Title 2</h3>
-            <p>Short description of the project.</p>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -414,7 +377,7 @@ const saveEditedCover = () => {
 };
 
 const getLastChapter = () => {
-  api.get(`/story/user-chapter/${id}`)
+  api.get(`/story/user-chapter`)
     .then(() => {
       console.log('Fetch successful');
     })
@@ -580,102 +543,6 @@ onBeforeUnmount(() => {
       font-size: 1.5rem;
     }
   }
-
-  .skills-section {
-    margin: 20px 0;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-
-    h2 {
-      margin-bottom: 15px;
-      font-size: 1.5rem;
-    }
-
-    .skills-list {
-      list-style-type: none;
-      padding: 0;
-
-      li {
-        font-size: 1rem;
-        margin: 5px 0;
-
-        i {
-          color: #007bff;
-          margin-right: 5px;
-        }
-      }
-    }
-
-    .skill-chart {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-
-      .chart {
-        width: 30%;
-        height: 20px;
-        background-color: #007bff;
-        border-radius: 5px;
-        position: relative;
-
-        &:nth-child(2) {
-          height: 40px;
-        }
-
-        &:last-child {
-          height: 60px;
-        }
-      }
-    }
-  }
-
-  .portfolio-section {
-    margin: 20px 0;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-
-    h2 {
-      margin-bottom: 15px;
-      font-size: 1.5rem;
-    }
-
-    .projects {
-      display: flex;
-      justify-content: space-between;
-
-      .project {
-        width: 48%;
-        margin-bottom: 15px;
-
-        img {
-          width: 100%;
-          border-radius: 5px;
-        }
-
-        .project-info {
-          padding: 10px;
-          background-color: #f1f1f1;
-          border-radius: 5px;
-
-          h3 {
-            margin: 0;
-            font-size: 1.2rem;
-          }
-
-          p {
-            margin: 5px 0 0;
-            color: #555;
-          }
-        }
-      }
-    }
-  }
-
-
 }
 
 

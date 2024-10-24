@@ -1,31 +1,22 @@
 <template>
-  <a-card title="Tạo File Mới" style="width: 100%">
+  <a-card title="Tạo Phần Mới" style="width: 100%">
     <form @submit.prevent="submitForm">
-      <!-- File Title Input -->
+      <!-- Title Input -->
       <div class="mb-3">
-        <label for="title">Tiêu đề file</label>
+        <label for="title">Tiêu đề</label>
         <input v-model="form.title" type="text" id="title" required class="form-control" />
       </div>
+
+      <!-- Section Number -->
+      <div class="mb-3">
+        <label for="sectionNumber">Phần số</label>
+        <input v-model="form.section_number" type="number" id="sectionNumber" required class="form-control" />
+      </div>
+
       <!-- File Upload -->
       <div class="mb-3">
-        <label for="file">Chọn tệp .txt để tải lên</label>
+        <label for="file">Chọn tệp .txt để nhập nội dung</label>
         <input @change="handleFileUpload" type="file" id="file" accept=".txt" class="form-control" />
-      </div>
-
-      <!-- Image Upload -->
-      <div class="mb-3">
-        <label for="images">Tải lên hình ảnh</label>
-        <input @change="handleImageUpload" type="file" id="images" accept="image/*" multiple class="form-control" />
-      </div>
-
-      <!-- Display Selected Images -->
-      <div class="mb-3" v-if="imagePreviews.length > 0">
-        <label>Hình ảnh đã chọn</label>
-        <div class="d-flex flex-wrap">
-          <div v-for="(image, index) in imagePreviews" :key="index" class="me-2 mb-2">
-            <img :src="image" alt="Image Preview" class="image-preview"/>
-          </div>
-        </div>
       </div>
 
       <!-- Content Sections -->
@@ -71,102 +62,70 @@ import { useMenu } from '../../../stores/use-menu';
 import { message } from 'ant-design-vue';
 import api from '../../../services/axiosInterceptor';
 import ScrollButtons from '../../../components/ScrollButtons.vue';
+import { useRoute } from 'vue-router';
+const route = useRoute();
 
 const form = ref({
   title: '',
+  section_number: route.params.lastIndex ? Number(route.params.lastIndex) : 1,
   content: [''],
-  images: [], // Lưu trữ file ảnh
 });
+const index = ref(Number(route.params.lastIndex));
 
-const imagePreviews = ref([]); // Lưu trữ đường dẫn ảnh để xem trước
 const isConfirmVisible = ref(false);
-
 const addSection = () => {
   form.value.content.push('');
 };
-
 const removeSection = (index) => {
   form.value.content.splice(index, 1);
 };
-
 const showConfirmDelete = () => {
   isConfirmVisible.value = true;
 };
-
 const removeAllSections = () => {
   form.value.content = [''];
   message.success('Đã xóa toàn bộ nội dung các đoạn');
   isConfirmVisible.value = false; 
 };
-
 const handleFileUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
     const reader = new FileReader();
     reader.onload = () => {
-      // Tách nội dung file theo 2 dòng trống để nhập thành nhiều đoạn
-      const content = reader.result.split('\n\n');
+      const content = reader.result.split('\n\n'); 
       form.value.content = content;
-      message.success('Nội dung của tệp đã được nhập vào dưới dạng các đoạn');
+      message.success('Nội dung của tệp đã được nhập vào');
     };
     reader.readAsText(file);
   }
 };
-
-
-// Xử lý tải lên hình ảnh
-const handleImageUpload = (event) => {
-  const files = event.target.files;
-  form.value.images = Array.from(files); // Lưu trữ file ảnh
-
-  // Xem trước hình ảnh
-  imagePreviews.value = [];
-  for (let i = 0; i < files.length; i++) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      imagePreviews.value.push(e.target.result); // Lưu URL ảnh để hiển thị
-    };
-    reader.readAsDataURL(files[i]);
-  }
-};
-
 const submitForm = async () => {
-  const formData = new FormData();
-  formData.append('title', form.value.title);
-  formData.append('content', form.value.content.join('\n\n'));
-
-  // Thêm ảnh vào formData
-  form.value.images.forEach((image, index) => {
-    formData.append(`images[${index}]`, image);
-  });
-
   try {
-    await api.post('/user-notifications', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    await api.post('/sections', {
+      title: form.value.title,
+      section_number: form.value.section_number,
+      content: form.value.content,
     });
-    message.success('File đã được tạo thành công');
+    message.success('Phần đã được tạo thành công');
+    index.value = index.value + 1;
     resetForm();
   } catch (error) {
     console.error(error);
-    message.error('Đã xảy ra lỗi khi tạo file');
+    message.error('Đã xảy ra lỗi khi tạo phần');
   }
 };
-
 const resetForm = () => {
   form.value = {
     title: '',
+    section_number: index.value,
     content: [''],
-    images: [],
   };
-  imagePreviews.value = [];
 };
-
 const handleCancelDelete = () => {
   isConfirmVisible.value = false;
 };
-
 onMounted(() => {
-  useMenu().onSelectedKey(['admin-news']);
+  useMenu().onSelectedKey(['admin-contents']);
 });
 </script>
 
@@ -174,11 +133,4 @@ onMounted(() => {
 .form-control {
   width: 100%;
 }
-.image-preview {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
-</style> 
+</style>
