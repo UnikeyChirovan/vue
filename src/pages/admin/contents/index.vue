@@ -86,7 +86,7 @@ const columns = [
 const getSections = async () => {
   try {
     const response = await api.get('/sections'); // Đổi endpoint thành sections
-    sections.value = response.data; 
+    sections.value = response.data.sections; 
   } catch (error) {
     console.error(error);
     if (error.response.status === 429) {

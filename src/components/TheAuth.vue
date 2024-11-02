@@ -1,5 +1,6 @@
 <template>
   <div>
+    <LoadingModal v-if="loadingStore.isDataLoading" />
     <n-button
       v-if="!auth.isLoggedIn"
       @click="showRegister = true"
@@ -152,6 +153,10 @@
   import { useMessage } from 'naive-ui';
   import { useRouter } from 'vue-router';
   import { useAuthStore } from '../stores/auth';
+  import LoadingModal from './LoadingModal.vue';
+  // import { isDataLoading, fetchDataAfterLogin } from '../services/loadingData';
+  import { useLoadingStore } from '../stores/loadingStore';
+  const loadingStore = useLoadingStore();
   const auth = useAuthStore();
 
   const router = useRouter();
@@ -231,7 +236,7 @@
 
   function handleRegisterSubmit() {
     loading.value = true;
-    axios.post('http://127.0.0.1:8000/api/auth/register', users)
+    apiLinks.auth.register(users)
       .then((res) => {
         if (res.status === 200) {
           message.success(res.data.message);
@@ -249,42 +254,60 @@
         loading.value = false;
       });
   }
-  const handleLoginSubmit = async () => {
-    try {
-      const response = await axios.post('http://127.0.0.1:8000/api/auth/login', {
-        username_or_email: usernameOrEmail.value,
-        password: password.value,
-        rememberMe: rememberMe.value,
-      });
-      const accessToken = response.data.access_token;
-      const user = response.data.user;
-      const isAdmin = response.data.isAdmin;
-      auth.login(user, isAdmin, accessToken);
-      message.success('Đăng nhập thành công!');
-      resetLoginForm();
-      closeLoginModal();
-      router.push({ name: 'home' });
-    } catch (error) {
-      if (error.response) {
-        if (error.response.data && error.response.data.errors) {
-          errorsLogin.value = error.response.data.errors;
-        } else {
-          errorsLogin.value = {};
-        }
-        if (error.response.status === 401) {
-          message.warning('Tài khoản hoặc mật khẩu không chính xác');
-        } else if (error.response.status === 403) {
-          message.error(error.response.data.message);
-          resetLoginForm();
-          closeLoginModal();
-        } else {
-          message.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
-        }
-      } else {
-        message.error('Không thể kết nối tới server. Vui lòng kiểm tra kết nối mạng.');
-      }
+const handleLoginSubmit = async () => {
+  try {
+    const response = await apiLinks.auth.login({
+      username_or_email: usernameOrEmail.value,
+      password: password.value,
+      rememberMe: rememberMe.value,
+    });
+
+    // Xử lý phản hồi đăng nhập
+    const accessToken = response.data.access_token;
+    const user = response.data.user;
+    const isAdmin = response.data.isAdmin;
+
+    auth.login(user, isAdmin, accessToken); // Đăng nhập người dùng
+
+    resetLoginForm();
+    closeLoginModal();
+
+    const beforeStatus = sessionStorage.getItem('Before');
+    loadingStore.isDataLoading = true;
+    if (beforeStatus) {
+      await loadingStore.fetchDataAfterLogin();
+    } else {
+      await loadingStore.fetchDataBeforeLogin();
+      loadingStore.isDataLoading = true;
+      await loadingStore.fetchDataAfterLogin();
     }
-  };
+    router.push({ name: 'home' });
+    message.success('Đăng nhập thành công!');
+    loadingStore.isDataLoading = false;
+    loadingStore.fetchDataFinalLogin();
+  } catch (error) {
+    loadingStore.isDataLoading = false;
+    if (error.response) {
+      if (error.response.data && error.response.data.errors) {
+        errorsLogin.value = error.response.data.errors;
+      } else {
+        errorsLogin.value = {};
+      }
+      if (error.response.status === 401) {
+        message.warning('Tài khoản hoặc mật khẩu không chính xác');
+      } else if (error.response.status === 403) {
+        message.error(error.response.data.message);
+        resetLoginForm();
+        closeLoginModal();
+      } else {
+        message.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+      }
+    } else {
+      message.error('Không thể kết nối tới server. Vui lòng kiểm tra kết nối mạng.');
+    }
+  }
+};
+
   function openLoginModal() {
     showRegister.value = false;
     showLogin.value = true;
@@ -330,6 +353,7 @@
     LogOutOutline as LogoutIcon,
     PersonCircleOutline as UserIcon,
   } from '@vicons/ionicons5';
+import apiLinks from '../services/api-links';
 
   function renderIcon(icon) {
     return () => {

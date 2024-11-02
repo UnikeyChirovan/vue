@@ -24,7 +24,9 @@
           </div>
         </div>
       </n-form-item>
-
+      <n-form-item label="Trang">
+        <n-select v-model:value="form.page" :options="pageOptions" placeholder="Chọn trang" />
+      </n-form-item>
       <!-- Nút cập nhật -->
       <div class="button-group">
         <n-button @click="submitText" type="success" ghost round size="large">📝 Cập nhật Text</n-button>
@@ -47,6 +49,7 @@ const message = useMessage();
 const form = ref({
   title: '',
   content: [],
+   page: '',
 });
 
 const id = route.params.id;
@@ -55,15 +58,32 @@ onMounted(async () => {
   try {
     const response = await api.get(`/user-notifications/${id}`);
     if (response.status === 200) {
-      const notification = response.data;
-      form.value.title = notification.title;
-      form.value.content = notification.content.split('\n');
+      const notificationDetail = response.data.notification_detail; // Truy cập vào notification_detail
+      form.value.title = notificationDetail.title;
+      form.value.content = notificationDetail.content.split('\n');
+      form.value.page = notificationDetail.page;
     }
   } catch (error) {
     message.error('Failed to load notification data.');
   }
+  await fetchPageOptions();
   useMenu().onSelectedKey(['admin-news']);
 });
+
+const pageOptions = ref([]);
+
+const fetchPageOptions = async () => {
+  try {
+    const response = await api.get('/user-notifications/page-options');
+    if (response.status === 200) {
+      pageOptions.value = response.data.pageOptions;
+    } else {
+      message.error('Không thể tải danh sách trang.');
+    }
+  } catch (error) {
+    message.error('Lỗi khi tải danh sách trang.');
+  }
+};
 
 // Thêm nội dung cho phần content
 const addParagraph = (index) => {
@@ -80,6 +100,7 @@ const submitText = async () => {
   const formData = new FormData();
   formData.append('title', form.value.title);
   formData.append('content', form.value.content.join('\n'));
+  formData.append('page', form.value.page);
 
   try {
     const response = await api.put(`/user-notifications/${id}/text`, formData);

@@ -21,7 +21,12 @@
     </a-menu-item>
     <a-menu-item key="admin-contents">
       <RouterLink :to="{ name: 'admin-contents' }">
-        <span><i class="fa-solid fa-file-lines me-1"></i>Contents</span>
+        <span><i class="fa-solid fa-indent me-1"></i>Text - About</span>
+      </RouterLink>
+    </a-menu-item>
+    <a-menu-item key="admin-company">
+      <RouterLink :to="{ name: 'admin-company' }">
+        <span><i class="fa-solid fa-layer-group me-1"></i>Company</span>
       </RouterLink>
     </a-menu-item>
     <a-menu-item key="admin-categories">

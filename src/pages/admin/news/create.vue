@@ -6,6 +6,15 @@
         <label for="title">Tiêu đề file</label>
         <input v-model="form.title" type="text" id="title" required class="form-control" />
       </div>
+
+            <!-- Page Dropdown -->
+      <div class="mb-3">
+        <label for="page">Trang</label>
+        <select v-model="form.page" id="page" required class="form-control">
+          <option value="">Chọn trang</option>
+          <option v-for="option in pageOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+        </select>
+      </div>
       <!-- File Upload -->
       <div class="mb-3">
         <label for="file">Chọn tệp .txt để tải lên</label>
@@ -75,11 +84,23 @@ import ScrollButtons from '../../../components/ScrollButtons.vue';
 const form = ref({
   title: '',
   content: [''],
-  images: [], // Lưu trữ file ảnh
+  images: [],
+  page: '',  // Thêm trường page
 });
 
 const imagePreviews = ref([]); // Lưu trữ đường dẫn ảnh để xem trước
 const isConfirmVisible = ref(false);
+
+const pageOptions = ref([]);
+
+const fetchPageOptions = async () => {
+  try {
+    const response = await api.get('/user-notifications/page-options');
+    pageOptions.value = response.data.pageOptions;
+  } catch (error) {
+    message.error('Không thể lấy danh sách trang');
+  }
+};
 
 const addSection = () => {
   form.value.content.push('');
@@ -134,6 +155,7 @@ const submitForm = async () => {
   const formData = new FormData();
   formData.append('title', form.value.title);
   formData.append('content', form.value.content.join('\n\n'));
+  formData.append('page', form.value.page);
 
   // Thêm ảnh vào formData
   form.value.images.forEach((image, index) => {
@@ -157,6 +179,7 @@ const resetForm = () => {
     title: '',
     content: [''],
     images: [],
+    page: '', // Reset giá trị page
   };
   imagePreviews.value = [];
 };
@@ -166,6 +189,7 @@ const handleCancelDelete = () => {
 };
 
 onMounted(() => {
+  fetchPageOptions();
   useMenu().onSelectedKey(['admin-news']);
 });
 </script>

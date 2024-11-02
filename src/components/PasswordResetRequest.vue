@@ -14,7 +14,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useMessage } from 'naive-ui';
-import api from '..//services/axiosInterceptor';
+import apiLinks from '../services/api-links';
 const email = ref('');
 const loading = ref(false);
 const message = useMessage();
@@ -23,7 +23,7 @@ const message = useMessage();
 const handleSubmit = async () => {
     loading.value = true;
     try {
-        const response = await api.post('auth/password-reset-request', { email: email.value });
+        const response = await apiLinks.auth.resetPasswordRequest({ email: email.value });
         message.success(response.data.message);
         email.value = '';
     } catch (error) {

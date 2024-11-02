@@ -89,7 +89,7 @@ const columns = [
 const getCategories = async () => {
   try {
     const response = await api.get('/categories'); // Endpoint để lấy danh mục
-    categories.value = response.data; 
+    categories.value = response.data.categories; 
   } catch (error) {
     console.error(error);
     if (error.response.status === 429) {

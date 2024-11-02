@@ -13,6 +13,15 @@
         <input v-model="form.code" type="text" id="code" required class="form-control" />
       </div>
 
+      <!-- Page Dropdown -->
+      <div class="mb-3">
+        <label for="page">Trang</label>
+        <select v-model="form.page" id="page" required class="form-control">
+          <option value="">Chọn trang</option>
+          <option v-for="option in pageOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+        </select>
+      </div>
+
       <!-- Submit Button -->
       <a-button type="primary" html-type="submit">Cập Nhật</a-button>
     </form>
@@ -23,8 +32,8 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { message } from 'ant-design-vue';
-import { useMenu } from '../../../stores/use-menu';
 import api from '../../../services/axiosInterceptor';
+import { useMenu } from '../../../stores/use-menu';
 
 const route = useRoute();
 const router = useRouter();
@@ -32,16 +41,31 @@ const router = useRouter();
 const form = ref({
   name: '',
   code: '',
+  page: '', // Thêm trường page
 });
+
+const pageOptions = ref([]);
 
 const getCategory = async () => {
   try {
     const response = await api.get(`/categories/${route.params.id}`);
     form.value.name = response.data.name;
-    form.value.code = response.data.code; // Lấy mã số từ API
+    form.value.code = response.data.code;
+    form.value.page = response.data.page; // Lấy giá trị của page từ API
   } catch (error) {
     console.error(error);
     message.error('Không thể lấy thông tin danh mục');
+  }
+};
+
+const fetchPageOptions = async () => {
+  try {
+    const response = await api.get('/categories/page-options');
+    console.log('dữ liệu', response);
+    pageOptions.value = response.data.pageOptions; // Cập nhật theo cấu trúc mới
+  } catch (error) {
+    console.log('lỗi', error);
+    message.error('Không thể lấy danh sách trang');
   }
 };
 
@@ -50,6 +74,7 @@ const submitForm = async () => {
     await api.put(`/categories/${route.params.id}`, {
       name: form.value.name,
       code: form.value.code,
+      page: form.value.page, // Gửi giá trị page
     });
     message.success('Danh mục đã được cập nhật thành công');
     await router.push({ name: 'admin-categories' });
@@ -60,6 +85,7 @@ const submitForm = async () => {
 };
 
 onMounted(() => {
+  fetchPageOptions(); // Gọi hàm để lấy danh sách trang
   getCategory();
   useMenu().onSelectedKey(['admin-categories']);
 });

@@ -80,6 +80,58 @@ const admin = [
         name: 'admin-contents-edit',
         component: () => import('../pages/admin/contents/edit.vue'),
       },
+      // Quản lý tên công ty
+      {
+        path: 'company',
+        name: 'admin-company',
+        component: () => import('../pages/admin/company/index.vue'),
+      },
+      {
+        path: 'company/create/:lastIndex?',
+        name: 'admin-company-create',
+        component: () => import('../pages/admin/company/create.vue'),
+      },
+      {
+        path: 'company/:id/edit',
+        name: 'admin-company-edit',
+        component: () => import('../pages/admin/company/edit.vue'),
+      },
+
+      // HeroSlide
+      {
+        path: 'hero-slide/create/:lastIndex?',
+        name: 'admin-hero-slide-create',
+        component: () => import('../pages/admin/company/heroSlide/create.vue'),
+      },
+      {
+        path: 'hero-slide/:id/edit',
+        name: 'admin-hero-slide-edit',
+        component: () => import('../pages/admin/company/heroSlide/edit.vue'),
+      },
+
+      // FutureProject
+      {
+        path: 'future-project/create/:lastIndex?',
+        name: 'admin-future-project-create',
+        component: () => import('../pages/admin/company/futureProject/create.vue'),
+      },
+      {
+        path: 'future-project/:id/edit',
+        name: 'admin-future-project-edit',
+        component: () => import('../pages/admin/company/futureProject/edit.vue'),
+      },
+
+      // Feature
+      {
+        path: 'feature/create/:lastIndex?',
+        name: 'admin-feature-create',
+        component: () => import('../pages/admin/company/feature/create.vue'),
+      },
+      {
+        path: 'feature/:id/edit',
+        name: 'admin-feature-edit',
+        component: () => import('../pages/admin/company/feature/edit.vue'),
+      },
       // Quản lý danh mục
       {
         path: 'categories',

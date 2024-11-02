@@ -3,11 +3,17 @@
   <div>
     <AboutImage />
     
-    <TeamMember v-for="member in teamMembers" :key="member.name" :member="member" />
+    <TeamMember
+        :author-title="authorTitle" 
+        :about-introduction-title="aboutIntroductionTitle" 
+    />
     
-    <Timeline :years="years" />
+    <Timeline 
+        :history-title="historyTitle"
+        :personal-journey-title="personalJourneyTitle"
+    />
     
-    <VisionMissionValues :visionMissionValues="visionMissionValues" />
+    <VisionMissionValues :vision-mission-core-values-title="visionMissionCoreValuesTitle" />
     
     <!-- <FAQ /> -->
   </div>
@@ -15,21 +21,67 @@
 </template>
 
 <script setup>
+import { ref, computed, onMounted } from 'vue';
 import TheHeader from '../../components/TheHeader.vue';
 import TheFooter from '../../components/TheFooter.vue';
-import { useAboutStore } from '../../stores/aboutStore';
 import AboutImage from '../../components/about/AboutImage.vue';
 import TeamMember from '../../components/about/TeamMember.vue';
 import Timeline from '../../components/about/Timeline.vue';
+import apiLinks from '../../services/api-links';
 import VisionMissionValues from '../../components/about/VisionMissionValues.vue';
-// import FAQ from '../../components/about/FAQ.vue';
+const categories = ref([]);
+const isCategoriesReady = ref(false); 
 
-const aboutStore = useAboutStore();
-aboutStore.fetchData(); 
+async function fetchCategories() {
+  const storedCategories = localStorage.getItem('categories');
+  if (storedCategories) {
+    categories.value = JSON.parse(storedCategories);
+    isCategoriesReady.value = true;
+  } else {
+    try {
+      const response = await fetch(apiLinks.categories.getAll);
+      const data = await response.json();
+      localStorage.setItem('categories', JSON.stringify(data));
+      categories.value = data;
+      isCategoriesReady.value = true;
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  }
+}
+const aboutIntroductionTitle = computed(() => 
+  isCategoriesReady.value
+    ? categories.value.find(category => category.code === '12' && category.page === 'about')?.name 
+    : 'Một Chút Về Selorson Tales'
+);
 
-const teamMembers = aboutStore.teamMembers;
-const years = aboutStore.timeline; // Assuming your timeline data is stored here
-const visionMissionValues = aboutStore.visionMissionValues;
+const historyTitle = computed(() => 
+  isCategoriesReady.value
+    ? categories.value.find(category => category.code === '13' && category.page === 'about')?.name 
+    : 'Đôi Dòng Lịch Sử'
+);
+
+const visionMissionCoreValuesTitle = computed(() => 
+  isCategoriesReady.value
+    ? categories.value.find(category => category.code === '15' && category.page === 'about')?.name 
+    : 'Tầm nhìn, Sứ mệnh và Giá trị cốt lõi'
+);
+
+const authorTitle = computed(() => 
+  isCategoriesReady.value
+    ? categories.value.find(category => category.code === '11' && category.page === 'about')?.name 
+    : 'Phạm Hữu Hoàng Anh'
+);
+
+const personalJourneyTitle = computed(() => 
+  isCategoriesReady.value
+    ? categories.value.find(category => category.code === '14' && category.page === 'about')?.name 
+    : 'Ngót nghét cũng 15 năm kể từ khi tập tành viết những dòng đầu tiên, nơi đây chứa đựng khao khát đam mê của tuổi trẻ, và nỗi đau, niềm vui, niềm hi vọng lúc trưởng thành.'
+);
+
+onMounted(async () => {
+  await fetchCategories();
+});
 </script>
 <style scoped>
 body {

@@ -1,5 +1,6 @@
 <template>
   <TheHeader />
+  <LoadingModal v-if="loadingStore.isDataLoading"/>
   <section class="hero-section" :style="{ backgroundImage: `url(${currentBackground})` }" data-aos="fade-in">
     <div class="hero-overlay"></div>
     <div class="hero-content">
@@ -11,9 +12,9 @@
     <button class="prev-btn" @click="prevSlide">Prev</button>
     <button class="next-btn" @click="nextSlide">Next</button>
   </section>
-  <Notification/>
+  <Notification :title="notificationTitle"/>
   <section class="future-projects-section" ref="futureSection" data-aos="fade-in">
-    <h2 class="future-projects-title text-uppercase">Dự Án Tương Lai</h2>
+    <h2 class="future-projects-title text-uppercase">{{ futureProjectTitle }}</h2>
     <div class="future-projects-carousel">
       <div class="future-project-item" v-for="project in futureProjects" :key="project.name">
         <h3 class="future-project-name">{{ project.name }}</h3>
@@ -23,7 +24,7 @@
     </div>
   </section>
   <section class="video-section" data-aos="zoom-in">
-    <h2 class="section-title text-uppercase">Cho Lần Đầu Gặp Gỡ</h2>
+    <h2 class="section-title text-uppercase">{{ firstMeetTitle }}</h2>
     <div class="video-container">
       <video controls>
         <source src="#!" type="video/mp4">
@@ -31,8 +32,8 @@
       </video>
     </div>
   </section>
-    <section class="feature-section" data-aos="fade-up">
-    <h2 class="feature-section-title text-uppercase">Dấu Ấn Hôm Nay</h2>
+  <section class="feature-section" data-aos="fade-up">
+    <h2 class="feature-section-title text-uppercase">{{ todayFeatureTitle }}</h2>
     <div class="feature-grid">
       <div 
         class="feature-item" 
@@ -75,68 +76,44 @@ import { useMessage } from 'naive-ui';
 import { useAuthStore } from '../../stores/auth';
 import { useVoteStore } from '../../stores/vote';
 import Notification from '../../components/Notification.vue';
+import LoadingModal from '../../components/LoadingModal.vue';
+import { useLoadingStore } from '../../stores/loadingStore';
+const loadingStore = useLoadingStore();
 const voteStore = useVoteStore(); 
 const authStore = useAuthStore();
 const message = useMessage();
 const router = useRouter();
+const categories = ref([]);
+const isCategoriesReady = ref(false); 
+
+async function fetchCategories() {
+  const storedCategories = localStorage.getItem('categories');
+  if (storedCategories) {
+    categories.value = JSON.parse(storedCategories);
+    isCategoriesReady.value = true;
+  } else {
+    try {
+      const response = await fetch(apiLinks.categories.getAll);
+      const data = await response.json();
+      localStorage.setItem('categories', JSON.stringify(data));
+      categories.value = data;
+      isCategoriesReady.value = true;
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  }
+}
+const futureProjectTitle = computed(() => isCategoriesReady.value? categories.value.find(category => category.code === '2' && category.page === 'home')?.name : 'Dự Án Tương Lai');
+const firstMeetTitle = computed(() => isCategoriesReady.value ? categories.value.find(category => category.code === '3' && category.page === 'home')?.name : 'Cho Lần Đầu Gặp Gỡ');
+const todayFeatureTitle = computed(() => isCategoriesReady.value? categories.value.find(category => category.code === '4' && category.page === 'home')?.name : 'Dấu Ấn Hôm Nay');
+const notificationTitle = computed(() => isCategoriesReady.value ? categories.value.find(category => category.code === '1' && category.page === 'home')?.name : 'Theo Dòng Sự Kiện');
 const voteResults = ref({
   totalVotes: 0,
   votesByChoice: {}
 });
-const heroSlides = ref([
-  {
-    background: '../../assets/img/slide1.jpg',
-    title: 'Welcome to Selorson Tales',
-    description: 'Nơi những cuộc phiêu lưu đang chờ đợi bạn...',
-    buttonText: 'Get Started'
-
-  },
-  {
-    background: '../../assets/img/slide2.jpg',
-    round: 'Khởi động!',
-    title: 'Hãy đến với Selorson Tales',
-    description: 'Kết nối với tôi, chúng ta cùng nhau xây dựng một cộng đồng vui vẻ, nhiều màu sắc nhé!',
-    buttonText: 'Tới Trang Liên Hệ'
-  },
-  {
-    background: '../../assets/img/slide3.jpg',
-    round: 'Vượt chướng ngại vật! ',
-    title: 'Câu chuyện của tác giả',
-    description: 'Câu chuyện về sự ra đời của thế giới Selorson...',
-    buttonText: 'Tới Trang Giới Thiệu'
-  },
-  {
-    background: '../../assets/img/slide4.jpg',
-    round: 'Tăng tốc!',
-    title: 'Thế giới bản đồ',
-    description: 'Khám phá thế giới của Selorson theo một cách khác!',
-    buttonText: 'Tới Trang Bản Đồ'
-  },
-  {
-    background: '../../assets/img/slide5.jpg',
-    round: 'Về Đích!',
-    title: 'Let\'s Go!!!',
-    description: 'Hòa mình vào cộng đồng Selorson và thư giãn cùng những trang sách!',
-    buttonText: 'Tới Trang Đọc Truyện'
-  }
-]);
-const futureProjects = ref([
-  { 
-    name: 'Selorson App', 
-    timeline: '2026', 
-    description: 'Ứng dụng di động Selorson sẽ cung cấp trải nghiệm đọc truyện, tương tác bản đồ và kết nối cộng đồng.' 
-  },
-  { 
-    name: 'Selorson YouTube', 
-    timeline: '2027', 
-    description: 'Kênh YouTube Selorson sẽ bao gồm podcast, clip giải thích, bàn luận và phim hoạt hình, chúng ta sẽ trò chuyện với nhau thế giới Selorson.' 
-  },
-  { 
-    name: 'Selorson World', 
-    timeline: '2028', 
-    description: 'Selorson World sẽ mở ra một thế giới ảo, cho phép người dùng khám phá và tương tác với nhau trong không gian kỳ ảo.' 
-  },
-]);
+const heroSlides = ref([]);
+const isHeroSlidesReady = ref(false); 
+const futureProjects = ref([]);
 
 const currentSlideIndex = ref(0);
 const nextSlide = () => {
@@ -148,18 +125,19 @@ const prevSlide = () => {
     (currentSlideIndex.value - 1 + heroSlides.value.length) % heroSlides.value.length;
 };
 
-const currentBackground = computed(() => heroSlides.value[currentSlideIndex.value].background);
-const currentRound = computed(() => heroSlides.value[currentSlideIndex.value].round);
-const currentTitle = computed(() => heroSlides.value[currentSlideIndex.value].title);
-const currentDescription = computed(() => heroSlides.value[currentSlideIndex.value].description);
-const currentButtonText = computed(() => heroSlides.value[currentSlideIndex.value].buttonText);
+const currentBackground = computed(() => isHeroSlidesReady.value ? heroSlides.value[currentSlideIndex.value].image_url : '');
+const currentRound = computed(() => isHeroSlidesReady.value ? heroSlides.value[currentSlideIndex.value].round : '');
+const currentTitle = computed(() => isHeroSlidesReady.value ? heroSlides.value[currentSlideIndex.value].title : '');
+const currentDescription = computed(() => isHeroSlidesReady.value ? heroSlides.value[currentSlideIndex.value].description : '');
+const currentButtonText = computed(() => isHeroSlidesReady.value ? heroSlides.value[currentSlideIndex.value].button_text : '');
 
 
-const features = ref([
-  { icon: markRaw(StarEmphasis24Filled), iconClass: 'green-star', title: 'Tặng Tôi Một Ngôi Sao', description: 'Hãy ghi nhận nỗ lực của tôi và khích lệ tinh thần để tôi có thể tiếp tục vươn xa hơn!' },
-  { icon: markRaw(Rocket), iconClass: 'black-rocket', title: 'Phóng Vô Tôi Một Trái Rocket', description: 'Nhắc nhở tôi về những điều cần cải thiện, giúp tôi nâng cao chất lượng nội dung và giao diện hơn nữa!' },
-  { icon: markRaw(Handshake20Filled), iconClass: 'Handshake', title: 'Trao Nhau Cái Bắt Tay', description: 'Chúng ta cùng nhau chia sẻ cảm xúc, nhận ra rằng ai cũng có những khuyết điểm. Bạn thông cảm cho những thiếu sót của tôi, còn tôi sẽ luôn luôn ở đây, lắng nghe và hỗ trợ bạn!' }
-]);
+const features = ref([]);
+const iconMap = {
+  'StarEmphasis24Filled': markRaw(StarEmphasis24Filled),
+  'Rocket': markRaw(Rocket),
+  'Handshake20Filled': markRaw(Handshake20Filled),
+};
 
 const handleButtonClick = () => {
   if (currentButtonText.value === 'Get Started') {
@@ -219,24 +197,87 @@ const vote = async (choice) => {
 };
 
 const getVoteResults = async () => {
-  try {
-    const response = await api.get('/vote/results');
-    voteResults.value = {
-      totalVotes: response.data.total_users_voted,
-      votesByChoice: response.data.votes_by_choice.reduce((acc, vote) => {
-        acc[vote.choice] = vote.total;
-        return acc;
-      }, {})
-    };
-  } catch (error) {
-    console.error('Lỗi khi lấy kết quả vote:', error);
+  const storedVoteResults = localStorage.getItem('voteResults');
+  
+  if (storedVoteResults) {
+    voteResults.value = JSON.parse(storedVoteResults);
+  } else {
+    try {
+      const response = await api.get('/vote/results');
+      voteResults.value = {
+        totalVotes: response.data.total_users_voted,
+        votesByChoice: response.data.votes_by_choice.reduce((acc, vote) => {
+          acc[vote.choice] = vote.total;
+          return acc;
+        }, {})
+      };
+      localStorage.setItem('voteResults', JSON.stringify(voteResults.value));
+    } catch (error) {
+      console.error('Lỗi khi lấy kết quả vote:', error);
+    }
   }
 };
+
 onMounted(async () => {
-  AOS.init();
-  voteStore.getUserVote();
+  const beforeStatus = sessionStorage.getItem('Before');
+  await AOS.init();
+
+  // Kiểm tra và xử lý heroSlides
+  const heroSlidesData = localStorage.getItem('heroSlides');
+  if (heroSlidesData) {
+    heroSlides.value = JSON.parse(heroSlidesData);
+    isHeroSlidesReady.value = true;
+    console.log('HeroSlides được tải từ localStorage!');
+  }
+
+  // Xử lý futureProjects ngay cả khi không có heroSlides trong localStorage
+  const futureProjectsData = localStorage.getItem('futureProjects');
+  if (futureProjectsData) {
+    futureProjects.value = JSON.parse(futureProjectsData);
+  }
+  const featuresData = localStorage.getItem('features');
+  if (featuresData) {
+    features.value = JSON.parse(featuresData).map(item => ({
+      ...item,
+      icon: item.icon ? iconMap[item.icon] : null,
+       iconClass: item.icon_class,
+    }));
+  }
+  // Gọi fetchDataBeforeLogin chỉ khi beforeStatus không phải là 'ok'
+  if (beforeStatus !== 'ok') {
+    await loadingStore.fetchDataBeforeLogin(() => {
+      // Xử lý dữ liệu heroSlides sau khi fetchDataBeforeLogin
+      const fetchedHeroSlidesData = localStorage.getItem('heroSlides');
+      if (fetchedHeroSlidesData) {
+        heroSlides.value = JSON.parse(fetchedHeroSlidesData);
+        isHeroSlidesReady.value = true;
+        console.log('Dữ liệu heroSlides đã được cập nhật từ API và lưu vào localStorage!');
+      }
+
+      // Cập nhật futureProjects từ localStorage sau khi dữ liệu đã được tải
+      const fetchedFutureProjectsData = localStorage.getItem('futureProjects');
+      if (fetchedFutureProjectsData) {
+        futureProjects.value = JSON.parse(fetchedFutureProjectsData);
+      }
+      // Cập nhật features từ localStorage sau khi dữ liệu đã được tải
+      const fetchedFeaturesData  = localStorage.getItem('features');
+      if (fetchedFeaturesData) {
+          features.value = JSON.parse(fetchedFeaturesData).map(item => ({
+          ...item,
+          icon: item.icon ? iconMap[item.icon] : null,
+          iconClass: item.icon_class,
+        }));
+      }
+    });
+  }
+  await fetchCategories();
   await getVoteResults();
+  if (authStore.isLoggedIn) {
+    await voteStore.getUserVote();
+  }
 });
+
+
 </script>
 
 <style scoped>

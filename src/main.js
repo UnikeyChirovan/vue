@@ -5,6 +5,7 @@ import { CkeditorPlugin } from '@ckeditor/ckeditor5-vue';
 import router from './router';
 import axios from 'axios';
 import api from './services/axiosInterceptor';
+import apiLinks from './services/api-links';
 // import 'default-passive-events'; // xử lý tự động passive là true
 window.axios = axios;
 axios.defaults.withCredentials = true;
@@ -70,6 +71,7 @@ import {
   NCarouselItem,
   NList,
   NListItem,
+  NProgress
 } from 'naive-ui';
 import App from './App.vue';
 
@@ -123,6 +125,7 @@ const naive = create({
     NAlert,
     NList,
     NListItem,
+    NProgress
   ],
 });
 
@@ -154,3 +157,4 @@ app.use( CkeditorPlugin );
 app.mount('#app');
 app.config.globalProperties.$message = message;
 app.config.globalProperties.$api = api;
+app.config.globalProperties.$apiLinks = apiLinks;

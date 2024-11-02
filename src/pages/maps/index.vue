@@ -1,37 +1,89 @@
 <template>
-  <TheHeader />
-  <n-layout>
-    <div class="container">
-      <div class="gioi-thieu">
-        <h1 class="text-uppercase">Chào Mừng Đến Với Bản Đồ Thế Giới Selorson</h1>
-        <p>Selorson là một thế giới rộng lớn, huyền bí, và đầy những vùng đất chưa được khám phá. Bản đồ này sẽ giúp bạn khám phá từ toàn bộ thế giới đến những vùng đất cụ thể, mỗi vùng đều ẩn chứa những câu chuyện, nền văn hóa và truyền thuyết riêng.</p>
+  <TheHeader/>
+  <div class="container">
+    <div v-for="notification in notifications" :key="notification.id" class="map-container">
+      <h2 class="text-uppercase title-centered">{{ notificationDetails[notification.id]?.title }}</h2>
+      
+      <!-- Xử lý nội dung thành nhiều đoạn văn -->
+      <div v-if="notificationDetails[notification.id]?.content">
+        <p v-for="(paragraph, index) in formattedContent(notificationDetails[notification.id].content)" 
+           :key="index" 
+           class="text-left indented-paragraph">
+          {{ paragraph }}
+        </p>
       </div>
-      <div class="map-container">
-        <h2 class="text-uppercase">Selorson World's Map</h2>
-        <p>Khám phá toàn bộ thế giới Selorson từ các đỉnh núi cao nhất đến những đại dương sâu thẳm.</p>
-        <img src="../../assets/img/map.jpg" alt="Bản Đồ Thế Giới Selorson" class="map-image" />
-      </div>
-      <div class="map-container">
-        <h2 class="text-uppercase">Annamland</h2>
-        <p>Annamland là một trong những vùng đất cổ xưa nhất, với những cánh rừng bí ẩn và những thành phố bị lãng quên từ lâu, của những con người chân chất và kiên cường.</p>
-        <img src="../../assets/img/annamland.jpg" alt="Bản Đồ Annamland" class="map-image" />
-      </div>
-      <div class="map-container">
-        <h2 class="text-uppercase">thánh địa Skyland</h2>
-        <p>Skyland, vùng đất trên những đám mây, nơi ở linh thiêng của các vị thần. Vùng đất này chứa đựng những bí ẩn của trời cao và phép thuật cổ xưa.</p>
-        <img src="../../assets/img/skyland.png" alt="Bản Đồ Skyland" class="map-image" />
-      </div>
-      <div class="map-container">
-        <h2 class="text-uppercase">tử địa devilland</h2>
-        <p>Devilland là vùng đất của bóng tối và sự hỗn loạn, lãnh địa của những thế lực hắc ám và sinh vật quái dị, một nơi mà sự sống và hy vọng đều bị bóp nghẹt bởi ma thuật tà ác.</p>
-        <img src="../../assets/img/devilland.png" alt="Bản Đồ Devilland" class="map-image" />
-      </div>
+      
+      <img v-if="notificationDetails[notification.id]?.image_paths.length > 0"
+           :src="`http://127.0.0.1:8000/storage/${notificationDetails[notification.id].image_paths[0]}`" 
+           :alt="`Image for ${notificationDetails[notification.id]?.title}`" 
+           class="map-image" />
     </div>
-  </n-layout>
+  </div>
+  <TheFooter/>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
+import apiLinks from '../../services/api-links';
 import TheHeader from '../../components/TheHeader.vue';
+import TheFooter from '../../components/TheFooter.vue';
+
+const notifications = ref([]);
+const notificationDetails = ref(JSON.parse(localStorage.getItem('notification_detail')) || {});
+
+// Hàm định dạng nội dung thành các đoạn văn tách biệt
+const formattedContent = (content) => {
+  return content.split(/\n+/).map(paragraph => paragraph.trim()).filter(paragraph => paragraph);
+};
+
+const fetchNotifications = async () => {
+  try {
+    const storedNotifications = JSON.parse(localStorage.getItem('notifications')) || [];
+    notifications.value = storedNotifications.filter((notification) => notification.page === 'maps');
+
+    if (notifications.value.length > 0) {
+      await Promise.all(
+        notifications.value.map(async (notification) => {
+          await loadNotificationDetail(notification.id);
+        })
+      );
+    } else {
+      const response = await apiLinks.notifications.getAll();
+      notifications.value = response.data.notifications.filter(
+        (notification) => notification.page === 'maps'
+      );
+      localStorage.setItem('notifications', JSON.stringify(notifications.value));
+
+      await Promise.all(
+        notifications.value.map(async (notification) => {
+          await loadNotificationDetail(notification.id);
+        })
+      );
+    }
+  } catch (error) {
+    console.error('Không thể tải thông báo:', error);
+  }
+};
+
+const loadNotificationDetail = async (id) => {
+  if (notificationDetails.value[id]) {
+    return;
+  }
+
+  try {
+    const response = await apiLinks.notifications.getDetail(id);
+    const detail = response.data.notification_detail;
+    notificationDetails.value[id] = detail;
+
+    localStorage.setItem('notification_detail', JSON.stringify(notificationDetails.value));
+  } catch (error) {
+    console.error(`Không thể tải nội dung thông báo ${id}:`, error);
+  }
+};
+
+onMounted(() => {
+  fetchNotifications();
+});
 </script>
 
 <style scoped>
@@ -41,37 +93,32 @@ import TheHeader from '../../components/TheHeader.vue';
   padding: 20px;
 }
 
-.gioi-thieu {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.gioi-thieu h1 {
-  font-size: 3rem;
-  color: #2c3e50;
-  margin-bottom: 15px;
-}
-
-.gioi-thieu p {
-  font-size: 1.2rem;
-  color: #7f8c8d;
-}
-
 .map-container {
   margin-bottom: 40px;
   text-align: center;
 }
 
-.map-container h2 {
+.title-centered {
+  text-align: center;
   font-size: 2rem;
   color: #34495e;
   margin-bottom: 10px;
 }
 
-.map-container p {
+.text-left {
+  text-align: left;
   font-size: 1.1rem;
   color: #95a5a6;
-  margin-bottom: 20px;
+}
+p{
+  margin-top: 0px;
+  margin-bottom: 7px;
+  /* padding-left: 3rem;
+  padding-right:3rem; */
+}
+
+.indented-paragraph {
+  text-indent: 2em; /* Thụt lề cho dòng đầu */
 }
 
 .map-image {
@@ -80,9 +127,5 @@ import TheHeader from '../../components/TheHeader.vue';
   height: auto;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-p{
-  text-align: left;
-  text-indent: 3rem;
 }
 </style>

@@ -3,7 +3,7 @@
   <div class="container mt-5">
     <div class="row">
       <div class="col-md-8">
-        <h2 class="title">TRANG LIÊN HỆ QUẢN TRỊ</h2>
+        <h2 class="title">{{ contactTitle }}</h2>
         <form @submit.prevent="submitForm" class="mt-4" style="position: relative;">
             <div class="row">
               <div class="col-12">
@@ -36,25 +36,25 @@
           </form>
       </div>
         <div class="col-md-4">
-          <h2 class="title mb-3">{{ webInfo.webname }}</h2>
+          <h2 class="title mb-3">{{ companyInfo.webname }}</h2>
           <div class="contact-info mt-4">
-            <p><strong>Địa chỉ:</strong> {{ webInfo.address }}</p>
-            <p><strong>Điện thoại:</strong> {{ webInfo.phone }}</p>
-            <p><strong>Email:</strong> {{ webInfo.email }} </p>
-            <p><strong>Mạng xã hội:</strong></p>
+            <p><strong>{{ titleAddress }}</strong> {{ companyInfo.address }}</p>
+            <p><strong>{{ titlePhone }}</strong> {{ companyInfo.phone }}</p>
+            <p><strong>{{ titleEmail }}</strong> {{ companyInfo.email }} </p>
+            <p><strong>{{ titleSocialMedia }}</strong></p>
             <ul class="list-unstyled d-flex">
-              <li class="me-3" v-if="webInfo.facebook">
-                <a :href="webInfo.facebook" target="_blank"><i class="fab fa-facebook"></i> Facebook</a>
+              <li class="me-3" v-if="companyInfo.facebook">
+                <a :href="companyInfo.facebook" target="_blank"><i class="fab fa-facebook"></i> Facebook</a>
               </li>
-              <li class="me-3" v-if="webInfo.twitter">
-                <a :href="webInfo.twitter" target="_blank"><i class="fab fa-twitter"></i> Twitter</a>
+              <li class="me-3" v-if="companyInfo.twitter">
+                <a :href="companyInfo.twitter" target="_blank"><i class="fab fa-twitter"></i> Twitter</a>
               </li>
-              <li class="me-3" v-if="webInfo.linkedin">
-                <a :href="webInfo.linkedin" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a>
+              <li class="me-3" v-if="companyInfo.linkedin">
+                <a :href="companyInfo.linkedin" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a>
               </li>
             </ul>
             <div class="mt-4">
-              <h4>Bản đồ</h4>
+              <h4>{{ titleMap }}</h4>
               <iframe
                 :src="'https://www.google.com/maps/embed?pb=' + webInfo.address"
                 width="100%" height="250" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
@@ -68,10 +68,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick } from 'vue';
+import { ref, reactive, onMounted, computed, nextTick } from 'vue';
 import CKEditor from '../../components/CKEditor.vue';
 import TheHeader from '../../components/TheHeader.vue';
 import TheFooter from '../../components/TheFooter.vue';
+import apiLinks from '../../services/api-links';
+const categories = ref([]);
+const isCategoriesReady = ref(false); 
 import axios from 'axios';
 import { useMessage } from 'naive-ui';
 const messagenaive = useMessage();
@@ -144,20 +147,88 @@ const defaultForm = () => {
       console.error(error);
     });
 };
+async function fetchCategories() {
+  const storedCategories = localStorage.getItem('categories');
+  if (storedCategories) {
+    categories.value = JSON.parse(storedCategories);
+    isCategoriesReady.value = true;
+  } else {
+    try {
+      const response = await fetch(apiLinks.categories.getAll);
+      const data = await response.json();
+      localStorage.setItem('categories', JSON.stringify(data));
+      categories.value = data;
+      isCategoriesReady.value = true;
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  }
+}
+const contactTitle = computed(() => isCategoriesReady.value? categories.value.find(category => category.code === '5' && category.page === 'contact')?.name : 'TRANG LIÊN HỆ QUẢN TRỊ');
+const titleAddress = computed(() => isCategoriesReady.value ? categories.value.find(category => category.code === '6' && category.page === 'contact')?.name : 'Địa chỉ:');
+const titlePhone = computed(() => isCategoriesReady.value ? categories.value.find(category => category.code === '7' && category.page === 'contact')?.name : 'Điện thoại:');
+const titleEmail = computed(() => isCategoriesReady.value ? categories.value.find(category => category.code === '8' && category.page === 'contact')?.name : 'Email:');
+const titleSocialMedia = computed(() => isCategoriesReady.value ? categories.value.find(category => category.code === '9' && category.page === 'contact')?.name : 'Mạng xã hội');
+const titleMap = computed(() => isCategoriesReady.value ? categories.value.find(category => category.code === '10' && category.page === 'contact')?.name : 'Bản đồ');
+// const titleWebname = computed(() => isCategoriesReady.value ? categories.value.find(category => category.code === '11' && category.page === 'contact')?.name : 'SELORSON TALES ENTERTAIMENT');
 
+const companyInfo = ref({
+  webname: 'SELORSON TALES ENTERTAINMENT',
+  address: '123 ABC QUẬN 1',
+  phone: '0123456789',
+  email: 'abc@gmail.com',
+  facebook: '#',
+  twitter: '#',
+  linkedin: '#',
+});
 
-const getInfo = () => {
-  axios.get('http://127.0.0.1:8000/api/noauth/contact')
-  .then((response)=>{
-    // console.log(response)
-    webInfo.value = response.data
-  })
-  .catch((err)=>{
-    console.log(err)
-  })
+async function checkCompanyInfos() {
+  let companyInfos = JSON.parse(localStorage.getItem('companyInfos'));
+  
+  for (let i = 0; i < 20; i++) {
+    if (companyInfos) {
+      // Nếu tìm thấy dữ liệu trong localStorage, trả về dữ liệu đầu tiên
+      return companyInfos[0]; // Lấy thông tin công ty đầu tiên
+    }
+    
+    // Đợi 0,5 giây trước khi thử lại
+    await new Promise(resolve => setTimeout(resolve, 500));
+    companyInfos = JSON.parse(localStorage.getItem('companyInfos'));
+  }
+
+  // Nếu không tìm thấy, gọi API để lấy dữ liệu và lưu vào localStorage
+  try {
+    const response = await apiLinks.companyInfo.getAll();
+    companyInfos = response.data;
+    localStorage.setItem('companyInfos', JSON.stringify(companyInfos)); // Lưu vào localStorage
+    return companyInfos[0]; // Lấy thông tin công ty đầu tiên
+  } catch (error) {
+    console.error('Lỗi khi lấy dữ liệu companyInfos từ API:', error);
+    return null;
+  }
+}
+
+// Hàm khởi tạo
+async function initCompanyInfos() {
+  // Đợi 2 giây trước khi bắt đầu kiểm tra
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  const info = await checkCompanyInfos();
+
+  if (info) {
+    companyInfo.value = {
+      webname: info.webname || 'Tiêu đề mặc định',
+      address: info.address || 'Địa chỉ mặc định',
+      phone: info.phone || 'Số điện thoại mặc định',
+      email: info.email || 'Email mặc định',
+      facebook: info.facebook || '#',
+      twitter: info.twitter || '#',
+      linkedin: info.linkedin || '#'
+    };
+  }
 }
   onMounted(() => {
-    getInfo();
+    fetchCategories();
+    initCompanyInfos();
   });
 </script>
 <style scoped>

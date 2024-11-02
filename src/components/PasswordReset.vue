@@ -18,8 +18,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useMessage } from 'naive-ui';
-import { GlassesOutline } from '@vicons/ionicons5';
-import api from '../services/axiosInterceptor';
+import apiLinks from '../services/api-links';
 
 const route = useRoute();
 const router = useRouter();
@@ -42,7 +41,7 @@ onMounted(() => {
 const handleSubmit = async () => {
     loading.value = true;
     try {
-        const response = await api.post('auth/password-reset', {
+        const response = await apiLinks.auth.resetPassword({
             token,
             email,
             password: password.value,

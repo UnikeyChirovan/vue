@@ -96,7 +96,7 @@ const getBackgrounds = async () => {
   try {
     const response = await api.get('image-manager');
     console.log('image', response)
-    backgrounds.value = response.data;
+    backgrounds.value = response.data.images;
   } catch (error) {
     console.error(error);
     message.error('Lỗi khi lấy danh sách hình nền.');

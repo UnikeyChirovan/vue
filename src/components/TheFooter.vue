@@ -15,7 +15,7 @@
                 <n-icon size="30">
                   <Sigma style="color: red;" />
                 </n-icon>
-                {{ totalVotes }}
+                {{ voteResults.totalVotes }}
               </div>
               <div class="icon">
                 <n-icon size="30">
@@ -100,28 +100,51 @@ import { NLayoutFooter, NButton, NInput, NSpace } from 'naive-ui';
 import { Star, Rocket } from '@vicons/ionicons5';
 import Handshake20Filled from '@vicons/fluent/Handshake20Filled';
 import Sigma from '@vicons/carbon/Sigma';
-import api from '../services/axiosInterceptor'; 
 import { useMessage } from 'naive-ui';
+import apiLinks from '../services/api-links';
 const message = useMessage();
 
 const voteResults = ref({
+  totalVotes: 0,
   votesByChoice: {}
 });
 
-const totalVotes = ref(0);
+const getVoteResultsFromStorageOrApi = async () => {
+  const storedVoteResults = localStorage.getItem('voteResults');
 
-const getVoteResults = async () => {
-  try {
-    const response = await api.get('/vote/results'); 
-    voteResults.value = {
-      votesByChoice: response.data.votes_by_choice.reduce((acc, vote) => {
-        acc[vote.choice] = vote.total;
-        return acc;
-      }, {})
-    };
-    totalVotes.value = response.data.total_users_voted || 0;
-  } catch (error) {
-    console.error('Lỗi khi lấy kết quả vote:', error);
+  if (storedVoteResults) {
+    voteResults.value = JSON.parse(storedVoteResults);
+  } else {
+    // Kiểm tra mỗi 0,5 giây, tối đa 30 lần (tổng cộng là 15 giây)
+    let attempts = 0;
+    const maxAttempts = 30;
+    const intervalTime = 500; // 0,5 giây
+
+    const intervalId = setInterval(async () => {
+      const voteData = localStorage.getItem('voteResults');
+
+      if (voteData) {
+        voteResults.value = JSON.parse(voteData);
+        clearInterval(intervalId);
+      } else if (attempts >= maxAttempts) {
+        clearInterval(intervalId);
+        
+        try {
+          const response = await apiLinks.votes.getVoteResults();
+          voteResults.value = {
+            totalVotes: response.data.total_users_voted,
+            votesByChoice: response.data.votes_by_choice.reduce((acc, vote) => {
+              acc[vote.choice] = vote.total;
+              return acc;
+            }, {})
+          };
+          localStorage.setItem('voteResults', JSON.stringify(voteResults.value));
+        } catch (error) {
+          console.error('Lỗi khi lấy kết quả vote:', error);
+        }
+      }
+      attempts++;
+    }, intervalTime);
   }
 };
 const email = ref('');
@@ -133,7 +156,7 @@ const subscribeToNewsletter = async () => {
   }
 
   try {
-    const response = await api.post('/newsletter/subscribe', { email: email.value });
+    const response = apiLinks.newsletter.subscribe({ email: email.value });
     message.success(response.data.success);
     email.value = '';
   } catch (error) {
@@ -142,7 +165,7 @@ const subscribeToNewsletter = async () => {
 };
 
 onMounted(() => {
-  getVoteResults();
+  getVoteResultsFromStorageOrApi();
 });
 </script>
 
