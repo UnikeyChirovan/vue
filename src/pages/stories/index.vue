@@ -102,20 +102,35 @@ const storyName = ref('');
 const authorName = ref('');
 const chapterContent = ref([]);
 const currentChapterTitle = ref('');
-const hasSavedChapter = ref(false);
 
 const isFetching = ref(false);
 
 const fetchChapterContent = async (chapterNumber) => {
-  const cachedChapter = sessionStorage.getItem(`chapter-${chapterNumber}`);
+  // Lấy chapter_detail từ localStorage và kiểm tra xem có dữ liệu chưa
+  let chapterDetail = JSON.parse(localStorage.getItem('chapter_detail')) || [];
+
+  // Đảm bảo chapterDetail là một mảng
+  if (!Array.isArray(chapterDetail)) {
+    chapterDetail = [];
+  }
+
+  // Tìm kiếm chương trong chapterDetail
+  const cachedChapter = chapterDetail.find(
+    (chapter) => chapter[`chapter-${chapterNumber}`]
+  );
+
   if (cachedChapter) {
-    const { title, content } = JSON.parse(cachedChapter);
+    const { title, content } = cachedChapter[`chapter-${chapterNumber}`];
     chapterContent.value = content;
     currentChapterTitle.value = title;
+    if (chapterStore.selectedChapter !== chapterNumber) {
+      chapterStore.setSelectedChapter(chapterNumber);
+    }
     window.scrollTo(0, 0);
     return;
   }
 
+  // Nếu không có trong cache, gọi API để lấy nội dung chương
   try {
     if (isFetching.value) return;
     isFetching.value = true;
@@ -126,7 +141,11 @@ const fetchChapterContent = async (chapterNumber) => {
     chapterContent.value = content;
     currentChapterTitle.value = title;
 
-    sessionStorage.setItem(`chapter-${chapterNumber}`, JSON.stringify({ title, content }));
+    // Thêm chương mới vào chapter_detail
+    chapterDetail.push({ [`chapter-${chapterNumber}`]: { title, content } });
+
+    // Cập nhật lại localStorage với chapter_detail mới
+    localStorage.setItem('chapter_detail', JSON.stringify(chapterDetail));
 
     if (chapterStore.selectedChapter !== chapterNumber) {
       chapterStore.setSelectedChapter(chapterNumber);
@@ -140,29 +159,46 @@ const fetchChapterContent = async (chapterNumber) => {
   }
 };
 
+
 const fetchChaptersList = async () => {
   try {
-    const response = await api.get('/story/chapters');
-    const options = response.data.map((chapter) => ({
+    let chapters = localStorage.getItem('chapters');
+    
+    // Nếu đã có dữ liệu trong localStorage thì dùng nó, không cần gọi API
+    if (chapters) {
+      chapters = JSON.parse(chapters);
+    } else {
+      // Nếu chưa có, gọi API và lưu vào localStorage
+      const response = await api.get('/story/chapters');
+      chapters = response.data;
+      localStorage.setItem('chapters', JSON.stringify(chapters));
+    }
+
+    // Tạo options từ dữ liệu chapters
+    const options = chapters.map((chapter) => ({
       label: `Chương ${chapter.chapter_number}`,
-      title: chapter.title,
       value: chapter.id,
+      title: chapter.title,
     }));
     chapterStore.setChapterOptions(options);
 
+    // Cập nhật thông tin truyện
+    const story = chapters[0]?.story_name || 'Tên truyện không xác định';
+    const author = chapters[0]?.author || 'Tác giả không xác định';
+    storyName.value = story;
+    authorName.value = author;
+    localStorage.setItem('storyName', story);
+    localStorage.setItem('authorName', author);
+
+    // Chọn chương đầu tiên nếu chưa có chương nào được chọn
     if (chapterStore.selectedChapter === null && options.length) {
       chapterStore.setSelectedChapter(options[0].value);
     }
-    const story = response.data[0]?.story_name || 'Tên truyện không xác định';
-    const author = response.data[0]?.author || 'Tác giả không xác định';
-    storyName.value = story;
-    authorName.value = author;
-    sessionStorage.setItem('storyName', story);
-    sessionStorage.setItem('authorName', author);
   } catch (error) {
     console.error('Lỗi khi lấy danh sách chương:', error);
   }
 };
+
 
 const prevChapter = () => {
   if (chapterStore.selectedChapter > 0) {
@@ -183,26 +219,29 @@ const updateChapterAndFetchContent = (newChapter) => {
 };
 const fetchLastReadChapter = async () => {
   try {
-    const response = await api.get(`/story/user-chapter`);
-    if (response.data) {
-      hasSavedChapter.value = true;
-      const lastChapterId = response.data.id; 
+    const lastChapterId = sessionStorage.getItem('lastReadChapter');
+
+    if (lastChapterId) {
       chapterStore.setSelectedChapter(lastChapterId);
       fetchChapterContent(lastChapterId);
+      return; // Kết thúc hàm nếu đã có lastChapterId
+    }
+
+    const response = await api.get(`/story/user-chapter`);
+    if (response.data) {
+      const chapterId = response.data?.chapter_id;
+      chapterStore.setSelectedChapter(chapterId);
+      fetchChapterContent(chapterId);
     }
   } catch (error) {
     console.error('Lỗi khi lấy chương cuối cùng:', error);
   }
 };
 
+
 const saveChapterProgress = async (chapterId) => {
   try {
-    if (hasSavedChapter.value) {
-      await api.put(`/story/user-chapter`, { chapter_id: chapterId });
-    } else {
       await api.post(`/story/user-chapter`, { chapter_id: chapterId });
-      hasSavedChapter.value = true;
-    }
   } catch (error) {
     console.error('Lỗi khi lưu chương:', error);
   }
@@ -223,8 +262,8 @@ watch(
 
 onMounted(() => {
   const lastReadChapter = sessionStorage.getItem('lastReadChapter');
-  const savedStoryName = sessionStorage.getItem('storyName');
-  const savedAuthorName = sessionStorage.getItem('authorName');
+  const savedStoryName = localStorage.getItem('storyName');
+  const savedAuthorName = localStorage.getItem('authorName');
 
   if (savedStoryName) {
     storyName.value = savedStoryName;
@@ -238,7 +277,6 @@ onMounted(() => {
     chapterStore.setSelectedChapter(chapterNumber);
     fetchChapterContent(chapterNumber);
     fetchChaptersList();
-    fetchLastReadChapter();
   } else {
     fetchChaptersList(); 
     fetchLastReadChapter();

@@ -39,39 +39,52 @@ export const useLoadingStore = defineStore('loading', () => {
     }
   }
 
-  async function fetchDataBeforeLogin(callback) {
-    isDataLoading.value = true;
-    loadingProgress.value = 0;
+    async function fetchDataBeforeLogin(callback) {
+      isDataLoading.value = true;
+      loadingProgress.value = 0;
 
-    try {
-      await checkAndUpdateData(apiLinks.heroSlides.getAll, 'heroSlides');
-      updateProgress(20);
-      await checkAndUpdateData(apiLinks.notifications.getAll, 'notifications');
-      const notificationId = JSON.parse(localStorage.getItem('notifications'))?.[0]?.id;
-      if (notificationId) {
-          await checkAndUpdateData(() => apiLinks.notifications.getDetail(notificationId), 'notification_detail');
+      const updateStepProgress = (step) => {
+        loadingProgress.value += step;
+      };
+
+      try {
+        // Tạo các promise và cập nhật tiến trình sau khi từng promise hoàn tất
+        await Promise.all([
+          checkAndUpdateData(apiLinks.heroSlides.getAll, 'heroSlides').then(() => updateStepProgress(20)),
+          checkAndUpdateData(apiLinks.notifications.getAll, 'notifications').then(async () => {
+            updateStepProgress(20);
+            const notificationId = JSON.parse(localStorage.getItem('notifications'))?.[0]?.id;
+            if (notificationId) {
+              await checkAndUpdateData(() => apiLinks.notifications.getDetail(notificationId), 'notification_detail');
+            }
+          }),
+          checkAndUpdateData(apiLinks.futureProjects.getAll, 'futureProjects').then(() => updateStepProgress(20)),
+          checkAndUpdateData(apiLinks.features.getAll, 'features').then(() => updateStepProgress(20))
+        ]);
+
+        if (callback) {
+          callback();
+        }
+
+        await checkAndUpdateData(apiLinks.categories.getAll, 'categories');
+        updateProgress(100);
+        sessionStorage.setItem('Before', 'ok');
+
+        // Các lời gọi API cuối cùng sau khi hoàn tất phần trên
+        await Promise.all([
+          checkAndUpdateData(apiLinks.companyInfo.getAll, 'companyInfos'),
+          checkAndUpdateData(apiLinks.sections.getAll, 'sections'),
+          checkAndUpdateData(apiLinks.imageManager.getImages, 'images')
+        ]);
+
+        sessionStorage.setItem('Before_2', 'ok');
+      } catch (error) {
+        console.error('Error fetching data before login:', error);
+        isDataLoading.value = false;
+        sessionStorage.setItem('Before', 'false');
       }
-      updateProgress(40);
-      await checkAndUpdateData(apiLinks.futureProjects.getAll, 'futureProjects');
-      updateProgress(60);
-      await checkAndUpdateData(apiLinks.features.getAll, 'features');
-      updateProgress(80);
-      if (callback) {
-        callback();
-      }
-      await checkAndUpdateData(apiLinks.categories.getAll, 'categories');
-      updateProgress(100);
-      sessionStorage.setItem('Before', 'ok');
-      await checkAndUpdateData(apiLinks.companyInfo.getAll, 'companyInfos');
-      await checkAndUpdateData(apiLinks.sections.getAll, 'sections');
-      await checkAndUpdateData(apiLinks.imageManager.getImages, 'images');
-      sessionStorage.setItem('Before_2', 'ok');
-    } catch (error) {
-      console.error('Error fetching data before login:', error);
-      isDataLoading.value = false;
-      sessionStorage.setItem('Before', 'false');
     }
-  }
+
 
 async function fetchDataAfterLogin() {
   isDataLoading.value = true;
@@ -93,32 +106,30 @@ async function fetchDataFinalLogin() {
   const userId = useAuthStore().user?.id;
 
   try {
-    const profile = await apiLinks.profile.show(userId);
-    sessionStorage.setItem('user_profile', JSON.stringify(profile.data));
+    const [
+      chapters,
+      lastChapter,
+      backgrounds,
+      userSettings,
+      profile,
+    ] = await Promise.all([
+      apiLinks.story.getChapters(),
+      apiLinks.story.getLastReadChapter(),
+      apiLinks.story.getBackgrounds(),
+      apiLinks.story.getSettings(userId),
+      apiLinks.profile.show(userId),
+    ]);
 
-    const profileEdit = await apiLinks.profile.edit(userId);
-    sessionStorage.setItem('user_profile_edit', JSON.stringify(profileEdit.data));
-
-    const chapters = await apiLinks.story.getChapters();
-    sessionStorage.setItem('story_chapters', JSON.stringify(chapters.data));
-    const chapterId = chapters.data[0]?.id;
-
+    localStorage.setItem('chapters', JSON.stringify(chapters.data));
+    
+    const chapterId = lastChapter.data?.chapter_id;
     if (chapterId) {
-      const chapterDetail = await apiLinks.story.getChapter(chapterId);
-      sessionStorage.setItem('chapter_detail', JSON.stringify(chapterDetail.data));
+      sessionStorage.setItem('lastReadChapter', chapterId);
     }
 
-    const backgrounds = await apiLinks.story.getBackgrounds();
-    sessionStorage.setItem('story_backgrounds', JSON.stringify(backgrounds.data));
-    const backgroundId = backgrounds.data[0]?.id;
-
-    if (backgroundId) {
-      const backgroundImage = await apiLinks.story.getImage(backgroundId);
-      sessionStorage.setItem('background_image', JSON.stringify(backgroundImage.data));
-    }
-
-    const userSettings = await apiLinks.story.getSettings(userId);
-    sessionStorage.setItem('user_settings', JSON.stringify(userSettings.data));
+    sessionStorage.setItem('backgrounds', JSON.stringify(backgrounds.data));
+    sessionStorage.setItem('user_settings_early', JSON.stringify(userSettings.data));
+    sessionStorage.setItem('user_profile', JSON.stringify(profile.data));
 
     sessionStorage.setItem('Final', 'ok');
   } catch (error) {
@@ -126,6 +137,7 @@ async function fetchDataFinalLogin() {
     sessionStorage.setItem('Final', 'false');
   }
 }
+
 
   return {
     loadingProgress,

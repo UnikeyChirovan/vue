@@ -398,7 +398,6 @@ onBeforeRouteLeave((to, from) => {
 
   onMounted(async () => {
       const savedSettings = sessionStorage.getItem('user-settings');
-      await fetchBackgrounds();
       if (savedSettings) {
         settingsStore.loadSettings();
       } else {
@@ -407,6 +406,7 @@ onBeforeRouteLeave((to, from) => {
       }
       saveInitialSettings(); 
       applySettings();
+      await fetchBackgrounds();
   });
 
 

@@ -103,6 +103,7 @@ import Sigma from '@vicons/carbon/Sigma';
 import { useMessage } from 'naive-ui';
 import apiLinks from '../services/api-links';
 const message = useMessage();
+import api from '../services/axiosInterceptor';
 
 const voteResults = ref({
   totalVotes: 0,
@@ -156,7 +157,7 @@ const subscribeToNewsletter = async () => {
   }
 
   try {
-    const response = apiLinks.newsletter.subscribe({ email: email.value });
+    const response = await api.post('/newsletter/subscribe', { email: email.value });
     message.success(response.data.success);
     email.value = '';
   } catch (error) {

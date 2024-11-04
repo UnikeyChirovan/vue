@@ -373,6 +373,7 @@ const updateUsers = () => {
     .then((response) => {
       if (response.status === 200) {
         message.success('Cập nhật thành công!');
+        useProfile.updateUser(payload);
         router.push({ name: 'profile-info' });
       }
     })

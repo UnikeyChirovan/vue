@@ -27,7 +27,7 @@ const apiLinks = {
     getVoteResults: () => api.get('/vote/results'),
   },
   newsletter: {
-    subscribe: (email) => api.post('/newsletter/subscribe', { email }),
+    subscribe: (email) => axios.post(`${baseUrls}/api/newsletter/subscribe`, { email }),
     unsubscribe: () => api.get('/newsletter/unsubscribe'),
     createNotification: (data) => api.post('/newsletter/notifications/create', data),
     getAllNotifications: () => api.get('/newsletter/notifications'),
@@ -71,7 +71,6 @@ const apiLinks = {
     getSettings: (userId) => api.get(`/story/${userId}/settings`),
     updateSettings: (data) => api.put('/story/settings', data),
     saveCurrentChapter: (data) => api.post('/story/user-chapter', data),
-    updateCurrentChapter: (data) => api.put('/story/user-chapter', data),
     getLastReadChapter: () => api.get('/story/user-chapter'),
     uploadBackground: (data) => api.post('/story/upload-background', data),
     updateChapter: (id, data) => api.put(`/story/chapters/${id}`, data),

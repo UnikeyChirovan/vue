@@ -118,6 +118,10 @@
           <p>Following</p>
         </div>
       </div>
+      <div class="last-chapter-section card">
+  <h2>Chương đọc gần nhất: <span>{{ lastChapter - 1 }}</span></h2>
+</div>
+
     </div>
     <div class="about-section card">
       <h2>About Me</h2>
@@ -376,15 +380,19 @@ const saveEditedCover = () => {
   });
 };
 
+const lastChapter = ref("");
+
 const getLastChapter = () => {
   api.get(`/story/user-chapter`)
-    .then(() => {
+    .then(response => {
       console.log('Fetch successful');
+      lastChapter.value = response.data.chapter_id;
     })
     .catch(error => {
       console.error('Error fetching the chapter:', error);
     });
 };
+
 
 
 onBeforeUnmount(() => {
@@ -605,5 +613,18 @@ onBeforeUnmount(() => {
   justify-content: center;
   z-index: 10;
 }
+.last-chapter-section {
+  border-radius: 5px;
+
+  h2 {
+    font-size: 1.5rem; 
+    
+    span {
+      font-weight: bold; 
+      color: #fb411c; 
+    }
+  }
+}
+
 </style>
 
