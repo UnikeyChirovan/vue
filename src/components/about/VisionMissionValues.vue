@@ -10,7 +10,6 @@
         <h2 class="primary">{{ sections[3].title }}</h2>
         <div class="content" v-html="formatContent(sections[3].content, sections[3].section_number)"></div>
       </div>
-      
       <!-- Mission -->
       <div v-if="sections[4]" class="col-md-4 mission-box">
         <n-icon size="64" class="mission-icon">
@@ -19,7 +18,6 @@
         <h2 class="primary">{{ sections[4].title }}</h2>
         <div class="content" v-html="formatContent(sections[4].content, sections[4].section_number)"></div>
       </div>
-
       <!-- Core Values -->
       <div v-if="sections[5]" class="col-md-4 values-box">
         <n-icon size="64" class="values-icon">
@@ -95,20 +93,20 @@ onMounted(() => {
   font-weight: bold;
   color: #2c3e50;
   margin-bottom: 30px;
-  text-transform: uppercase; /* In hoa tiêu đề */
+  text-transform: uppercase;
 }
 
 h2 {
   margin-top: 15px;
   margin-bottom: 10px;
   font-size: 1.5rem;
-  text-align: center; /* Canh giữa tiêu đề */
+  text-align: center; 
 }
 
 .content {
   font-size: 1rem;
   color: #333;
-  text-align: left; /* Canh lề trái cho nội dung */
+  text-align: left;
 }
 
 .vision-icon {
@@ -123,7 +121,7 @@ h2 {
   color: #e74c3c;
 }
 
-/* Hiệu ứng hover: sáng và nhích lên */
+
 .vision-box,
 .mission-box,
 .values-box {
@@ -133,7 +131,7 @@ h2 {
 .vision-box:hover,
 .mission-box:hover,
 .values-box:hover {
-  transform: translateY(-10px); /* Nhích lên khi hover */
-  filter: brightness(1.2); /* Sáng lên khi hover */
+  transform: translateY(-10px);
+  filter: brightness(1.2); 
 }
 </style>

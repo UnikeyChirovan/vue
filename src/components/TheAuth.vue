@@ -154,7 +154,6 @@
   import { useRouter } from 'vue-router';
   import { useAuthStore } from '../stores/auth';
   import LoadingModal from './LoadingModal.vue';
-  // import { isDataLoading, fetchDataAfterLogin } from '../services/loadingData';
   import { useLoadingStore } from '../stores/loadingStore';
   const loadingStore = useLoadingStore();
   const auth = useAuthStore();
@@ -262,12 +261,12 @@ const handleLoginSubmit = async () => {
       rememberMe: rememberMe.value,
     });
 
-    // Xử lý phản hồi đăng nhập
+
     const accessToken = response.data.access_token;
     const user = response.data.user;
     const isAdmin = response.data.isAdmin;
 
-    auth.login(user, isAdmin, accessToken); // Đăng nhập người dùng
+    auth.login(user, isAdmin, accessToken); 
 
     resetLoginForm();
     closeLoginModal();

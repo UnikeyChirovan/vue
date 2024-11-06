@@ -26,19 +26,19 @@ const router = useRouter();
 const backgroundId = route.params.id;
 
 const form = ref({
-  image_name: '', // Sửa lại key để khớp với dữ liệu từ API
+  image_name: '', 
   image_path: '', 
 });
 
 const BaseURL = 'http://127.0.0.1:8000';
 const imageUrl = computed(() => {
-  return `${BaseURL}/storage/${form.value.image_path}`; // Sửa lại để lấy đường dẫn đúng
+  return `${BaseURL}/storage/${form.value.image_path}`; 
 });
 
 const fetchBackgroundData = async () => {
   try {
     const response = await api.get(`/image-manager/${backgroundId}`);
-    form.value = response.data; // Gán dữ liệu từ API vào form
+    form.value = response.data; 
   } catch (error) {
     console.error(error);
     message.error('Đã xảy ra lỗi khi tải hình nền.');
@@ -48,7 +48,7 @@ const fetchBackgroundData = async () => {
 const submitForm = async () => {
   try {
     await api.put(`/image-manager/${backgroundId}`, {
-      image_name: form.value.image_name, // Sửa lại key để khớp với API
+      image_name: form.value.image_name, 
     });
     message.success('Hình nền đã được cập nhật thành công.');
     router.push({ name: 'admin-images-manager' }); 

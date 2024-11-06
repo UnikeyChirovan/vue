@@ -6,7 +6,7 @@
         <div class="col-md-2">
           <h3 class="company-name text-uppercase text-white">Selorson Tales</h3>
           <p class="text-white">Chút sắc màu cuộc sống</p>
-          <img src="../assets/img/logo.png" alt="Logo Công Ty" class="company-logo mb-3" />
+          <img :src="introImage" alt="Logo Công Ty" class="company-logo mb-3" />
         </div>
         <div class="col-md-10">
           <div class="row mb-2">
@@ -41,17 +41,16 @@
             <div class="col-md-3">
               <h5 class="text-white">VỀ CHÚNG TÔI</h5>
               <ul class="list-unstyled">
-                <li><a href="#" class="text-white">Giới thiệu</a></li>
-                <li><a href="#" class="text-white">Liên hệ</a></li>
-                <li><a href="#" class="text-white">Sơ đồ trang web</a></li>
+                <li><router-link to="/about" class="text-white">Giới Thiệu</router-link></li>
+                <li><router-link to="/contact" class="text-white">Liên Hệ</router-link></li>
               </ul>
             </div>
             <div class="col-md-3">
               <h5 class="text-white">HỖ TRỢ</h5>
               <ul class="list-unstyled">
-                <li><a href="#" class="text-white">FAQ</a></li>
-                <li><a href="#" class="text-white">Chính sách bảo mật</a></li>
-                <li><a href="#" class="text-white">Điều khoản dịch vụ</a></li>
+                <li><router-link to="/faq" class="text-white">FAQs</router-link></li>
+                <li><router-link to="/policy" class="text-white">Chính sách bảo mật</router-link></li>
+                <li><router-link to="/terms" class="text-white">Điều khoản dịch vụ</router-link></li>
               </ul>
             </div>
             <div class="col-md-3">
@@ -95,7 +94,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
+import { useLoadingStore } from '../stores/loadingStore';
 import { NLayoutFooter, NButton, NInput, NSpace } from 'naive-ui';
 import { Star, Rocket } from '@vicons/ionicons5';
 import Handshake20Filled from '@vicons/fluent/Handshake20Filled';
@@ -116,10 +116,9 @@ const getVoteResultsFromStorageOrApi = async () => {
   if (storedVoteResults) {
     voteResults.value = JSON.parse(storedVoteResults);
   } else {
-    // Kiểm tra mỗi 0,5 giây, tối đa 30 lần (tổng cộng là 15 giây)
     let attempts = 0;
     const maxAttempts = 30;
-    const intervalTime = 500; // 0,5 giây
+    const intervalTime = 500; 
 
     const intervalId = setInterval(async () => {
       const voteData = localStorage.getItem('voteResults');
@@ -165,9 +164,40 @@ const subscribeToNewsletter = async () => {
   }
 };
 
+const loadingStore = useLoadingStore();
+const introImage = ref(null); 
+let checkCount = 0;
+const maxChecks = 10; 
+const intervalTime = 1000; 
+
+const checkIntroImage = async () => {
+  let images = JSON.parse(localStorage.getItem('images')) || [];
+  const intro = images.find(img => img.image_name === 'LOGO');
+  
+  if (intro) {
+    introImage.value = `http://127.0.0.1:8000/storage/${intro.image_path}`;
+    clearInterval(intervalId); 
+  } else if (checkCount >= maxChecks) {
+    await loadingStore.checkAndUpdateData(apiLinks.imageManager.getImages, 'images');
+    images = JSON.parse(localStorage.getItem('images')) || [];
+    const updatedIntro = images.find(img => img.image_name === 'LOGO');
+    if (updatedIntro) {
+      introImage.value = `http://127.0.0.1:8000/storage/${updatedIntro.image_path}`;
+    }
+    clearInterval(intervalId); 
+  }
+  checkCount++;
+};
+let intervalId;
 onMounted(() => {
   getVoteResultsFromStorageOrApi();
+  intervalId = setInterval(checkIntroImage, intervalTime);
 });
+
+onUnmounted(() => {
+  clearInterval(intervalId);
+});
+
 </script>
 
 <style scoped>
@@ -213,7 +243,6 @@ a:hover {
   border-radius: 5px;
   cursor: pointer;
 }
-
 .newsletter-button:hover {
   background-color: #218838; 
 }

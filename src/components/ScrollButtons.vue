@@ -33,7 +33,6 @@ const scrollToBottom = () => {
   font-size: 16px;
   cursor: pointer;
   border: none;
-  /* background-color: #1890ff; */
   color: white;
   border-radius: 5px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);

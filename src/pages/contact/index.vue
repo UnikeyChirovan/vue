@@ -187,30 +187,24 @@ async function checkCompanyInfos() {
   
   for (let i = 0; i < 20; i++) {
     if (companyInfos) {
-      // Nếu tìm thấy dữ liệu trong localStorage, trả về dữ liệu đầu tiên
-      return companyInfos[0]; // Lấy thông tin công ty đầu tiên
+      return companyInfos[0]; 
     }
-    
-    // Đợi 0,5 giây trước khi thử lại
     await new Promise(resolve => setTimeout(resolve, 500));
     companyInfos = JSON.parse(localStorage.getItem('companyInfos'));
   }
 
-  // Nếu không tìm thấy, gọi API để lấy dữ liệu và lưu vào localStorage
   try {
     const response = await apiLinks.companyInfo.getAll();
     companyInfos = response.data;
-    localStorage.setItem('companyInfos', JSON.stringify(companyInfos)); // Lưu vào localStorage
-    return companyInfos[0]; // Lấy thông tin công ty đầu tiên
+    localStorage.setItem('companyInfos', JSON.stringify(companyInfos)); 
+    return companyInfos[0]; 
   } catch (error) {
     console.error('Lỗi khi lấy dữ liệu companyInfos từ API:', error);
     return null;
   }
 }
 
-// Hàm khởi tạo
 async function initCompanyInfos() {
-  // Đợi 2 giây trước khi bắt đầu kiểm tra
   await new Promise(resolve => setTimeout(resolve, 2000));
   const info = await checkCompanyInfos();
 
@@ -232,9 +226,6 @@ async function initCompanyInfos() {
   });
 </script>
 <style scoped>
-/* .is-invalid {
-  border-color: red;
-} */
 input {
   min-width: 40%;
   border: none;

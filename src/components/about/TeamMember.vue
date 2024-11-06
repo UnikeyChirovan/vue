@@ -2,7 +2,6 @@
   <div class="container-fluid team-member-container">
     <div class="title-text"><h2 class="text-uppercase">{{ aboutIntroductionTitle }}</h2></div>
     <div class="row m-0 p-0">
-      <!-- Avatar và thông tin cơ bản -->
       <div class="col-md-4 info-left">
         <img class="avatar" :src="avatarImage" alt="Avatar" />
         <div class="basic-info">
@@ -58,7 +57,6 @@ const loadingStore = useLoadingStore();
 const coverImage = ref(null);
 const avatarImage = ref(null);
 
-// Danh sách lưu trữ các interval ID
 const intervalIds = ref([]);
 
 async function fetchSections() {
@@ -107,10 +105,8 @@ const checkImage = async (imageName, imageRef) => {
   return false;
 };
 
-const fetchImageWithRetry = async (imageName, imageRef, maxChecks = 20, intervalTime = 500) => {
+const fetchImageWithRetry = async (imageName, imageRef, maxChecks = 10, intervalTime = 1000) => {
   let checkCount = 0;
-
-  // Tạo interval và lưu lại ID của nó vào danh sách
   const intervalId = setInterval(async () => {
     const found = await checkImage(imageName, imageRef);
     if (found || checkCount >= maxChecks) {
@@ -129,7 +125,6 @@ const fetchImageWithRetry = async (imageName, imageRef, maxChecks = 20, interval
   intervalIds.value.push(intervalId);
 };
 
-// Xóa tất cả interval khi component bị unmounted
 onUnmounted(() => {
   intervalIds.value.forEach(clearInterval);
   intervalIds.value = [];
@@ -221,14 +216,14 @@ hr {
   border-right: 10px solid #d9b382;
 }
 
-/* Căn chỉnh tiêu đề bài thơ bên trong cùng khối */
+
 .poem h2 {
   font-size: 1.5rem;
   margin-bottom: 15px;
   color: #0056b3;
   text-align: center;
   margin-top: 0;
-  font-style: normal; /* Giữ tiêu đề không nghiêng */
+  font-style: normal;
 }
 
 
@@ -237,18 +232,18 @@ hr {
   display: flex;
   align-items: center;
   animation: slideInFromRight 1.5s ease-in-out;
-  padding: 15px; /* Thêm padding để tránh chữ bị dồn */
+  padding: 15px;
 }
 
 .introduction {
   font-size: 1.2rem;
   color: #333;
   line-height: 1.7;
-  max-width: 85%; /* Đảm bảo chiều rộng chỉ chiếm 80% */
-  margin: 0 auto; /* Canh giữa phần tử bằng cách đặt margin trái và phải tự động */
-  font-style: italic; /* Định dạng chữ nghiêng */
-  text-align: left; /* Canh lề trái */
-  padding-left: 15px; /* Thêm padding vào lề trái */
+  max-width: 85%;
+  margin: 0 auto; 
+  font-style: italic; 
+  text-align: left; 
+  padding-left: 15px; 
 }
 
 .title-text {
@@ -265,15 +260,15 @@ hr {
 .about-image-container img {
   width: 90%;
   border-radius: 10px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease; /* Chuyển đổi mượt mà */
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Bóng mờ nhẹ xung quanh */
+  transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease; 
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); 
 }
 
-/* Hiệu ứng khi di chuột vào hình ảnh */
+
 .about-image-container img:hover {
-  transform: scale(1.05) translateY(-5px); /* Phóng to nhẹ và nổi lên */
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 255, 255, 0.4); /* Bóng sáng ở ngoài */
-  filter: brightness(1.1); /* Làm sáng nhẹ hình ảnh */
+  transform: scale(1.05) translateY(-5px); 
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 255, 255, 0.4); 
+  filter: brightness(1.1); 
 }
 
 
@@ -283,7 +278,7 @@ hr {
   height: 300px;
   object-fit: fill; 
 }
-/* Animation for text from right */
+
 @keyframes slideInFromRight {
   0% {
     transform: translateX(100%);
@@ -295,7 +290,7 @@ hr {
   }
 }
 
-/* Animation for avatar and info from top */
+
 @keyframes slideInFromLeft {
   0% {
     transform: translateX(-100%);
@@ -307,7 +302,7 @@ hr {
   }
 }
 
-/* Responsive adjustments */
+
 @media (max-width: 768px) {
   .content-right {
     padding-top: 20px;

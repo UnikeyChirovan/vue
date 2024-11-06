@@ -47,7 +47,7 @@ const fetchPageOptions = async () => {
     console.log('bắt đầu')
     const response = await api.get('/categories/page-options');
     console.log('chưa tới')
-    pageOptions.value = response.data.pageOptions; // Cập nhật theo cấu trúc mới
+    pageOptions.value = response.data.pageOptions;
   } catch (error) {
     console.log('lỗi')
     console.error(error);
@@ -60,7 +60,7 @@ const submitForm = async () => {
     await api.post('/categories', {
       name: form.value.name,
       code: form.value.code,
-      page: form.value.page, // Gửi giá trị page
+      page: form.value.page,
     });
     message.success('Danh mục đã được tạo thành công');
     resetForm();
@@ -73,11 +73,11 @@ const submitForm = async () => {
 const resetForm = () => {
   form.value.name = '';
   form.value.code = '';
-  form.value.page = ''; // Reset giá trị page
+  form.value.page = ''; 
 };
 
 onMounted(() => {
-  fetchPageOptions(); // Gọi hàm để lấy danh sách trang
+  fetchPageOptions(); 
   useMenu().onSelectedKey(['admin-categories']);
 });
 </script>

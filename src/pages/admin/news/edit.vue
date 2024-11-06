@@ -85,17 +85,14 @@ const fetchPageOptions = async () => {
   }
 };
 
-// Thêm nội dung cho phần content
 const addParagraph = (index) => {
   form.value.content.splice(index + 1, 0, '');
 }
 
-// Xóa nội dung từ phần content
 const removeParagraph = (index) => {
   form.value.content.splice(index, 1);
 }
 
-// Gởi cập nhật text
 const submitText = async () => {
   const formData = new FormData();
   formData.append('title', form.value.title);
@@ -130,7 +127,7 @@ const submitText = async () => {
 }
 
 .textarea-card {
-  width: 100%; /* Mở rộng chiều rộng textarea */
+  width: 100%; 
   border-radius: 8px;
 }
 

@@ -323,13 +323,13 @@ const saveNewCover = () => {
 };
 const cancelChange = () => {
   showChange.value = false;
-  newCoverUrl.value = null; // Xóa hình ảnh mới đã chọn
+  newCoverUrl.value = null; 
   message.info('Đã hủy thao tác thay đổi hình cover.');
 };
 
 const cancelEdit = () => {
   showEdit.value = false;
-  cover_position.value = originalCoverPosition; // Đặt lại vị trí cover ban đầu
+  cover_position.value = originalCoverPosition; 
   message.info('Đã hủy thao tác chỉnh sửa hình cover.');
 };
 

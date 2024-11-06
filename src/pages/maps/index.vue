@@ -3,8 +3,6 @@
   <div class="container">
     <div v-for="notification in notifications" :key="notification.id" class="map-container">
       <h2 class="text-uppercase title-centered">{{ notificationDetails[notification.id]?.title }}</h2>
-      
-      <!-- Xử lý nội dung thành nhiều đoạn văn -->
       <div v-if="notificationDetails[notification.id]?.content">
         <p v-for="(paragraph, index) in formattedContent(notificationDetails[notification.id].content)" 
            :key="index" 
@@ -12,7 +10,6 @@
           {{ paragraph }}
         </p>
       </div>
-      
       <img v-if="notificationDetails[notification.id]?.image_paths.length > 0"
            :src="`http://127.0.0.1:8000/storage/${notificationDetails[notification.id].image_paths[0]}`" 
            :alt="`Image for ${notificationDetails[notification.id]?.title}`" 
@@ -31,7 +28,6 @@ import TheFooter from '../../components/TheFooter.vue';
 const notifications = ref([]);
 const notificationDetails = ref(JSON.parse(localStorage.getItem('notification_detail')) || {});
 
-// Hàm định dạng nội dung thành các đoạn văn tách biệt
 const formattedContent = (content) => {
   return content.split(/\n+/).map(paragraph => paragraph.trim()).filter(paragraph => paragraph);
 };
@@ -113,12 +109,10 @@ onMounted(() => {
 p{
   margin-top: 0px;
   margin-bottom: 7px;
-  /* padding-left: 3rem;
-  padding-right:3rem; */
 }
 
 .indented-paragraph {
-  text-indent: 2em; /* Thụt lề cho dòng đầu */
+  text-indent: 2em;
 }
 
 .map-image {

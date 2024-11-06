@@ -8,7 +8,7 @@
         <span @click="showDrawer()"><i class="fa-solid fa-bars"></i></span>
       </div>
       <div class="col-10 col-sm-9 d-flex align-items-center justify-content-center justify-content-sm-start">
-        <img src="../assets/img/logo.png" alt="logo" height="32" width="34" class="me-1" />
+        <img :src="introImage" alt="logo" height="32" width="34" class="me-1" />
         <div class="align-item-center justify-content-center">
           <ul class="m-0 p-0 d-sm-flex">
             <template v-for="item in listItem" :key="item.name">
@@ -50,12 +50,14 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import TheMenu from './TheMenu.vue';
 import { useAuthStore } from '../stores/auth';
+import { useLoadingStore } from '../stores/loadingStore';
+import apiLinks from '../services/api-links';
 import TheAuth from './TheAuth.vue';
 
-const authStore = useAuthStore();  // Không cần lưu cục bộ isLoggedIn và isAdmin
+const authStore = useAuthStore();  
 
 const visible = ref(false);
 const visible_user = ref(false);
@@ -75,6 +77,42 @@ const showDrawer = () => {
 const showDrawerUser = () => {
   visible_user.value = true;
 };
+
+
+const loadingStore = useLoadingStore();
+const introImage = ref(null); 
+let checkCount = 0;
+const maxChecks = 10; 
+const intervalTime = 1000; 
+
+const checkIntroImage = async () => {
+  let images = JSON.parse(localStorage.getItem('images')) || [];
+  const intro = images.find(img => img.image_name === 'LOGO');
+  
+  if (intro) {
+    introImage.value = `http://127.0.0.1:8000/storage/${intro.image_path}`;
+    clearInterval(intervalId);
+  } else if (checkCount >= maxChecks) {
+    await loadingStore.checkAndUpdateData(apiLinks.imageManager.getImages, 'images');
+    images = JSON.parse(localStorage.getItem('images')) || [];
+    const updatedIntro = images.find(img => img.image_name === 'LOGO');
+    
+    if (updatedIntro) {
+      introImage.value = `http://127.0.0.1:8000/storage/${updatedIntro.image_path}`;
+    }
+    clearInterval(intervalId); 
+  }
+  checkCount++;
+};
+
+let intervalId;
+onMounted(() => {
+  intervalId = setInterval(checkIntroImage, intervalTime);
+});
+
+onUnmounted(() => {
+  clearInterval(intervalId);
+});
 </script>
 <style scoped>
 .container-fluid{

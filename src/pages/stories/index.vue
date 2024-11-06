@@ -106,15 +106,10 @@ const currentChapterTitle = ref('');
 const isFetching = ref(false);
 
 const fetchChapterContent = async (chapterNumber) => {
-  // Lấy chapter_detail từ localStorage và kiểm tra xem có dữ liệu chưa
   let chapterDetail = JSON.parse(localStorage.getItem('chapter_detail')) || [];
-
-  // Đảm bảo chapterDetail là một mảng
   if (!Array.isArray(chapterDetail)) {
     chapterDetail = [];
   }
-
-  // Tìm kiếm chương trong chapterDetail
   const cachedChapter = chapterDetail.find(
     (chapter) => chapter[`chapter-${chapterNumber}`]
   );
@@ -129,8 +124,6 @@ const fetchChapterContent = async (chapterNumber) => {
     window.scrollTo(0, 0);
     return;
   }
-
-  // Nếu không có trong cache, gọi API để lấy nội dung chương
   try {
     if (isFetching.value) return;
     isFetching.value = true;
@@ -140,11 +133,7 @@ const fetchChapterContent = async (chapterNumber) => {
 
     chapterContent.value = content;
     currentChapterTitle.value = title;
-
-    // Thêm chương mới vào chapter_detail
     chapterDetail.push({ [`chapter-${chapterNumber}`]: { title, content } });
-
-    // Cập nhật lại localStorage với chapter_detail mới
     localStorage.setItem('chapter_detail', JSON.stringify(chapterDetail));
 
     if (chapterStore.selectedChapter !== chapterNumber) {
@@ -163,18 +152,14 @@ const fetchChapterContent = async (chapterNumber) => {
 const fetchChaptersList = async () => {
   try {
     let chapters = localStorage.getItem('chapters');
-    
-    // Nếu đã có dữ liệu trong localStorage thì dùng nó, không cần gọi API
     if (chapters) {
       chapters = JSON.parse(chapters);
     } else {
-      // Nếu chưa có, gọi API và lưu vào localStorage
       const response = await api.get('/story/chapters');
       chapters = response.data;
       localStorage.setItem('chapters', JSON.stringify(chapters));
     }
 
-    // Tạo options từ dữ liệu chapters
     const options = chapters.map((chapter) => ({
       label: `Chương ${chapter.chapter_number}`,
       value: chapter.id,
@@ -182,7 +167,6 @@ const fetchChaptersList = async () => {
     }));
     chapterStore.setChapterOptions(options);
 
-    // Cập nhật thông tin truyện
     const story = chapters[0]?.story_name || 'Tên truyện không xác định';
     const author = chapters[0]?.author || 'Tác giả không xác định';
     storyName.value = story;
@@ -190,7 +174,6 @@ const fetchChaptersList = async () => {
     localStorage.setItem('storyName', story);
     localStorage.setItem('authorName', author);
 
-    // Chọn chương đầu tiên nếu chưa có chương nào được chọn
     if (chapterStore.selectedChapter === null && options.length) {
       chapterStore.setSelectedChapter(options[0].value);
     }
@@ -224,7 +207,7 @@ const fetchLastReadChapter = async () => {
     if (lastChapterId) {
       chapterStore.setSelectedChapter(lastChapterId);
       fetchChapterContent(lastChapterId);
-      return; // Kết thúc hàm nếu đã có lastChapterId
+      return; 
     }
 
     const response = await api.get(`/story/user-chapter`);

@@ -51,7 +51,7 @@ const form = ref({
 
 const submitForm = async () => {
     if (!form.value.image_url) {
-    form.value.image_url = "default-image-url"; // URL mặc định hợp lệ
+    form.value.image_url = "default-image-url"; 
   }
   try {
     await api.post('/hero-slides', form.value);

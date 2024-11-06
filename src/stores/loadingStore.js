@@ -149,5 +149,5 @@ async function fetchDataFinalLogin() {
     fetchDataFinalLogin
   };
 }, {
-  persist: true,  // Kích hoạt tính năng lưu trữ cho store
+  persist: true,  
 });

@@ -20,7 +20,7 @@
               <span>{{ record.name }}</span>
             </template>
             <template v-if="column.key === 'code'">
-              <span>{{ record.code }}</span> <!-- Hiển thị mã số -->
+              <span>{{ record.code }}</span> 
             </template>
             <template v-if="column.key === 'action'">
               <router-link :to="{ name: 'admin-categories-edit', params: { id: record.id } }">
@@ -74,7 +74,7 @@ const columns = [
     align: 'center',
   },
   {
-    title: 'Mã Số', // Thêm cột mã số
+    title: 'Mã Số',
     dataIndex: 'code',
     key: 'code',
     align: 'center',
@@ -88,7 +88,7 @@ const columns = [
 
 const getCategories = async () => {
   try {
-    const response = await api.get('/categories'); // Endpoint để lấy danh mục
+    const response = await api.get('/categories'); 
     categories.value = response.data.categories; 
   } catch (error) {
     console.error(error);
@@ -107,11 +107,11 @@ const deleteCategory = (id) => {
 
 const handleOk = () => {
   api
-    .delete(`/categories/${categoryIdToDelete.value}`) // Endpoint để xóa danh mục
+    .delete(`/categories/${categoryIdToDelete.value}`) 
     .then((res) => {
       if (res.status === 200) {
         message.success('Xóa danh mục thành công');
-        getCategories(); // Cập nhật danh sách danh mục sau khi xóa
+        getCategories(); 
       }
     })
     .catch((err) => {
@@ -127,9 +127,9 @@ const handleCancel = () => {
 };
 
 onMounted(() => {
-  getCategories(); // Gọi hàm lấy danh mục khi component được mount
+  getCategories(); 
   window.addEventListener('resize', () => {
-    isMobile.value = window.innerWidth < 600; // Theo dõi kích thước màn hình
+    isMobile.value = window.innerWidth < 600; 
   });
   useMenu().onSelectedKey(['admin-categories']);
 });

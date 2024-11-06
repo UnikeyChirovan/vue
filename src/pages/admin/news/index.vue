@@ -20,7 +20,6 @@
               <span>{{ record.title }}</span>
             </template>
             <template v-if="column.key === 'image'">
-              <!-- Sử dụng baseUrl để xử lý đường dẫn hình ảnh -->
               <img :src="`${baseUrl}/storage/${record.image_paths[0]}`" alt="Notification Image" style="max-width: 100px;" />
             </template>
             <template v-if="column.key === 'action'">
@@ -55,10 +54,9 @@ import { message } from 'ant-design-vue';
 import { useMenu } from '../../../stores/use-menu';
 import api from '../../../services/axiosInterceptor';
 
-// Dùng baseUrl để xử lý đường dẫn hình ảnh
 const baseUrl = "http://127.0.0.1:8000";
 
-const notifications = ref([]); // Không cần hiển thị nội dung 'content'
+const notifications = ref([]); 
 const isMobile = ref(window.innerWidth < 600);
 const scrollOptions = computed(() => {
   return isMobile.value ? { x: 1200 } : { x: 576 };
@@ -89,7 +87,6 @@ const columns = [
   },
 ];
 
-// Hàm lấy dữ liệu thông báo
 const getNotifications = async () => {
   try {
     const response = await api.get('/user-notifications');
@@ -111,11 +108,11 @@ const deleteNotification = (id) => {
 };
 const handleOk = () => {
   api
-    .delete(`/user-notifications/${notificationIdToDelete.value}`) // Xóa thông báo
+    .delete(`/user-notifications/${notificationIdToDelete.value}`) 
     .then((res) => {
       if (res.status === 204) {
         message.success('Xóa thông báo thành công');
-        getNotifications(); // Lấy lại danh sách thông báo
+        getNotifications(); 
       }
     })
     .catch((err) => {

@@ -36,7 +36,6 @@ const formValue = ref({
 });
 
 const submitForm = async () => {
-  // Kiểm tra xem các trường có rỗng không
   if (!formValue.value.title || !formValue.value.content) {
     message.warning("Vui lòng nhập đầy đủ tiêu đề và nội dung.");
     return;

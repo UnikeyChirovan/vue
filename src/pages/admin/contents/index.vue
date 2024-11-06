@@ -85,7 +85,7 @@ const columns = [
 ];
 const getSections = async () => {
   try {
-    const response = await api.get('/sections'); // Đổi endpoint thành sections
+    const response = await api.get('/sections'); 
     sections.value = response.data.sections; 
   } catch (error) {
     console.error(error);
@@ -103,7 +103,7 @@ const deleteSection = (id) => {
 };
 const handleOk = () => {
   api
-    .delete(`/sections/${sectionIdToDelete.value}`) // Đổi endpoint thành sections
+    .delete(`/sections/${sectionIdToDelete.value}`) 
     .then((res) => {
       if (res.status === 204) {
         message.success('Xóa phần thành công');

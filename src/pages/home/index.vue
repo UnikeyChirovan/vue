@@ -243,23 +243,18 @@ onMounted(async () => {
        iconClass: item.icon_class,
     }));
   }
-  // Gọi fetchDataBeforeLogin chỉ khi beforeStatus không phải là 'ok'
   if (beforeStatus !== 'ok') {
     await loadingStore.fetchDataBeforeLogin(() => {
-      // Xử lý dữ liệu heroSlides sau khi fetchDataBeforeLogin
       const fetchedHeroSlidesData = localStorage.getItem('heroSlides');
       if (fetchedHeroSlidesData) {
         heroSlides.value = JSON.parse(fetchedHeroSlidesData);
         isHeroSlidesReady.value = true;
         console.log('Dữ liệu heroSlides đã được cập nhật từ API và lưu vào localStorage!');
       }
-
-      // Cập nhật futureProjects từ localStorage sau khi dữ liệu đã được tải
       const fetchedFutureProjectsData = localStorage.getItem('futureProjects');
       if (fetchedFutureProjectsData) {
         futureProjects.value = JSON.parse(fetchedFutureProjectsData);
       }
-      // Cập nhật features từ localStorage sau khi dữ liệu đã được tải
       const fetchedFeaturesData  = localStorage.getItem('features');
       if (fetchedFeaturesData) {
           features.value = JSON.parse(fetchedFeaturesData).map(item => ({
@@ -507,9 +502,9 @@ p.feature-percentage {
 }
 
 video {
-  width: 50%; /* Hoặc tùy chỉnh kích thước video */
+  width: 50%; 
   height: auto;
-  object-fit: cover; /* Giữ tỉ lệ của video */
+  object-fit: cover; 
 }
 
 

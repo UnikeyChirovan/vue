@@ -358,7 +358,7 @@ const saveSettings = async () => {
   const handleBackgroundSelection = (selectedValue) => {
   const selected = backgroundOptions.value.find(option => option.value === selectedValue);
   if (selected) {
-    backgroundStoryId.value = selected.backgroundStoryId; // Gán giá trị backgroundStoryId
+    backgroundStoryId.value = selected.backgroundStoryId; 
   }
 };
   const fetchUserSettings = async (userId) => {

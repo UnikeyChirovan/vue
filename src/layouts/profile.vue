@@ -14,9 +14,6 @@
         <router-view></router-view>
       </div>
     </div>
-    <!-- <div class="row">
-      <div class="col-12 footer">Footer</div>
-    </div> -->
   </div>
   <CropperModal
     v-if="isCropperModal"

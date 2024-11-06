@@ -41,12 +41,10 @@ const notifications = ref([]);
 const currentIndex = ref(0);
 const currentNotification = ref(null);
 
-// Chuyển sang sử dụng localStorage
 const notificationDetails = ref(
   JSON.parse(localStorage.getItem('notification_detail')) || {}
 );
 
-// Định dạng nội dung thông báo
 const currentNotificationFormattedContent = computed(() => {
   if (currentNotification.value && currentNotification.value.content) {
     return currentNotification.value.content.replace(/\n/g, '<br>');
@@ -60,23 +58,21 @@ const fetchNotifications = async () => {
       const allNotifications = JSON.parse(storedNotifications);
       notifications.value = allNotifications.filter(
         (notification) => notification.page === 'home'
-      ); // Chỉ lấy thông báo của trang "home" để hiển thị
+      ); 
 
       if (notifications.value.length > 0) {
-        await loadAllNotificationDetails(allNotifications); // Gọi hàm để tải tất cả chi tiết thông báo
+        await loadAllNotificationDetails(allNotifications); 
       }
     } else {
       const response = await apiLinks.notifications.getAll();
       const allNotifications = response.data.notifications;
       notifications.value = allNotifications.filter(
         (notification) => notification.page === 'home'
-      ); // Chỉ lấy thông báo của trang "home" để hiển thị
-
-      // Lưu tất cả thông báo vào localStorage, không chỉ của trang "home"
+      ); 
       localStorage.setItem('notifications', JSON.stringify(allNotifications));
 
       if (notifications.value.length > 0) {
-        await loadAllNotificationDetails(allNotifications); // Gọi hàm để tải tất cả chi tiết thông báo
+        await loadAllNotificationDetails(allNotifications); 
       }
     }
   } catch (error) {
@@ -84,23 +80,19 @@ const fetchNotifications = async () => {
   }
 };
 
-// Hàm tải chi tiết tất cả các thông báo và lưu vào localStorage
+
 const loadAllNotificationDetails = async (allNotifications) => {
   try {
-    // Duyệt qua từng thông báo và tải chi tiết của mỗi thông báo
     for (const notification of allNotifications) {
       const id = notification.id;
 
-      // Kiểm tra nếu `notification_detail` chưa tồn tại trong localStorage thì mới gọi API
       if (!notificationDetails.value[id]) {
         const response = await apiLinks.notifications.getDetail(id);
         notificationDetails.value[id] = response.data.notification_detail;
       }
     }
-    // Lưu toàn bộ `notification_detail` vào localStorage sau khi tải xong
     localStorage.setItem('notification_detail', JSON.stringify(notificationDetails.value));
 
-    // Đặt `currentNotification` với thông báo đầu tiên của trang "home" nếu có
     if (notifications.value.length > 0) {
       currentNotification.value = notificationDetails.value[notifications.value[0].id];
     }
@@ -121,8 +113,6 @@ const prevNotification = () => {
   currentNotification.value = notificationDetails.value[prevId] || null;
 };
 
-
-// Kiểm tra trạng thái sau khi đăng nhập và tải thông báo
 onMounted(() => {
   const checkDataInterval = setInterval(() => {
     const storedNotifications = localStorage.getItem('notifications');
@@ -131,11 +121,11 @@ onMounted(() => {
         (notification) => notification.page === 'home'
       );
       if (notifications.value.length > 0) {
-        clearInterval(checkDataInterval); // Dừng kiểm tra khi có dữ liệu của home
-        fetchNotifications(); // Tiến hành lấy thông báo
+        clearInterval(checkDataInterval); 
+        fetchNotifications(); 
       }
     }
-  }, 500); // Kiểm tra mỗi 500ms
+  }, 500); 
 
   onUnmounted(() => {
     clearInterval(checkDataInterval);

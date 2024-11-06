@@ -27,14 +27,11 @@
       </div>
       <a-button @click="addSection" class="mb-3">Thêm đoạn</a-button>
 
-      <!-- New "Xóa Toàn Bộ" Button -->
       <a-button @click="showConfirmDelete" danger class="mb-3 ms-3">Xóa Toàn Bộ</a-button>
 
-      <!-- Submit Button -->
       <a-button type="primary" html-type="submit">Gởi</a-button>
     </form>
 
-    <!-- Confirm Delete Modal -->
     <a-modal
       v-model:visible="isConfirmVisible"
       title="Xác Nhận Xóa Toàn Bộ"
@@ -44,7 +41,6 @@
       <p>Bạn có chắc chắn muốn xóa toàn bộ nội dung các đoạn không?</p>
     </a-modal>
 
-    <!-- Scroll Buttons -->
     <ScrollButtons>
       <template v-slot:top-button>
         <a-button type="primary"><i class="fa-solid fa-arrow-down"></i></a-button>

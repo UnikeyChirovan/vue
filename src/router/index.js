@@ -11,6 +11,9 @@ import stories from './stories';
 import profile from './profile';
 import PasswordReset from './passwordreset';
 import PasswordResetRequest from './PasswordResetRequest';
+import PrivacyPolicy from './PrivacyPolicy';
+import TermsOfService from './TermsOfService';
+import FAQ from './faq';
 
 const routes = [
   ...admin,
@@ -23,10 +26,21 @@ const routes = [
   ...profile,
   ...PasswordReset,
   ...PasswordResetRequest,
+  ...PrivacyPolicy,
+  ...TermsOfService,
+  ...FAQ,
 ];
+
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition; 
+    } else {
+      return { top: 0 }; 
+    }
+  }
 });
 
 router.beforeEach(async (to, from, next) => {
@@ -38,7 +52,5 @@ router.beforeEach(async (to, from, next) => {
     next();
   }
 });
-
-
 
 export default router;

@@ -125,7 +125,8 @@ const naive = create({
     NAlert,
     NList,
     NListItem,
-    NProgress
+    NProgress,
+    NText
   ],
 });
 

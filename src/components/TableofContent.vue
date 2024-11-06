@@ -19,13 +19,12 @@ import { NButton, NDropdown } from 'naive-ui';
 
 const chapterStore = useChapterStore();
 
-// Chuyển đổi dữ liệu chapter thành định dạng phù hợp với dropdown
 const chapterOptions = computed(() =>
   chapterStore.chapterOptions.map(chapter => ({
     label: `${chapter.label}: ${chapter.title}`,
     key: chapter.value,
-    type: chapterStore.selectedChapter === chapter.value ? 'active' : null, // Đánh dấu chương được chọn
-    props: { style: chapterStore.selectedChapter === chapter.value ? 'background-color: #f0f0f0; color: #1890ff;' : '' }, // Thêm màu cho mục đã chọn
+    type: chapterStore.selectedChapter === chapter.value ? 'active' : null, 
+    props: { style: chapterStore.selectedChapter === chapter.value ? 'background-color: #f0f0f0; color: #1890ff;' : '' }, 
   }))
 );
 
@@ -49,7 +48,7 @@ const selectChapter = (chapter) => {
 
 .n-dropdown-menu-item.active {
   background-color: #f0f0f0;
-  color: #1890ff; /* Màu sắc nổi bật cho mục đã chọn */
+  color: #1890ff; 
 }
 
 </style>

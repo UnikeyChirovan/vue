@@ -44,15 +44,9 @@
         <a-button @click="removeSection(index)" danger class="mt-2">Xóa đoạn</a-button>
       </div>
       <a-button @click="addSection" class="mb-3">Thêm đoạn</a-button>
-
-      <!-- New "Xóa Toàn Bộ" Button -->
       <a-button @click="showConfirmDelete" danger class="mb-3 ms-3">Xóa Toàn Bộ</a-button>
-
-      <!-- Submit Button -->
       <a-button type="primary" html-type="submit">Gởi</a-button>
     </form>
-
-    <!-- Confirm Delete Modal -->
     <a-modal
       v-model:visible="isConfirmVisible"
       title="Xác Nhận Xóa Toàn Bộ"
@@ -85,10 +79,10 @@ const form = ref({
   title: '',
   content: [''],
   images: [],
-  page: '',  // Thêm trường page
+  page: '',  
 });
 
-const imagePreviews = ref([]); // Lưu trữ đường dẫn ảnh để xem trước
+const imagePreviews = ref([]); 
 const isConfirmVisible = ref(false);
 
 const pageOptions = ref([]);
@@ -125,7 +119,6 @@ const handleFileUpload = (event) => {
   if (file) {
     const reader = new FileReader();
     reader.onload = () => {
-      // Tách nội dung file theo 2 dòng trống để nhập thành nhiều đoạn
       const content = reader.result.split('\n\n');
       form.value.content = content;
       message.success('Nội dung của tệp đã được nhập vào dưới dạng các đoạn');
@@ -134,13 +127,10 @@ const handleFileUpload = (event) => {
   }
 };
 
-
-// Xử lý tải lên hình ảnh
 const handleImageUpload = (event) => {
   const files = event.target.files;
   form.value.images = Array.from(files); // Lưu trữ file ảnh
 
-  // Xem trước hình ảnh
   imagePreviews.value = [];
   for (let i = 0; i < files.length; i++) {
     const reader = new FileReader();
@@ -157,7 +147,6 @@ const submitForm = async () => {
   formData.append('content', form.value.content.join('\n\n'));
   formData.append('page', form.value.page);
 
-  // Thêm ảnh vào formData
   form.value.images.forEach((image, index) => {
     formData.append(`images[${index}]`, image);
   });
@@ -179,7 +168,7 @@ const resetForm = () => {
     title: '',
     content: [''],
     images: [],
-    page: '', // Reset giá trị page
+    page: '', 
   };
   imagePreviews.value = [];
 };

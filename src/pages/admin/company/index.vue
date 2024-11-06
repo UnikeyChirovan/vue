@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- Quản Lý Thông Tin Công Ty -->
     <a-card title="Quản Lý Thông Tin Công Ty" style="width: 100%">
       <div class="row mb-3">
         <div class="col-12 d-flex justify-content-end">
@@ -53,8 +52,6 @@
         <p>Bạn có chắc chắn muốn xóa thông tin này không?</p>
       </a-modal>
     </a-card>
-
-    <!-- Quản Lý HeroSlide -->
     <a-card title="Quản Lý HeroSlide" style="width: 100%" class="mt-4">
       <div class="row mb-3">
         <div class="col-12 d-flex justify-content-end">
@@ -99,8 +96,6 @@
         <p>Bạn có chắc chắn muốn xóa HeroSlide này không?</p>
       </a-modal>
     </a-card>
-
-    <!-- Quản Lý Future Project -->
     <a-card title="Quản Lý Future Project" style="width: 100%" class="mt-4">
       <div class="row mb-3">
         <div class="col-12 d-flex justify-content-end">
@@ -146,8 +141,6 @@
         <p>Bạn có chắc chắn muốn xóa Future Project này không?</p>
       </a-modal>
     </a-card>
-
-    <!-- Quản Lý Feature -->
     <a-card title="Quản Lý Feature" style="width: 100%" class="mt-4">
       <div class="row mb-3">
         <div class="col-12 d-flex justify-content-end">
@@ -203,7 +196,6 @@ import { message } from 'ant-design-vue';
 import api from '../../../services/axiosInterceptor';
 import { useMenu } from '../../../stores/use-menu';
 
-// Khai báo các dữ liệu và cột cho từng loại thông tin
 const companyInfos = ref([]);
 const heroSlides = ref([]);
 const futureProjects = ref([]);
@@ -211,7 +203,6 @@ const features = ref([]);
 const isMobile = ref(window.innerWidth < 600);
 const scrollOptions = computed(() => (isMobile.value ? { x: 1200 } : { x: 576 }));
 
-// Định nghĩa các cột cho từng bảng
 const companyColumns = [
   { title: '#', key: 'index', width: 50, align: 'center' },
   { title: 'Tên Công Ty', dataIndex: 'webname', key: 'webname', align: 'center' },
@@ -245,7 +236,6 @@ const featureColumns = [
   { title: 'Công Cụ', key: 'action', align: 'center' },
 ];
 
-// Các hàm lấy dữ liệu từ API
 const getCompanyInfos = async () => {
   try {
     const response = await api.get('/company-info');
@@ -282,7 +272,6 @@ const getFeatures = async () => {
   }
 };
 
-// Hiển thị modal xác nhận xóa
 const isModalVisible = ref(false);
 const isHeroSlideModalVisible = ref(false);
 const isFutureProjectModalVisible = ref(false);
@@ -302,7 +291,6 @@ const showDeleteModal = (type, id) => {
   }
 };
 
-// Các hàm xóa thông tin
 const deleteInfo = async () => {
   try {
     await api.delete(`/company-info/${itemIdToDelete.value}`);
@@ -351,7 +339,6 @@ const deleteFeature = async () => {
   }
 };
 
-// Xử lý lỗi
 const handleError = (error) => {
   console.error(error);
   if (error.response?.status === 429) {
@@ -361,7 +348,6 @@ const handleError = (error) => {
   }
 };
 
-// Đóng modal
 const handleCancel = () => { isModalVisible.value = false; };
 const handleHeroSlideCancel = () => { isHeroSlideModalVisible.value = false; };
 const handleFutureProjectCancel = () => { isFutureProjectModalVisible.value = false; };
@@ -378,8 +364,3 @@ onMounted(() => {
   useMenu().onSelectedKey(['admin-company']);
 });
 </script>
-
-
-<style scoped>
-/* Thêm CSS nếu cần */
-</style>
