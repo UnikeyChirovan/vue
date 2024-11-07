@@ -78,42 +78,36 @@ const showDrawerUser = () => {
   visible_user.value = true;
 };
 
-
 const loadingStore = useLoadingStore();
-const introImage = ref(null); 
-let checkCount = 0;
-const maxChecks = 10; 
-const intervalTime = 1000; 
+const introImage = ref(null);
 
-const checkIntroImage = async () => {
+const fetchIntroImage = async () => {
   let images = JSON.parse(localStorage.getItem('images')) || [];
   const intro = images.find(img => img.image_name === 'LOGO');
-  
+
   if (intro) {
     introImage.value = `http://127.0.0.1:8000/storage/${intro.image_path}`;
-    clearInterval(intervalId);
-  } else if (checkCount >= maxChecks) {
-    await loadingStore.checkAndUpdateData(apiLinks.imageManager.getImages, 'images');
-    images = JSON.parse(localStorage.getItem('images')) || [];
-    const updatedIntro = images.find(img => img.image_name === 'LOGO');
-    
-    if (updatedIntro) {
-      introImage.value = `http://127.0.0.1:8000/storage/${updatedIntro.image_path}`;
+  } else {
+    try {
+      const response = await apiLinks.imageManager.getImages();
+      localStorage.setItem('images', JSON.stringify(response.data));
+      images = response.data || [];
+      const updatedIntro = images.find(img => img.image_name === 'LOGO');
+      if (updatedIntro) {
+        introImage.value = `http://127.0.0.1:8000/storage/${updatedIntro.image_path}`;
+      }
+    } catch (error) {
+      console.error('Lỗi khi lấy dữ liệu hình ảnh:', error);
     }
-    clearInterval(intervalId); 
   }
-  checkCount++;
 };
 
-let intervalId;
 onMounted(() => {
-  intervalId = setInterval(checkIntroImage, intervalTime);
+  fetchIntroImage();
 });
 
-onUnmounted(() => {
-  clearInterval(intervalId);
-});
 </script>
+
 <style scoped>
 .container-fluid{
   margin: 0;

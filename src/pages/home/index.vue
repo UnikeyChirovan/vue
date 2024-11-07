@@ -69,6 +69,7 @@ import 'aos/dist/aos.css';
 import TheHeader from '../../components/TheHeader.vue';
 import TheFooter from '../../components/TheFooter.vue';
 import api from '../../services/axiosInterceptor';
+import apiLinks from '../../services/api-links';
 import Handshake20Filled from '@vicons/fluent/Handshake20Filled';
 import StarEmphasis24Filled from '@vicons/fluent/StarEmphasis24Filled';
 import {Rocket} from '@vicons/ionicons5';

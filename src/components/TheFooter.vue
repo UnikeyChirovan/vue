@@ -102,51 +102,37 @@ import Handshake20Filled from '@vicons/fluent/Handshake20Filled';
 import Sigma from '@vicons/carbon/Sigma';
 import { useMessage } from 'naive-ui';
 import apiLinks from '../services/api-links';
-const message = useMessage();
 import api from '../services/axiosInterceptor';
+
+const message = useMessage();
 
 const voteResults = ref({
   totalVotes: 0,
   votesByChoice: {}
 });
 
-const getVoteResultsFromStorageOrApi = async () => {
+const getVoteResults = async () => {
   const storedVoteResults = localStorage.getItem('voteResults');
 
   if (storedVoteResults) {
     voteResults.value = JSON.parse(storedVoteResults);
   } else {
-    let attempts = 0;
-    const maxAttempts = 30;
-    const intervalTime = 500; 
-
-    const intervalId = setInterval(async () => {
-      const voteData = localStorage.getItem('voteResults');
-
-      if (voteData) {
-        voteResults.value = JSON.parse(voteData);
-        clearInterval(intervalId);
-      } else if (attempts >= maxAttempts) {
-        clearInterval(intervalId);
-        
-        try {
-          const response = await apiLinks.votes.getVoteResults();
-          voteResults.value = {
-            totalVotes: response.data.total_users_voted,
-            votesByChoice: response.data.votes_by_choice.reduce((acc, vote) => {
-              acc[vote.choice] = vote.total;
-              return acc;
-            }, {})
-          };
-          localStorage.setItem('voteResults', JSON.stringify(voteResults.value));
-        } catch (error) {
-          console.error('Lỗi khi lấy kết quả vote:', error);
-        }
-      }
-      attempts++;
-    }, intervalTime);
+    try {
+      const response = await apiLinks.votes.getVoteResults();
+      voteResults.value = {
+        totalVotes: response.data.total_users_voted,
+        votesByChoice: response.data.votes_by_choice.reduce((acc, vote) => {
+          acc[vote.choice] = vote.total;
+          return acc;
+        }, {})
+      };
+      localStorage.setItem('voteResults', JSON.stringify(voteResults.value));
+    } catch (error) {
+      console.error('Lỗi khi lấy kết quả vote:', error);
+    }
   }
 };
+
 const email = ref('');
 
 const subscribeToNewsletter = async () => {
@@ -165,40 +151,37 @@ const subscribeToNewsletter = async () => {
 };
 
 const loadingStore = useLoadingStore();
-const introImage = ref(null); 
-let checkCount = 0;
-const maxChecks = 10; 
-const intervalTime = 1000; 
+const introImage = ref(null);
 
-const checkIntroImage = async () => {
+const fetchIntroImage = async () => {
   let images = JSON.parse(localStorage.getItem('images')) || [];
   const intro = images.find(img => img.image_name === 'LOGO');
-  
+
   if (intro) {
     introImage.value = `http://127.0.0.1:8000/storage/${intro.image_path}`;
-    clearInterval(intervalId); 
-  } else if (checkCount >= maxChecks) {
-    await loadingStore.checkAndUpdateData(apiLinks.imageManager.getImages, 'images');
-    images = JSON.parse(localStorage.getItem('images')) || [];
-    const updatedIntro = images.find(img => img.image_name === 'LOGO');
-    if (updatedIntro) {
-      introImage.value = `http://127.0.0.1:8000/storage/${updatedIntro.image_path}`;
+  } else {
+    try {
+      const response = await apiLinks.imageManager.getImages();
+      localStorage.setItem('images', JSON.stringify(response.data));
+      images = response.data || [];
+      const updatedIntro = images.find(img => img.image_name === 'LOGO');
+      if (updatedIntro) {
+        introImage.value = `http://127.0.0.1:8000/storage/${updatedIntro.image_path}`;
+      }
+    } catch (error) {
+      console.error('Lỗi khi lấy dữ liệu hình ảnh:', error);
     }
-    clearInterval(intervalId); 
   }
-  checkCount++;
 };
-let intervalId;
-onMounted(() => {
-  getVoteResultsFromStorageOrApi();
-  intervalId = setInterval(checkIntroImage, intervalTime);
-});
 
-onUnmounted(() => {
-  clearInterval(intervalId);
+onMounted(() => {
+  getVoteResults();
+  fetchIntroImage();
 });
 
 </script>
+
+
 
 <style scoped>
 .footer {
