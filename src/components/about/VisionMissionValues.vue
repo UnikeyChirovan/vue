@@ -3,41 +3,39 @@
     <h2 class="section-title">{{ visionMissionCoreValuesTitle }}</h2>
     <div class="row">
       <!-- Vision -->
-      <div v-if="sections[3]" class="col-md-4 vision-box">
+      <div v-if="dataStore.sections[3]" class="col-md-4 vision-box">
         <n-icon size="64" class="vision-icon">
           <LightbulbFilament20Regular />
         </n-icon>
-        <h2 class="primary">{{ sections[3].title }}</h2>
-        <div class="content" v-html="formatContent(sections[3].content, sections[3].section_number)"></div>
+        <h2 class="primary">{{ dataStore.sections[3].title }}</h2>
+        <div class="content" v-html="formatContent(dataStore.sections[3].content, dataStore.sections[3].section_number)"></div>
       </div>
       <!-- Mission -->
-      <div v-if="sections[4]" class="col-md-4 mission-box">
+      <div v-if="dataStore.sections[4]" class="col-md-4 mission-box">
         <n-icon size="64" class="mission-icon">
           <TargetArrow24Filled />
         </n-icon>
-        <h2 class="primary">{{ sections[4].title }}</h2>
-        <div class="content" v-html="formatContent(sections[4].content, sections[4].section_number)"></div>
+        <h2 class="primary">{{ dataStore.sections[4].title }}</h2>
+        <div class="content" v-html="formatContent(dataStore.sections[4].content, dataStore.sections[4].section_number)"></div>
       </div>
       <!-- Core Values -->
-      <div v-if="sections[5]" class="col-md-4 values-box">
+      <div v-if="dataStore.sections[5]" class="col-md-4 values-box">
         <n-icon size="64" class="values-icon">
           <Heart48Filled />
         </n-icon>
-        <h2 class="primary">{{ sections[5].title }}</h2>
-        <div class="content" v-html="formatContent(sections[5].content, sections[5].section_number)"></div>
+        <h2 class="primary">{{ dataStore.sections[5].title }}</h2>
+        <div class="content" v-html="formatContent(dataStore.sections[5].content, dataStore.sections[5].section_number)"></div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import apiLinks from '../../services/api-links';
+import { useDataStore } from '../../stores/dataStore';
 import { NIcon } from 'naive-ui';
 import Heart48Filled from '@vicons/fluent/Heart48Filled';
 import TargetArrow24Filled from '@vicons/fluent/TargetArrow24Filled';
 import LightbulbFilament20Regular from '@vicons/fluent/LightbulbFilament20Regular';
-import { defineProps } from 'vue';
 
 const props = defineProps({
   visionMissionCoreValuesTitle: {
@@ -45,27 +43,8 @@ const props = defineProps({
     required: true
   },
 });
+const dataStore = useDataStore();
 
-const sections = ref({});
-
-async function fetchSections() {
-  const storedSections = localStorage.getItem('sections');
-
-  if (storedSections) {
-    sections.value = JSON.parse(storedSections);
-  } else {
-    try {
-      const response = await apiLinks.sections.getAll();
-      const data = response.data;
-
-      localStorage.setItem('sections', JSON.stringify(data.sections));
-
-      sections.value = data.sections;
-    } catch (error) {
-      console.error('Lỗi khi gọi API sections:', error);
-    }
-  }
-}
 
 function formatContent(content, sectionNumber) {
   return content
@@ -75,10 +54,6 @@ function formatContent(content, sectionNumber) {
     })
     .join('');
 }
-
-onMounted(() => {
-  fetchSections();
-});
 </script>
 
 

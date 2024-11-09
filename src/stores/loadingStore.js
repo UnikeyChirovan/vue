@@ -70,9 +70,9 @@ export const useLoadingStore = defineStore('loading', () => {
         apiLinks.sections.getAll().then((response) => {
           localStorage.setItem('sections', JSON.stringify(response.data));
         }),
-        apiLinks.imageManager.getImages().then((response) => {
-          localStorage.setItem('images', JSON.stringify(response.data));
-        })
+        // apiLinks.imageManager.getImages().then((response) => {
+        //   localStorage.setItem('images', JSON.stringify(response.data));
+        // })
       ]);
 
       sessionStorage.setItem('Before_2', 'ok');
@@ -105,15 +105,15 @@ export const useLoadingStore = defineStore('loading', () => {
       const [
         chapters,
         lastChapter,
-        backgrounds,
-        userSettings,
-        profile,
+        // backgrounds,
+        // userSettings,
+        // profile,
       ] = await Promise.all([
         apiLinks.story.getChapters(),
         apiLinks.story.getLastReadChapter(),
-        apiLinks.story.getBackgrounds(),
-        apiLinks.story.getSettings(userId),
-        apiLinks.profile.show(userId),
+        // apiLinks.story.getBackgrounds(),
+        // apiLinks.story.getSettings(userId),
+        // apiLinks.profile.show(userId),
       ]);
 
       localStorage.setItem('chapters', JSON.stringify(chapters.data));
@@ -123,9 +123,9 @@ export const useLoadingStore = defineStore('loading', () => {
         sessionStorage.setItem('lastReadChapter', chapterId);
       }
 
-      sessionStorage.setItem('backgrounds', JSON.stringify(backgrounds.data));
-      sessionStorage.setItem('user_settings_early', JSON.stringify(userSettings.data));
-      sessionStorage.setItem('user_profile', JSON.stringify(profile.data));
+      // sessionStorage.setItem('backgrounds', JSON.stringify(backgrounds.data));
+      // sessionStorage.setItem('user_settings_early', JSON.stringify(userSettings.data));
+      // sessionStorage.setItem('user_profile', JSON.stringify(profile.data));
 
       sessionStorage.setItem('Final', 'ok');
     } catch (error) {

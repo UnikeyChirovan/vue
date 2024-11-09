@@ -1,46 +1,12 @@
 <template>
-  <div v-if="introImage" class="about-image-container">
-    <img :src="introImage" alt="Về Selorson Tales" class="about-image" />
+  <div v-if="dataStore.introImage" class="about-image-container">
+    <img :src="dataStore.introImage" alt="Về Selorson Tales" class="about-image" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-const introImage = ref(null);
-const originalSetItem = localStorage.setItem;
-
-const checkIntroImage = () => {
-  const images = JSON.parse(localStorage.getItem('images')) || [];
-  const intro = images.find(img => img.image_name === 'INTRO');
-
-  if (intro) {
-    introImage.value = `http://127.0.0.1:8000/storage/${intro.image_path}`;
-  }
-};
-
-const observeLocalStorageChange = () => {
-  localStorage.setItem = function(key, value) {
-    originalSetItem.apply(this, arguments);
-    if (key === 'images') {
-      checkIntroImage();
-    }
-  };
-};
-
-onMounted(() => {
-  observeLocalStorageChange();
-  checkIntroImage();
-  window.addEventListener('storage', (event) => {
-    if (event.key === 'images') {
-      checkIntroImage();
-    }
-  });
-});
-
-onUnmounted(() => {
-  localStorage.setItem = originalSetItem;
-  window.removeEventListener('storage', checkIntroImage);
-});
+import { useDataStore } from '../../stores/dataStore';
+const dataStore = useDataStore();
 
 </script>
 

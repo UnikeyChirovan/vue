@@ -4,13 +4,13 @@
     <AboutImage />
     
     <TeamMember
-        :author-title="authorTitle" 
-        :about-introduction-title="aboutIntroductionTitle" 
+      :author-title="authorTitle" 
+      :about-introduction-title="aboutIntroductionTitle" 
     />
     
     <Timeline 
-        :history-title="historyTitle"
-        :personal-journey-title="personalJourneyTitle"
+      :history-title="historyTitle"
+      :personal-journey-title="personalJourneyTitle"
     />
     
     <VisionMissionValues :vision-mission-core-values-title="visionMissionCoreValuesTitle" />
@@ -21,68 +21,40 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { computed } from 'vue';
+import { useCategoryStore } from '../../stores/useCategoryStore';
 import TheHeader from '../../components/TheHeader.vue';
 import TheFooter from '../../components/TheFooter.vue';
 import AboutImage from '../../components/about/AboutImage.vue';
 import TeamMember from '../../components/about/TeamMember.vue';
 import Timeline from '../../components/about/Timeline.vue';
-import apiLinks from '../../services/api-links';
 import VisionMissionValues from '../../components/about/VisionMissionValues.vue';
-const categories = ref([]);
-const isCategoriesReady = ref(false); 
 
-async function fetchCategories() {
-  const storedCategories = localStorage.getItem('categories');
-  if (storedCategories) {
-    categories.value = JSON.parse(storedCategories);
-    isCategoriesReady.value = true;
-  } else {
-    try {
-      const response = await fetch(apiLinks.categories.getAll);
-      const data = await response.json();
-      localStorage.setItem('categories', JSON.stringify(data));
-      categories.value = data;
-      isCategoriesReady.value = true;
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  }
-}
+// Sử dụng Pinia store
+const categoryStore = useCategoryStore();
+
+// Sử dụng computed để lấy dữ liệu từ store
 const aboutIntroductionTitle = computed(() => 
-  isCategoriesReady.value
-    ? categories.value.find(category => category.code === '12' && category.page === 'about')?.name 
-    : 'Một Chút Về Selorson Tales'
+  categoryStore.getCategoryTitle('12', 'about', 'Một Chút Về Selorson Tales')
 );
 
 const historyTitle = computed(() => 
-  isCategoriesReady.value
-    ? categories.value.find(category => category.code === '13' && category.page === 'about')?.name 
-    : 'Đôi Dòng Lịch Sử'
+  categoryStore.getCategoryTitle('13', 'about', 'Đôi Dòng Lịch Sử')
 );
 
 const visionMissionCoreValuesTitle = computed(() => 
-  isCategoriesReady.value
-    ? categories.value.find(category => category.code === '15' && category.page === 'about')?.name 
-    : 'Tầm nhìn, Sứ mệnh và Giá trị cốt lõi'
+  categoryStore.getCategoryTitle('15', 'about', 'Tầm nhìn, Sứ mệnh và Giá trị cốt lõi')
 );
 
 const authorTitle = computed(() => 
-  isCategoriesReady.value
-    ? categories.value.find(category => category.code === '11' && category.page === 'about')?.name 
-    : 'Phạm Hữu Hoàng Anh'
+  categoryStore.getCategoryTitle('11', 'about', 'Phạm Hữu Hoàng Anh')
 );
 
 const personalJourneyTitle = computed(() => 
-  isCategoriesReady.value
-    ? categories.value.find(category => category.code === '14' && category.page === 'about')?.name 
-    : 'Ngót nghét cũng 15 năm kể từ khi tập tành viết những dòng đầu tiên, nơi đây chứa đựng khao khát đam mê của tuổi trẻ, và nỗi đau, niềm vui, niềm hi vọng lúc trưởng thành.'
+  categoryStore.getCategoryTitle('14', 'about', 'Ngót nghét cũng 15 năm kể từ khi tập tành viết những dòng đầu tiên...')
 );
-
-onMounted(async () => {
-  await fetchCategories();
-});
 </script>
+
 <style scoped>
 body {
     font-family: 'Arial', sans-serif;

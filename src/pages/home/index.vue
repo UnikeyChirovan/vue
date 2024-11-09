@@ -79,35 +79,18 @@ import { useVoteStore } from '../../stores/vote';
 import Notification from '../../components/Notification.vue';
 import LoadingModal from '../../components/LoadingModal.vue';
 import { useLoadingStore } from '../../stores/loadingStore';
+import { useCategoryStore } from '../../stores/useCategoryStore';
 const loadingStore = useLoadingStore();
 const voteStore = useVoteStore(); 
 const authStore = useAuthStore();
+const categoryStore = useCategoryStore();
 const message = useMessage();
 const router = useRouter();
-const categories = ref([]);
-const isCategoriesReady = ref(false); 
 
-async function fetchCategories() {
-  const storedCategories = localStorage.getItem('categories');
-  if (storedCategories) {
-    categories.value = JSON.parse(storedCategories);
-    isCategoriesReady.value = true;
-  } else {
-    try {
-      const response = await fetch(apiLinks.categories.getAll);
-      const data = await response.json();
-      localStorage.setItem('categories', JSON.stringify(data));
-      categories.value = data;
-      isCategoriesReady.value = true;
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  }
-}
-const futureProjectTitle = computed(() => isCategoriesReady.value? categories.value.find(category => category.code === '2' && category.page === 'home')?.name : 'Dự Án Tương Lai');
-const firstMeetTitle = computed(() => isCategoriesReady.value ? categories.value.find(category => category.code === '3' && category.page === 'home')?.name : 'Cho Lần Đầu Gặp Gỡ');
-const todayFeatureTitle = computed(() => isCategoriesReady.value? categories.value.find(category => category.code === '4' && category.page === 'home')?.name : 'Dấu Ấn Hôm Nay');
-const notificationTitle = computed(() => isCategoriesReady.value ? categories.value.find(category => category.code === '1' && category.page === 'home')?.name : 'Theo Dòng Sự Kiện');
+const futureProjectTitle = computed(() => categoryStore.getCategoryTitle('2', 'home', 'Dự Án Tương Lai'));
+const firstMeetTitle = computed(() => categoryStore.getCategoryTitle('3', 'home', 'Cho Lần Đầu Gặp Gỡ'));
+const todayFeatureTitle = computed(() => categoryStore.getCategoryTitle('4', 'home', 'Dấu Ấn Hôm Nay'));
+const notificationTitle = computed(() => categoryStore.getCategoryTitle('1', 'home', 'Theo Dòng Sự Kiện'));
 const voteResults = ref({
   totalVotes: 0,
   votesByChoice: {}
@@ -219,60 +202,74 @@ const getVoteResults = async () => {
   }
 };
 
-onMounted(async () => {
-  const beforeStatus = sessionStorage.getItem('Before');
-  await AOS.init();
+const observeLocalStorageChange = () => {
+  const originalSetItem = localStorage.setItem;
 
-  // Kiểm tra và xử lý heroSlides
+  localStorage.setItem = function(key, value) {
+    originalSetItem.apply(this, arguments);
+    switch (key) {
+      case 'heroSlides':
+        heroSlides.value = JSON.parse(value);
+        isHeroSlidesReady.value = true;
+        break;
+      case 'futureProjects':
+        futureProjects.value = JSON.parse(value);
+        break;
+      case 'features':
+        features.value = JSON.parse(value).map(item => ({
+          ...item,
+          icon: item.icon ? iconMap[item.icon] : null,
+          iconClass: item.icon_class,
+        }));
+        break;
+    }
+  };
+};
+
+
+const loadHeroSlidesFromStorage = () => {
   const heroSlidesData = localStorage.getItem('heroSlides');
   if (heroSlidesData) {
     heroSlides.value = JSON.parse(heroSlidesData);
     isHeroSlidesReady.value = true;
-    console.log('HeroSlides được tải từ localStorage!');
   }
+};
 
-  // Xử lý futureProjects ngay cả khi không có heroSlides trong localStorage
+const loadFutureProjectsFromStorage = () => {
   const futureProjectsData = localStorage.getItem('futureProjects');
   if (futureProjectsData) {
     futureProjects.value = JSON.parse(futureProjectsData);
   }
+};
+
+const loadFeaturesFromStorage = () => {
   const featuresData = localStorage.getItem('features');
   if (featuresData) {
     features.value = JSON.parse(featuresData).map(item => ({
       ...item,
       icon: item.icon ? iconMap[item.icon] : null,
-       iconClass: item.icon_class,
+      iconClass: item.icon_class,
     }));
   }
+};
+
+onMounted(async () => {
+  const beforeStatus = sessionStorage.getItem('Before');
+  await AOS.init();
+  observeLocalStorageChange();
+  loadHeroSlidesFromStorage();
+  loadFutureProjectsFromStorage();
+  loadFeaturesFromStorage();
   if (beforeStatus !== 'ok') {
     await loadingStore.fetchDataBeforeLogin(() => {
-      const fetchedHeroSlidesData = localStorage.getItem('heroSlides');
-      if (fetchedHeroSlidesData) {
-        heroSlides.value = JSON.parse(fetchedHeroSlidesData);
-        isHeroSlidesReady.value = true;
-        console.log('Dữ liệu heroSlides đã được cập nhật từ API và lưu vào localStorage!');
-      }
-      const fetchedFutureProjectsData = localStorage.getItem('futureProjects');
-      if (fetchedFutureProjectsData) {
-        futureProjects.value = JSON.parse(fetchedFutureProjectsData);
-      }
-      const fetchedFeaturesData  = localStorage.getItem('features');
-      if (fetchedFeaturesData) {
-          features.value = JSON.parse(fetchedFeaturesData).map(item => ({
-          ...item,
-          icon: item.icon ? iconMap[item.icon] : null,
-          iconClass: item.icon_class,
-        }));
-      }
+      console.log('Dữ liệu được cập nhật từ API và lưu vào localStorage!');
     });
   }
-  await fetchCategories();
   await getVoteResults();
   if (authStore.isLoggedIn) {
     await voteStore.getUserVote();
   }
 });
-
 
 </script>
 

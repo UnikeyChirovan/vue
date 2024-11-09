@@ -3,7 +3,7 @@
     <div class="title-text"><h2 class="text-uppercase">{{ aboutIntroductionTitle }}</h2></div>
     <div class="row m-0 p-0">
       <div class="col-md-4 info-left">
-        <img class="avatar" :src="avatarImage" alt="Avatar" />
+        <img class="avatar" :src="avatarImage" alt="Avatar" loading="lazy" />
         <div class="basic-info">
           <h3>{{ authorTitle }}</h3>
           <hr />
@@ -21,7 +21,7 @@
             </div>
           </div>
             <div v-if="coverImage" class="about-image-container mt-2">
-              <img :src="coverImage" alt="Về Selorson Tales" class="about-image" />
+              <img :src="coverImage" alt="Về Selorson Tales" class="about-image" loading="lazy" />
             </div>
         </div>
       </div>

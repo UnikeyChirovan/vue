@@ -13,7 +13,8 @@
       <img v-if="notificationDetails[notification.id]?.image_paths.length > 0"
            :src="`http://127.0.0.1:8000/storage/${notificationDetails[notification.id].image_paths[0]}`" 
            :alt="`Image for ${notificationDetails[notification.id]?.title}`" 
-           class="map-image" />
+           class="map-image"
+           loading="lazy" />
     </div>
   </div>
   <TheFooter/>
