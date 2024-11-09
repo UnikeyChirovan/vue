@@ -255,15 +255,18 @@ const loadFeaturesFromStorage = () => {
 
 onMounted(async () => {
   const beforeStatus = sessionStorage.getItem('Before');
+  const finalStatus = localStorage.getItem('Final');
   await AOS.init();
   observeLocalStorageChange();
   loadHeroSlidesFromStorage();
   loadFutureProjectsFromStorage();
   loadFeaturesFromStorage();
-  if (beforeStatus !== 'ok') {
-    await loadingStore.fetchDataBeforeLogin(() => {
-      console.log('Dữ liệu được cập nhật từ API và lưu vào localStorage!');
-    });
+  if(finalStatus !=='ok'){
+    if (beforeStatus !== 'ok') {
+      await loadingStore.fetchDataBeforeLogin(() => {
+        console.log('Dữ liệu được cập nhật từ API và lưu vào localStorage!');
+      });
+    }
   }
   await getVoteResults();
   if (authStore.isLoggedIn) {

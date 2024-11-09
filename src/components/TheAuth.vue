@@ -274,13 +274,15 @@ const handleLoginSubmit = async () => {
     const beforeStatus = sessionStorage.getItem('Before');
     loadingStore.isDataLoading = true;
     if (beforeStatus) {
-      await loadingStore.fetchDataAfterLogin();
+      // await loadingStore.fetchDataAfterLogin();
+      router.push({ name: 'home' });
     } else {
       await loadingStore.fetchDataBeforeLogin();
       loadingStore.isDataLoading = true;
-      await loadingStore.fetchDataAfterLogin();
+      router.push({ name: 'home' });
+      // await loadingStore.fetchDataAfterLogin();
     }
-    router.push({ name: 'home' });
+    // router.push({ name: 'home' });
     message.success('Đăng nhập thành công!');
     loadingStore.isDataLoading = false;
     loadingStore.fetchDataFinalLogin();

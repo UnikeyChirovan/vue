@@ -202,7 +202,7 @@ const updateChapterAndFetchContent = (newChapter) => {
 };
 const fetchLastReadChapter = async () => {
   try {
-    const lastChapterId = sessionStorage.getItem('lastReadChapter');
+    const lastChapterId = localStorage.getItem('lastReadChapter');
 
     if (lastChapterId) {
       chapterStore.setSelectedChapter(lastChapterId);
@@ -235,7 +235,7 @@ watch(
   (newChapter, oldChapter) => {
     if (newChapter !== oldChapter && newChapter !== null) {
       fetchChapterContent(newChapter); 
-      sessionStorage.setItem('lastReadChapter', newChapter); 
+      localStorage.setItem('lastReadChapter', newChapter); 
       saveChapterProgress(newChapter);
     }
   }
@@ -244,7 +244,7 @@ watch(
 
 
 onMounted(() => {
-  const lastReadChapter = sessionStorage.getItem('lastReadChapter');
+  const lastReadChapter = localStorage.getItem('lastReadChapter');
   const savedStoryName = localStorage.getItem('storyName');
   const savedAuthorName = localStorage.getItem('authorName');
 

@@ -60,7 +60,6 @@ export const useLoadingStore = defineStore('loading', () => {
       const categoriesResponse = await apiLinks.categories.getAll();
       localStorage.setItem('categories', JSON.stringify(categoriesResponse.data));
       updateProgress(100);
-      sessionStorage.setItem('Before', 'ok');
 
       // Các lời gọi API cuối cùng sau khi hoàn tất phần trên
       await Promise.all([
@@ -75,7 +74,7 @@ export const useLoadingStore = defineStore('loading', () => {
         // })
       ]);
 
-      sessionStorage.setItem('Before_2', 'ok');
+      sessionStorage.setItem('Before', 'ok');
     } catch (error) {
       console.error('Error fetching data before login:', error);
       isDataLoading.value = false;
@@ -83,23 +82,23 @@ export const useLoadingStore = defineStore('loading', () => {
     }
   }
 
-  async function fetchDataAfterLogin() {
-    isDataLoading.value = true;
-    loadingProgress.value = 0;
-    try {
-      const userVote = await apiLinks.votes.getUserVote();
-      sessionStorage.setItem('user_vote', JSON.stringify(userVote.data));
-      updateProgress(100);
-      sessionStorage.setItem('After', 'ok');
-    } catch (error) {
-      console.error('Error fetching data after login:', error);
-      isDataLoading.value = false;
-      sessionStorage.setItem('After', 'false');
-    }
-  }
+  // async function fetchDataAfterLogin() {
+  //   isDataLoading.value = true;
+  //   loadingProgress.value = 0;
+  //   try {
+  //     const userVote = await apiLinks.votes.getUserVote();
+  //     sessionStorage.setItem('user_vote', JSON.stringify(userVote.data));
+  //     updateProgress(100);
+  //     sessionStorage.setItem('After', 'ok');
+  //   } catch (error) {
+  //     console.error('Error fetching data after login:', error);
+  //     isDataLoading.value = false;
+  //     sessionStorage.setItem('After', 'false');
+  //   }
+  // }
 
   async function fetchDataFinalLogin() {
-    const userId = useAuthStore().user?.id;
+    // const userId = useAuthStore().user?.id;
 
     try {
       const [
@@ -120,17 +119,17 @@ export const useLoadingStore = defineStore('loading', () => {
       
       const chapterId = lastChapter.data?.chapter_id;
       if (chapterId) {
-        sessionStorage.setItem('lastReadChapter', chapterId);
+        localStorage.setItem('lastReadChapter', chapterId);
       }
 
       // sessionStorage.setItem('backgrounds', JSON.stringify(backgrounds.data));
       // sessionStorage.setItem('user_settings_early', JSON.stringify(userSettings.data));
       // sessionStorage.setItem('user_profile', JSON.stringify(profile.data));
 
-      sessionStorage.setItem('Final', 'ok');
+      localStorage.setItem('Final', 'ok');
     } catch (error) {
       console.error('Error fetching data final after login:', error);
-      sessionStorage.setItem('Final', 'false');
+      localStorage.setItem('Final', 'false');
     }
   }
 
@@ -139,7 +138,7 @@ export const useLoadingStore = defineStore('loading', () => {
     isDataLoading,
     updateProgress,
     fetchDataBeforeLogin,
-    fetchDataAfterLogin,
+    // fetchDataAfterLogin,
     fetchDataFinalLogin
   };
 }, {
