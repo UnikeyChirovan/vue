@@ -15,7 +15,7 @@
           <div class="poem-section">
             <div v-if="sections[2]" class="section-content">
               <div class="poem">
-                <h2 class="primary">{{ sections[2].title }}</h2> <!-- Chuyển tiêu đề vào trong div.poem -->
+                <h2 class="primary">{{ sections[2].title }}</h2>
                 <div v-html="formatContent(sections[2].content, sections[2].section_number)"></div>
               </div>
             </div>
@@ -39,7 +39,6 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import apiLinks from '../../services/api-links';
 import { useLoadingStore } from '../../stores/loadingStore';
-import { defineProps } from 'vue';
 
 const props = defineProps({
   authorTitle: {
@@ -59,7 +58,6 @@ const avatarImage = ref(null);
 
 const intervalIds = ref([]);
 
-// Hàm kiểm tra ảnh trong localStorage và trả về đường dẫn nếu có
 const checkImage = (imageName, imageRef) => {
   const images = JSON.parse(localStorage.getItem('images')) || [];
   const image = images.find(img => img.image_name === imageName);
@@ -71,7 +69,6 @@ const checkImage = (imageName, imageRef) => {
   return false;
 };
 
-// Hàm tải ảnh từ API nếu không tìm thấy trong localStorage
 const fetchImageWithRetry = async (imageName, imageRef, maxChecks = 10, intervalTime = 1000) => {
   let checkCount = 0;
 
@@ -85,7 +82,7 @@ const fetchImageWithRetry = async (imageName, imageRef, maxChecks = 10, interval
         try {
           const response = await apiLinks.imageManager.getImages();
           localStorage.setItem('images', JSON.stringify(response.data));
-          checkImage(imageName, imageRef); // Gọi lại để cập nhật imageRef với dữ liệu mới
+          checkImage(imageName, imageRef); 
         } catch (error) {
           console.error('Lỗi khi gọi API lấy hình ảnh:', error);
         }

@@ -89,7 +89,7 @@ const columns = [
 const getCategories = async () => {
   try {
     const response = await api.get('/categories'); 
-    categories.value = response.data.categories; 
+    categories.value = response.data; 
   } catch (error) {
     console.error(error);
     if (error.response.status === 429) {

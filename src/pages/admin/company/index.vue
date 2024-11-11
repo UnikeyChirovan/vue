@@ -239,7 +239,7 @@ const featureColumns = [
 const getCompanyInfos = async () => {
   try {
     const response = await api.get('/company-info');
-    companyInfos.value = response.data.companyInfos;
+    companyInfos.value = response.data;
   } catch (error) {
     handleError(error);
   }
@@ -248,7 +248,7 @@ const getCompanyInfos = async () => {
 const getHeroSlides = async () => {
   try {
     const response = await api.get('/hero-slides');
-    heroSlides.value = response.data.heroSlides;
+    heroSlides.value = response.data;
   } catch (error) {
     handleError(error);
   }
@@ -257,7 +257,7 @@ const getHeroSlides = async () => {
 const getFutureProjects = async () => {
   try {
     const response = await api.get('/future-projects');
-    futureProjects.value = response.data.futureProjects;
+    futureProjects.value = response.data;
   } catch (error) {
     handleError(error);
   }
@@ -266,7 +266,7 @@ const getFutureProjects = async () => {
 const getFeatures = async () => {
   try {
     const response = await api.get('/features');
-    features.value = response.data.features;
+    features.value = response.data;
   } catch (error) {
     handleError(error);
   }

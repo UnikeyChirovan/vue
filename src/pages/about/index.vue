@@ -30,10 +30,9 @@ import TeamMember from '../../components/about/TeamMember.vue';
 import Timeline from '../../components/about/Timeline.vue';
 import VisionMissionValues from '../../components/about/VisionMissionValues.vue';
 
-// Sử dụng Pinia store
+
 const categoryStore = useCategoryStore();
 
-// Sử dụng computed để lấy dữ liệu từ store
 const aboutIntroductionTitle = computed(() => 
   categoryStore.getCategoryTitle('12', 'about', 'Một Chút Về Selorson Tales')
 );

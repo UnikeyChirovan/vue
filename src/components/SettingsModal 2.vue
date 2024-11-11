@@ -126,10 +126,10 @@
   };
 
   onMounted(() => {
-    settingsStore.loadSettings();  // Load settings from sessionStorage
-    settingsStore.fetchBackgrounds();  // Load settings from sessionStorage
+    settingsStore.loadSettings(); 
+    settingsStore.fetchBackgrounds(); 
     if (authStore.user?.id) {
-      settingsStore.fetchUserSettings(authStore.user.id);  // Fetch user-specific settings
+      settingsStore.fetchUserSettings(authStore.user.id);
     }
   });
 </script>

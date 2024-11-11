@@ -58,7 +58,7 @@ onMounted(async () => {
   try {
     const response = await api.get(`/user-notifications/${id}`);
     if (response.status === 200) {
-      const notificationDetail = response.data.notification_detail; // Truy cập vào notification_detail
+      const notificationDetail = response.data; // Truy cập vào notification_detail
       form.value.title = notificationDetail.title;
       form.value.content = notificationDetail.content.split('\n');
       form.value.page = notificationDetail.page;

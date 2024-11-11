@@ -91,7 +91,7 @@ const getNotifications = async () => {
   try {
     const response = await api.get('/user-notifications');
     console.log('dữ liệu', response);
-    notifications.value = response.data.notifications; 
+    notifications.value = response.data; 
   } catch (error) {
     console.error(error);
     if (error.response.status === 429) {

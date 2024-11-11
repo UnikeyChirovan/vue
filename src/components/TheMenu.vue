@@ -46,7 +46,7 @@
     </a-menu-item>
     <a-menu-item key="admin-images">
       <RouterLink :to="{ name: 'admin-images' }">
-        <span><i class="fa-solid fa-image me-1"></i>Quản lý hình nên</span>
+        <span><i class="fa-solid fa-image me-1"></i>Quản lý hình nền</span>
       </RouterLink>
     </a-menu-item>
     <a-menu-item key="admin-contacts">

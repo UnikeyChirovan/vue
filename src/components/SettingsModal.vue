@@ -175,7 +175,6 @@ const selectedBackground = createComputedProperty('selectedBackground');
 
 let initialSettings = {};
 
-// Khi khởi động hoặc khi người dùng mở modal, lưu lại giá trị ban đầu
 const saveInitialSettings = () => {
   initialSettings = {
     backgroundStoryId: backgroundStoryId.value,

@@ -1,4 +1,3 @@
-// stores/loadingStore.js
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import apiLinks from '../services/api-links';
@@ -26,7 +25,6 @@ export const useLoadingStore = defineStore('loading', () => {
     };
 
     try {
-      // Tạo các promise và lưu dữ liệu sau khi từng promise hoàn tất
       await Promise.all([
         apiLinks.heroSlides.getAll().then((response) => {
           localStorage.setItem('heroSlides', JSON.stringify(response.data));
@@ -36,7 +34,6 @@ export const useLoadingStore = defineStore('loading', () => {
           localStorage.setItem('notifications', JSON.stringify(response.data));
           updateStepProgress(20);
 
-          // Gọi chi tiết thông báo nếu có ID thông báo
           const notificationId = response.data?.[0]?.id;
           if (notificationId) {
             const detailResponse = await apiLinks.notifications.getDetail(notificationId);
@@ -61,7 +58,6 @@ export const useLoadingStore = defineStore('loading', () => {
       localStorage.setItem('categories', JSON.stringify(categoriesResponse.data));
       updateProgress(100);
 
-      // Các lời gọi API cuối cùng sau khi hoàn tất phần trên
       await Promise.all([
         apiLinks.companyInfo.getAll().then((response) => {
           localStorage.setItem('companyInfos', JSON.stringify(response.data));

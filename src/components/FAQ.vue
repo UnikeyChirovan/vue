@@ -45,7 +45,6 @@ import { useRouter } from 'vue-router';
         question: "Làm thế nào để liên hệ với bộ phận hỗ trợ?",
         answer: "Bạn có thể liên hệ với chúng tôi qua email, điện thoại hoặc điền vào form liên hệ trên trang Liên hệ.",
       },
-      // Thêm các câu hỏi khác nếu cần
     ]);
 
 </script>
