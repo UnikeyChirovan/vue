@@ -67,7 +67,20 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
-const pendingRequests = new Map();
+
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+// Hàm thêm các lệnh đợi khi refresh token
+function subscribeTokenRefresh(callback) {
+  refreshSubscribers.push(callback);
+}
+
+// Gọi các lệnh đợi với token mới
+function onRefreshed(newAccessToken) {
+  refreshSubscribers.map(callback => callback(newAccessToken));
+  refreshSubscribers = [];
+}
 
 api.interceptors.request.use(
   async (config) => {
@@ -76,12 +89,6 @@ api.interceptors.request.use(
     if (authStore.isLoggedIn && authStore.accessToken) {
       config.headers['Authorization'] = `Bearer ${authStore.accessToken}`;
     }
-    const requestKey = `${config.method}-${config.url}`;
-    if (pendingRequests.has(requestKey)) {
-      return pendingRequests.get(requestKey);
-    }
-    const requestPromise = Promise.resolve(config);
-    pendingRequests.set(requestKey, requestPromise);
 
     return config;
   },
@@ -89,33 +96,49 @@ api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
 api.interceptors.response.use(
   (response) => {
-    const requestKey = `${response.config.method}-${response.config.url}`;
-    pendingRequests.delete(requestKey); 
     return response;
   },
   async (error) => {
     const authStore = useAuthStore();
     const originalRequest = error.config;
-    const requestKey = `${originalRequest.method}-${originalRequest.url}`;
-    pendingRequests.delete(requestKey);
 
     if (error.response && error.response.status === 401) {
+      // Kiểm tra nếu đã thử gọi refresh token
       if (!originalRequest._retry && originalRequest.url !== '/auth/refresh') {
         originalRequest._retry = true;
-        try {
-          const response = await api.post('/auth/refresh');
-          const newAccessToken = response.data.access_token;
-          authStore.accessToken = newAccessToken;
-          originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-          return api(originalRequest);
-        } catch (refreshError) {
-          if (refreshError.response && refreshError.response.status === 403) {
-            await authStore.forceLogout();
-            return Promise.reject(refreshError);
+
+        if (!isRefreshing) {
+          isRefreshing = true;
+          try {
+            const response = await api.post('/auth/refresh');
+            const newAccessToken = response.data.access_token;
+            authStore.accessToken = newAccessToken;
+
+            // Đặt Authorization cho lệnh gốc và thực hiện lại lệnh
+            originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+            onRefreshed(newAccessToken);
+            isRefreshing = false;
+
+            return api(originalRequest);
+          } catch (refreshError) {
+            isRefreshing = false;
+            if (refreshError.response && refreshError.response.status === 403) {
+              await authStore.forceLogout();
+              return Promise.reject(refreshError);
+            }
           }
         }
+
+        // Đợi cho đến khi refresh token hoàn tất
+        return new Promise((resolve) => {
+          subscribeTokenRefresh((newAccessToken) => {
+            originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+            resolve(api(originalRequest));
+          });
+        });
       }
     }
 
