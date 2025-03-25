@@ -9,6 +9,11 @@
         <span><i class="fa-solid fa-user me-1"></i>Quản lý tài khoản</span>
       </RouterLink>
     </a-menu-item>
+    <a-menu-item key="admin-mails">
+      <RouterLink :to="{ name: 'admin-mails' }">
+        <span><i class="fa-solid fa-heart me-1"></i>Danh sách Mails</span>
+      </RouterLink>
+    </a-menu-item>
     <a-menu-item key="admin-news">
       <RouterLink :to="{ name: 'admin-news' }">
         <span><i class="fa-solid fa-bell me-1"></i> Quản lý thông báo</span>
@@ -47,6 +52,11 @@
     <a-menu-item key="admin-images">
       <RouterLink :to="{ name: 'admin-images' }">
         <span><i class="fa-solid fa-image me-1"></i>Quản lý hình nền</span>
+      </RouterLink>
+    </a-menu-item>
+    <a-menu-item key="admin-videos">
+      <RouterLink :to="{ name: 'admin-videos' }">
+        <span><i class="fa-solid fa-film me-1"></i>Quản lý Video</span>
       </RouterLink>
     </a-menu-item>
     <a-menu-item key="admin-contacts">

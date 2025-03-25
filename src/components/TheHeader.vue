@@ -68,6 +68,7 @@ const listItem = reactive([
   { name: 'Giới Thiệu', link: 'about', icon: 'fas fa-info-circle', requiresLogin: false, isAdmin: false },
   { name: 'Bản Đồ', link: 'maps', icon: 'fas fa-map', requiresLogin: false, isAdmin: false },
   { name: 'Đọc Truyện', link: 'stories', icon: 'fas fa-book', requiresLogin: true, isAdmin: false },
+  { name: 'Hoạt Hình', link: 'animators', icon: 'fas fa-film', requiresLogin: true, isAdmin: false },
   { name: 'Quản Lý', link: 'admin-users', icon: 'fas fa-user-secret', requiresLogin: false, isAdmin: true },
 ]);
 

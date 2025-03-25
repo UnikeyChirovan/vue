@@ -48,6 +48,12 @@ const admin = [
         name: 'admin-infos-create',
         component: () => import('../pages/admin/infos/create.vue'),
       },
+      // Quản lý Email đã đăng ký
+      {
+      path: 'mails',
+      name: 'admin-mails',
+      component: () => import('../pages/admin/mails/index.vue'),
+      },
       // Quản lý stories
       {
         path: 'stories',
@@ -179,6 +185,22 @@ const admin = [
         path: 'images-manager/:id/edit',
         name: 'admin-images-manager-edit',
         component: () => import('../pages/admin/images-manager/edit.vue'),
+      },
+      // Quản lý Video
+      {
+        path: 'videos',
+        name: 'admin-videos',
+        component: () => import('../pages/admin/videos/index.vue'),
+      },
+      {
+        path: 'videos/create',
+        name: 'admin-videos-create',
+        component: () => import('../pages/admin/videos/create.vue'),
+      },
+      {
+        path: 'videos/:id/edit',
+        name: 'admin-videos-edit',
+        component: () => import('../pages/admin/videos/edit.vue'),
       },
       // Quản lý contacts
       {

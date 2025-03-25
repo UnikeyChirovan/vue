@@ -133,7 +133,15 @@ const apiLinks = {
     create: (data) => api.post('/features', data),
     update: (id, data) => api.put(`/features/${id}`, data),
     delete: (id) => api.delete(`/features/${id}`),
-  }
+  },
+    videos: {
+    getAll: () => api.get('/video-manager'),
+    getDetail: (id) => api.get(`/video-manager/${id}`),
+    create: (data) => api.post('/video-manager/upload', data),
+    update: (id, data) => api.put(`/video-manager/${id}`, data),
+    delete: (id) => api.delete(`/video-manager/${id}`),
+  },
+
 };
 
 export default apiLinks;

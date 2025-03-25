@@ -19,6 +19,8 @@
     "ckeditor5": "^43.1.1",
     "dayjs": "^1.11.13",
     "default-passive-events": "^2.0.0",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
     "naive-ui": "^2.39.0",
     "pinia": "^2.2.2",
     "pinia-plugin-persistedstate": "^4.0.0-alpha.4",

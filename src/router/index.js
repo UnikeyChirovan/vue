@@ -14,6 +14,7 @@ import PasswordResetRequest from './PasswordResetRequest';
 import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfService from './TermsOfService';
 import FAQ from './faq';
+import animators from './animator';
 
 const routes = [
   ...admin,
@@ -21,6 +22,7 @@ const routes = [
   ...about,
   ...contact,
   ...maps,
+  ...animators,
   ...settings,
   ...stories,
   ...profile,

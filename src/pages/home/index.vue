@@ -23,14 +23,16 @@
       </div>
     </div>
   </section>
-  <section class="video-section" data-aos="zoom-in">
+  <section class="video-section" >
     <h2 class="section-title text-uppercase">{{ firstMeetTitle }}</h2>
-    <div class="video-container">
-      <video controls>
-        <source src="#!" type="video/mp4">
+    <div class="video-container" v-if="featuredVideo">
+      <video controls preload="metadata">
+        <source :src="getVideoUrl(featuredVideo.video_path)" type="video/mp4">
         Your browser does not support the video tag.
       </video>
+      <p class="video-title">{{ featuredVideo.video_name }}</p>
     </div>
+    <p v-else>Chưa có thông tin video nào.</p>
   </section>
   <section class="feature-section" data-aos="fade-up">
     <h2 class="feature-section-title text-uppercase">{{ todayFeatureTitle }}</h2>
@@ -80,6 +82,9 @@ import Notification from '../../components/Notification.vue';
 import LoadingModal from '../../components/LoadingModal.vue';
 import { useLoadingStore } from '../../stores/loadingStore';
 import { useCategoryStore } from '../../stores/useCategoryStore';
+const BaseURL = 'http://127.0.0.1:8000';
+const getVideoUrl = (path) => `${BaseURL}/storage/${path}`;
+
 const loadingStore = useLoadingStore();
 const voteStore = useVoteStore(); 
 const authStore = useAuthStore();
@@ -98,6 +103,8 @@ const voteResults = ref({
 const heroSlides = ref([]);
 const isHeroSlidesReady = ref(false); 
 const futureProjects = ref([]);
+const featuredVideo = ref(null);
+
 
 const currentSlideIndex = ref(0);
 const nextSlide = () => {
@@ -252,6 +259,14 @@ const loadFeaturesFromStorage = () => {
     }));
   }
 };
+const fetchFeaturedVideo = async () => {
+  try {
+    const response = await api.get('/videos/featured');
+    featuredVideo.value = response.data;
+  } catch (error) {
+    console.error('Lỗi khi lấy video đặc biệt:', error);
+  }
+};
 
 onMounted(async () => {
   const beforeStatus = sessionStorage.getItem('Before');
@@ -261,6 +276,7 @@ onMounted(async () => {
   loadHeroSlidesFromStorage();
   loadFutureProjectsFromStorage();
   loadFeaturesFromStorage();
+  fetchFeaturedVideo();
   if(finalStatus !=='ok'){
     if (beforeStatus !== 'ok') {
       await loadingStore.fetchDataBeforeLogin(() => {
@@ -496,11 +512,19 @@ p.feature-percentage {
 }
 
 .video-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
+    display: flex;
+    flex-direction: column; /* Đảm bảo sắp xếp theo chiều dọc */
+    align-items: center; /* Căn giữa nội dung */
+    text-align: center; /* Căn giữa chữ */
 }
+
+.video-title {
+    margin-top: 20px; /* Tạo khoảng cách với video */
+    font-size: 16px;
+    font-weight: bold;
+    color: rgb(245, 44, 44);
+}
+
 
 video {
   width: 50%; 
