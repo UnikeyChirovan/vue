@@ -13,6 +13,30 @@
         />
       </div>
 
+      <div class="mb-3">
+        <label for="thumbnailFile" class="form-label me-2">Chọn Thumbnail</label>
+        <input 
+          type="file" 
+          id="thumbnailFile" 
+          class="form-control" 
+          @change="handleThumbnailUpload" 
+          accept="image/*" 
+        />
+      </div>
+
+      <div v-if="thumbnailPreviewUrl" class="mb-3">
+        <img :src="thumbnailPreviewUrl" class="thumbnail-preview" alt="Thumbnail Preview" />
+      </div>
+
+      <div class="mb-3">
+        <label for="videoDescription" class="form-label me-2">Mô tả Video</label>
+        <textarea 
+          id="videoDescription" 
+          class="form-control description-box" 
+          v-model="videoDescription"
+        ></textarea>
+      </div>
+
       <div v-if="videoFile" class="mb-3">
         <div class="mb-4 block">
           <div class="mb-2">
@@ -49,6 +73,9 @@ import api from '../../../services/axiosInterceptor';
 const videoFile = ref(null);
 const videoName = ref("");
 const videoPreviewUrl = ref("");
+const videoDescription = ref("");
+const thumbnailFile = ref(null);
+const thumbnailPreviewUrl = ref("");
 const loading = ref(false);
 const message = ref("");
 
@@ -57,14 +84,25 @@ const handleFileUpload = (e) => {
   if (!file) return;
   
   videoFile.value = file;
-  videoName.value = file.name.split('.').slice(0, -1).join('.'); // Lấy tên file không có đuôi mở rộng
+  videoName.value = file.name.split('.').slice(0, -1).join('.');
   videoPreviewUrl.value = URL.createObjectURL(file);
+};
+
+const handleThumbnailUpload = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  thumbnailFile.value = file;
+  thumbnailPreviewUrl.value = URL.createObjectURL(file);
 };
 
 const removeVideo = () => {
   videoFile.value = null;
   videoName.value = "";
   videoPreviewUrl.value = "";
+  videoDescription.value = "";
+  thumbnailFile.value = null;
+  thumbnailPreviewUrl.value = "";
 };
 
 const submitForm = async () => {
@@ -76,19 +114,21 @@ const submitForm = async () => {
   const formData = new FormData();
   formData.append("videos[]", videoFile.value);
   formData.append("video_names[]", videoName.value);
-
+  formData.append("descriptions[]", videoDescription.value);
+  if (thumbnailFile.value) {
+    formData.append("thumbnails[]", thumbnailFile.value);
+  }
 
   loading.value = true;
 
   try {
-    console.log("Dữ liệu gửi đi:", formData);
     const response = await api.post("/videos/upload", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
     if (response.data.message) {
       message.value = response.data.message;
-      removeVideo(); // Xóa video sau khi upload thành công
+      removeVideo();
     }
   } catch (error) {
     console.error("Upload thất bại:", error);
@@ -111,5 +151,17 @@ onMounted(() => {
 }
 .preview {
   border: 3px solid teal;
+}
+.thumbnail-preview {
+  max-width: 100%;
+  height: auto;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+.description-box {
+  width: 100%;
+  height: 120px;
+  resize: vertical;
 }
 </style>
