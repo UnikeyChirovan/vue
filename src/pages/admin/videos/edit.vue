@@ -19,6 +19,10 @@
         <textarea v-model="form.description" id="videoDescription" rows="4" class="form-control"></textarea>
       </div>
       <div class="mb-3">
+        <label for="episodeNumber">Số Tập</label>
+        <input v-model="form.episode_number" type="number" id="episodeNumber" class="form-control" min="0" required />
+      </div>
+      <div class="mb-3">
         <label for="videoThumbnail">Chọn Thumbnail Mới</label>
         <input type="file" id="videoThumbnail" class="form-control" @change="handleThumbnailUpload" accept="image/*" />
       </div>
@@ -44,6 +48,7 @@ const form = ref({
   video_name: '',
   video_path: '',
   description: '',
+  episode_number: 1,
   thumbnail: '',
 });
 
@@ -74,7 +79,6 @@ const submitForm = async () => {
     const formData = new FormData();
     let hasChanges = false;
 
-    // Laravel không hỗ trợ PUT với FormData, nên phải dùng POST + _method=PUT
     formData.append('_method', 'PUT');
 
     if (form.value.video_name) {
@@ -84,6 +88,11 @@ const submitForm = async () => {
 
     if (form.value.description) {
       formData.append('description', form.value.description);
+      hasChanges = true;
+    }
+
+    if (form.value.episode_number || form.value.episode_number === 0) {
+      formData.append('episode_number', form.value.episode_number);
       hasChanges = true;
     }
 
@@ -129,14 +138,15 @@ onMounted(() => {
   padding: 5px;
 }
 .thumbnail-preview {
-  max-width: 100%;
+  max-width: 50%;
   height: auto;
   border: 1px solid #ddd;
   border-radius: 4px;
   padding: 5px;
   display: block;
-  margin: 0 auto;
+  margin: 10px auto; /* Canh giữa theo chiều ngang */
 }
+
 .form-control {
   width: 100%;
 }

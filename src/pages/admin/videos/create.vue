@@ -37,6 +37,18 @@
         ></textarea>
       </div>
 
+      <div class="mb-3">
+        <label for="episodeNumber" class="form-label me-2">Số Tập</label>
+        <input 
+          type="number" 
+          id="episodeNumber" 
+          class="form-control" 
+          v-model="episodeNumber"
+          min="0"
+          required
+        />
+      </div>
+
       <div v-if="videoFile" class="mb-3">
         <div class="mb-4 block">
           <div class="mb-2">
@@ -74,6 +86,7 @@ const videoFile = ref(null);
 const videoName = ref("");
 const videoPreviewUrl = ref("");
 const videoDescription = ref("");
+const episodeNumber = ref(0);
 const thumbnailFile = ref(null);
 const thumbnailPreviewUrl = ref("");
 const loading = ref(false);
@@ -101,6 +114,7 @@ const removeVideo = () => {
   videoName.value = "";
   videoPreviewUrl.value = "";
   videoDescription.value = "";
+  episodeNumber.value = 0;
   thumbnailFile.value = null;
   thumbnailPreviewUrl.value = "";
 };
@@ -112,11 +126,12 @@ const submitForm = async () => {
   }
 
   const formData = new FormData();
-  formData.append("videos[]", videoFile.value);
-  formData.append("video_names[]", videoName.value);
-  formData.append("descriptions[]", videoDescription.value);
+  formData.append("video", videoFile.value);
+  formData.append("video_name", videoName.value);
+  formData.append("description", videoDescription.value);
+  formData.append("episode_number", episodeNumber.value);
   if (thumbnailFile.value) {
-    formData.append("thumbnails[]", thumbnailFile.value);
+    formData.append("thumbnail", thumbnailFile.value);
   }
 
   loading.value = true;

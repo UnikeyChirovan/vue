@@ -25,6 +25,7 @@
           <li v-for="video in videoList" :key="video.id" 
               @click="selectVideo(video)" 
               :class="{ 'active-video': video.id === currentVideo.id }">
+            <div class="episode-number">{{ video.episode_number }}</div> <!-- Hiển thị số tập -->
             <img v-if="video.thumbnail" :src="BaseURL + '/' + video.thumbnail" class="related-thumbnail" alt="Thumbnail" />
             <div class="video-info">
               <span>{{ video.video_name }}</span>
@@ -64,8 +65,8 @@ const selectVideo = async (video) => {
   currentVideo.value = video;
   await nextTick(); // Đảm bảo videoPlayer được cập nhật
   if (videoPlayer.value) {
-    videoPlayer.value.load(); // Tải lại video
-    videoPlayer.value.play(); // Tự động phát lại từ đầu
+    videoPlayer.value.load();
+    // videoPlayer.value.play();
   }
 };
 
@@ -155,7 +156,7 @@ onMounted(fetchVideos);
 }
 
 .related-videos {
-  flex: 1;
+  flex: 1.5; /* Làm cho danh sách video rộng hơn một chút */
   background: #222;
   padding: 10px;
   border-radius: 10px;
@@ -185,7 +186,7 @@ onMounted(fetchVideos);
 }
 
 .active-video {
-  background: #ff4500 !important;
+  background: yellowgreen !important;
   color: white;
   font-weight: bold;
 }
@@ -201,5 +202,22 @@ onMounted(fetchVideos);
   font-size: 14px;
   color: #1e90ff;
   font-weight: bold;
+}
+
+.episode-number {
+  font-size: 30px;
+  color: #fff;
+  font-weight: bold;
+  background-color: red;
+  padding: 5px 10px; /* Tăng chiều rộng và chiều cao của background */
+  border-radius: 5px;
+  margin-right: 10px;
+  display: flex;
+  align-items: center; /* Căn giữa theo chiều dọc */
+  justify-content: center; /* Căn giữa theo chiều ngang */
+  height: 40px; /* Đặt chiều cao bằng với chiều cao của thumbnail */
+  width: auto;
+  margin-left: -5px; /* Mở rộng background ra ngoài khoảng 5px */
+  margin-right: 5px; /* Mở rộng background ra ngoài khoảng 5px */
 }
 </style>
