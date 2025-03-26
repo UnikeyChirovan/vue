@@ -8,14 +8,16 @@ export const useAuthStore = defineStore('auth', {
     isAdmin: false,
     user: null,
     accessToken: null,
+    sessionId: null,
   }),
   actions: {
-    async login(userData, isAdmin, accessToken, rememberMe) {
+    async login(userData, isAdmin, accessToken, sessionId, rememberMe) {
       this.isLoggedIn = true;
       this.accessToken = accessToken;
       this.isAdmin = isAdmin;
       this.rememberMe = rememberMe;
       this.user = userData;
+      this.sessionId = sessionId;
     },
     async logout() {
       try {
@@ -31,6 +33,7 @@ export const useAuthStore = defineStore('auth', {
         this.isAdmin = false;
         this.user = null;
         this.accessToken = null;
+        this.sessionId = null;
         localStorage.clear();
         sessionStorage.clear(); 
         router.push({ name: 'home' });
@@ -46,16 +49,61 @@ export const useAuthStore = defineStore('auth', {
         this.isAdmin = false;
         this.user = null;
         this.accessToken = null;
+        this.sessionId = null;
         localStorage.clear();
         sessionStorage.clear(); 
         router.push({ name: 'home' });
       } catch (error) {
         console.log(error)
       }
+    },
+    async superForceLogout() {
+      try {
+        const token = this.accessToken;
+
+        await api.post('/auth/super-force-logout', {}, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        this.isLoggedIn = false;
+        this.isAdmin = false;
+        this.user = null;
+        this.accessToken = null;
+        this.sessionId = null;
+        localStorage.clear();
+        sessionStorage.clear();
+        router.push({ name: 'home' });
+      } catch (error) {
+        console.error('Đăng xuất tất cả thiết bị thất bại:', error);
+      }
+    },
+    async selfDeleteAccount() {
+      try {
+        const token = this.accessToken;
+        await api.delete('/auth/delete-account', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        this.isLoggedIn = false;
+        this.isAdmin = false;
+        this.user = null;
+        this.accessToken = null;
+        this.sessionId = null;
+        localStorage.clear();
+        sessionStorage.clear();
+        router.push({ name: 'home' });
+      } catch (error) {
+        console.error('Lỗi khi xóa tài khoản:', error);
+        throw error.response?.data?.message || 'Có lỗi xảy ra khi xóa tài khoản. Vui lòng thử lại!';
+      }
     }
   },
   persist: {
     storage: localStorage,
-    paths: ['isLoggedIn', 'user', 'isAdmin', 'accessToken'],
+    paths: ['isLoggedIn', 'user', 'isAdmin', 'accessToken', 'sessionId'],
   },
 });

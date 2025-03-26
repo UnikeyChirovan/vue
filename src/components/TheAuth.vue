@@ -260,13 +260,14 @@ const handleLoginSubmit = async () => {
       password: password.value,
       rememberMe: rememberMe.value,
     });
-
-
+    console.log("dữ liệu trả về", response);
     const accessToken = response.data.access_token;
     const user = response.data.user;
     const isAdmin = response.data.isAdmin;
+    const sessionId = response.data.session_id;
+    console.log("sessionId", sessionId);
 
-    auth.login(user, isAdmin, accessToken); 
+    auth.login(user, isAdmin, accessToken, sessionId); 
 
     resetLoginForm();
     closeLoginModal();

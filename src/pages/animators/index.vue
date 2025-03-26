@@ -37,7 +37,6 @@
   </div>
   <TheFooter />
 </template>
-
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
 import api from '../../services/axiosInterceptor';
@@ -53,20 +52,48 @@ const fetchVideos = async () => {
   try {
     const response = await api.get('/videos');
     videoList.value = response.data;
-    if (videoList.value.length > 0) {
-      selectVideo(videoList.value[0]);
-    }
+    checkLastWatchedEpisode();
   } catch (error) {
     console.error('Lỗi khi tải danh sách video:', error);
   }
 };
 
-const selectVideo = async (video) => {
+const checkLastWatchedEpisode = () => {
+  const lastWatchEpisode = localStorage.getItem('lastWatchEpisode');
+  if (lastWatchEpisode) {
+    const lastVideo = videoList.value.find(video => video.id === parseInt(lastWatchEpisode));
+    const nextIndex = videoList.value.findIndex(v => v.id === parseInt(lastWatchEpisode)) + 1;
+    if (lastVideo && nextIndex < videoList.value.length) {
+      if (confirm(`Bạn đã coi đến tập ${lastVideo.episode_number}. Bạn có muốn coi tập tiếp theo không?`)) {
+        selectVideo(videoList.value[nextIndex]);
+      } else {
+        selectVideo(lastVideo, false);
+      }
+    } else {
+      selectVideo(lastVideo, false);
+    }
+  } else if (videoList.value.length > 0) {
+    selectVideo(videoList.value[0]);
+  }
+};
+
+const selectVideo = async (video, updateLastWatch = true) => {
   currentVideo.value = video;
-  await nextTick(); // Đảm bảo videoPlayer được cập nhật
+  if (updateLastWatch) {
+    localStorage.setItem('lastWatchEpisode', video.id);
+    await saveWatchEpisode(video.id);
+  }
+  await nextTick();
   if (videoPlayer.value) {
     videoPlayer.value.load();
-    // videoPlayer.value.play();
+  }
+};
+
+const saveWatchEpisode = async (videoId) => {
+  try {
+    await api.post('/videos/user-episode', { episode_id: videoId });
+  } catch (error) {
+    console.error('Lỗi khi lưu tập đã xem:', error);
   }
 };
 

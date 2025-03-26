@@ -119,8 +119,11 @@
         </div>
       </div>
       <div class="last-chapter-section card">
-  <h2>Chương đọc gần nhất: <span>{{ lastChapter - 1 }}</span></h2>
-</div>
+        <h2>Chương đọc gần nhất: <span>{{ lastChapter - 1 }}</span></h2>
+      </div>
+      <div class="last-episode-section card">
+        <h2>Tập coi gần nhất: <span>{{ lastEpisode - 1 }}</span></h2>
+      </div>
 
     </div>
     <div class="about-section card">
@@ -183,6 +186,7 @@ const fetchProfile = async () => {
     useMenuProfile().onSelectedKey(['profile-info']);
     fetchProfile();
     getLastChapter();
+    getlastEpisode();
   });
   //
   import { h } from "vue";
@@ -390,6 +394,18 @@ const getLastChapter = () => {
     })
     .catch(error => {
       console.error('Error fetching the chapter:', error);
+    });
+};
+const lastEpisode = ref("");
+
+const getlastEpisode = () => {
+  api.get(`/videos/user-episode`)
+    .then(response => {
+      console.log('Fetch successful');
+      lastEpisode.value = response.data.episode_id;
+    })
+    .catch(error => {
+      console.error('Error fetching the episode:', error);
     });
 };
 
@@ -613,7 +629,7 @@ onBeforeUnmount(() => {
   justify-content: center;
   z-index: 10;
 }
-.last-chapter-section {
+.last-chapter-section, .last-episode-section {
   border-radius: 5px;
 
   h2 {
