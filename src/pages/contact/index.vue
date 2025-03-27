@@ -148,7 +148,7 @@ input {
 }
 .title {
   text-align: center;
-  color: red;
+  color: #0c713d;
   font-size: 2rem;
 }
 

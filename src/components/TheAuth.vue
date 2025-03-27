@@ -137,7 +137,7 @@
       </div>
     </n-modal>
     <div class="profile m-0 p-0" v-if="auth.isLoggedIn">
-      <span class="me-2 text-danger">
+      <span class="me-2 text-white">
         {{ 'Welcome, ' + auth.user.nickname }}
       </span>
       <n-dropdown :options="options" @select="handleSelect">

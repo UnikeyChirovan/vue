@@ -1,42 +1,38 @@
 <template>
   <TheHeader />
-  <div class="container mt-5 custom-container">
-    <h2 class="mb-4 text-center page-title">Cài Đặt Tài Khoản</h2>
+  <div class="settings-page">
+    <div class="header">
+      <h2>Cài Đặt Tài Khoản</h2>
+    </div>
 
-    <!-- Tùy chỉnh giao diện -->
-    <div class="card shadow-sm mb-4 rounded">
-      <div class="card-header font-weight-bold">Tùy Chỉnh Giao Diện</div>
-      <div class="card-body d-flex align-items-center justify-content-center">
-      <span class="font-weight-bold mr-3 me-4" style="font-size: 17px;">Chế độ tối</span>
+    <n-form>
+      <!-- Chế độ tối -->
+      <div class="form-item">
+       <label class="form-label theme-label">Chế độ tối:</label>
         <n-switch v-model:value="isDarkMode" @update:value="toggleTheme" />
       </div>
-    </div>
 
-    <!-- Đăng xuất tất cả tài khoản -->
-    <div class="card shadow-sm mb-4 rounded">
-      <div class="card-header font-weight-bold">Bảo Mật</div>
-      <div class="card-body text-center">
-        <button class="btn btn-warning px-4 py-2" @click="logoutAllDevices">
-          🔒 Đăng xuất khỏi tất cả thiết bị
-        </button>
+      <!-- Đăng xuất khỏi tất cả thiết bị -->
+      <div class="button-wrapper">
+        <n-button type="warning" @click="logoutAllDevices" class="logout-btn">🔒 Đăng xuất tất cả</n-button>
       </div>
-    </div>
 
-    <!-- Xóa tài khoản -->
-    <div class="card shadow-sm rounded">
-      <div class="card-header font-weight-bold text-danger">Xóa Tài Khoản</div>
-      <div class="card-body text-center">
-        <p class="text-danger font-italic">
-          ⚠ Hành động này không thể hoàn tác. Toàn bộ dữ liệu sẽ bị xóa vĩnh viễn.
+      <!-- Xóa tài khoản -->
+      <div class="button-wrapper">
+        <n-button type="error" @click="confirmDeleteAccount" class="delete-btn">🗑 Xóa tài khoản</n-button>
+      </div>
+      
+      <!-- Cảnh báo -->
+      <div class="warning-message">
+        <p>
+          ⚠ Hành động xóa tài khoản này không thể hoàn tác. Toàn bộ dữ liệu sẽ bị xóa vĩnh viễn.
         </p>
-        <button class="btn btn-danger px-4 py-2"  @click="confirmDeleteAccount">
-          🗑 Xóa tài khoản
-        </button>
       </div>
-    </div>
+    </n-form>
   </div>
   <TheFooter />
 </template>
+
 
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
@@ -122,37 +118,79 @@ html, body {
   font-family: 'Arial', sans-serif;
 }
 
-.custom-container {
-  max-width: 600px;
-  margin: auto;
-  color: var(--light-text);
+.settings-page {
+  width: 100%;
+  max-width: 650px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f4f6f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.page-title {
-  font-size: 1.8rem;
+.header {
+  background-color: #dee1e5;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+h2 {
+  margin: 0;
+  font-size: 24px;
+  color: black;
+  font-weight: 600;
+}
+
+.form-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 0 10px;
+}
+
+.form-label {
+  flex: 1;
+  text-align: left;
+  font-weight: 500;
+}
+
+.button-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.logout-btn, .delete-btn {
+  padding: 12px 24px;
+  border-radius: 6px;
   font-weight: bold;
+  font-size: 16px;
+  transition: background-color 0.3s;
 }
 
-.card {
-  border-radius: 12px;
-  overflow: hidden;
-  background-color: var(--light-bg);
-  color: var(--light-text);
+.logout-btn:hover {
+  background-color: orange;
 }
 
-.card-header {
-  font-size: 1.1rem;
-  padding: 10px 15px;
-  background: #f8f9fa;
+.delete-btn:hover {
+  background-color: red;
 }
 
-button {
-  transition: all 0.2s ease-in-out;
+.warning-message {
+  text-align: center;
+  margin-top: 20px;
+  font-weight: bold;
+  color: red;
+}
+.theme-label {
+  font-size: 18px;
+  font-weight: bold;
+  color: teal;
 }
 
-button:hover {
-  transform: scale(1.05);
-}
 
 /* Áp dụng nền tối toàn bộ trang */
 .dark-mode {

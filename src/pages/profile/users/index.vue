@@ -1,71 +1,70 @@
 <template>
   <div class="profile-page">
-<div class="cover-section">
-  <div class="cover-container" v-show="!showChange&&!showEdit">
-    <img 
-      :src="coverUrl ? coverUrl : 'https://via.placeholder.com/1200x300'" 
-      alt="Cover Image" 
-      class="cover-img"
-      :style="coverStyle"
-    />
-  </div>
+    <div class="cover-section">
+      <div class="cover-container" v-show="!showChange&&!showEdit">
+        <img 
+          :src="coverUrl ? coverUrl : 'https://via.placeholder.com/1200x300'" 
+          alt="Cover Image" 
+          class="cover-img"
+          :style="coverStyle"
+        />
+      </div>
 
-  <div class="cover-change" v-if="showChange">
-    <n-upload
-      :headers="uploadHeaders"
-      :max-file="1"
-      accept="image/*"
-      @change="handleUpload"
-      class="upload-container"
-      :show-file-list="false"
-    >
-      <n-button type="primary" class="select-image-btn">Chọn hình</n-button>
-    </n-upload>
+      <div class="cover-change" v-if="showChange">
+        <n-upload
+          :headers="uploadHeaders"
+          :max-file="1"
+          accept="image/*"
+          @change="handleUpload"
+          class="upload-container"
+          :show-file-list="false"
+        >
+          <n-button type="primary" class="select-image-btn">Chọn hình</n-button>
+        </n-upload>
 
-    <div
-      class="custom-cover"
-      :style="{ cursor: 'grab'}"
-      @mousedown="startDrag($event, 'cover')"
-      v-if="newCoverUrl"
-    >
-      <img
-        :src="newCoverUrl" class="img-cover-custom"
-        alt="Cover"
-        :style="coverStyle"
-      />
+        <div
+          class="custom-cover"
+          :style="{ cursor: 'grab'}"
+          @mousedown="startDrag($event, 'cover')"
+          v-if="newCoverUrl"
+        >
+          <img
+            :src="newCoverUrl" class="img-cover-custom"
+            alt="Cover"
+            :style="coverStyle"
+          />
+        </div>
+
+        <n-space class="slider-container">
+          <n-slider v-model:value="coverPosition" :min="-1000" :max="0" vertical ><template #thumb>
+            <n-icon-wrapper :size="24" :border-radius="12">
+              <n-icon :size="18" :component="AnimalCat24Regular" />
+            </n-icon-wrapper>
+          </template></n-slider>
+        </n-space>
+        <n-button @click="cancelChange" class="cancel-button" type="error">Hủy</n-button>
+        <n-button @click="saveNewCover" class="save-button" type="info">Lưu</n-button>
+      </div>
+      <div class="cover-edit" v-if="showEdit">
+        <div class="custom-cover" :style="{ cursor: 'grab'}" @mousedown="startDrag($event, 'cover')" v-if="coverUrl">
+          <img :src="coverUrl" class="img-cover-custom" alt="Cover" :style="coverStyle" />
+        </div>
+        <n-space class="slider-container">
+          <n-slider v-model:value="coverPosition" :min="-1000" :max="0" vertical />
+        </n-space>
+        <n-button @click="cancelEdit" class="cancel-button" type="error">Hủy</n-button>
+        <n-button @click="saveEditedCover" class="save-button" type="info">Lưu</n-button>
+      </div>
+
+
+      <div class="edit-cover-btn" v-if="authStore.user?.id === users.id">
+        <n-dropdown :options="options" @select="handleSelect">
+          <n-button strong secondary round type="primary">
+            <i class="fa-solid fa-gear"></i>
+          </n-button>
+        </n-dropdown>
+      </div>
     </div>
-
-    <n-space class="slider-container">
-      <n-slider v-model:value="coverPosition" :min="-1000" :max="0" vertical ><template #thumb>
-        <n-icon-wrapper :size="24" :border-radius="12">
-          <n-icon :size="18" :component="AnimalCat24Regular" />
-        </n-icon-wrapper>
-      </template></n-slider>
-    </n-space>
-    <n-button @click="cancelChange" class="cancel-button" type="error">Hủy</n-button>
-    <n-button @click="saveNewCover" class="save-button" type="info">Lưu</n-button>
-  </div>
-  <div class="cover-edit" v-if="showEdit">
-    <div class="custom-cover" :style="{ cursor: 'grab'}" @mousedown="startDrag($event, 'cover')" v-if="coverUrl">
-      <img :src="coverUrl" class="img-cover-custom" alt="Cover" :style="coverStyle" />
-    </div>
-    <n-space class="slider-container">
-      <n-slider v-model:value="coverPosition" :min="-1000" :max="0" vertical />
-    </n-space>
-    <n-button @click="cancelEdit" class="cancel-button" type="error">Hủy</n-button>
-    <n-button @click="saveEditedCover" class="save-button" type="info">Lưu</n-button>
-  </div>
-
-
-  <div class="edit-cover-btn" v-if="authStore.user?.id === users.id">
-    <n-dropdown :options="options" @select="handleSelect">
-      <n-button strong secondary round type="primary">
-        <i class="fa-solid fa-gear"></i>
-      </n-button>
-    </n-dropdown>
-  </div>
-</div>
-
     <div class="avatar-section">
       <n-image
         class="avatar-img"
@@ -83,54 +82,58 @@
     <n-modal v-model:show="showViewModal" title="Xem hình cover">
       <n-image :src="coverUrl" class="full-cover-img" />
     </n-modal>  
-    <div class="user-info">
-      <h1 class="username">{{ users.name }}</h1>
+    <h1 class="username">{{ users.name }}</h1>
+    <div class="rate-container">
       <n-rate color="#4fb233" readonly :default-value="5" />
-      <p class="occupation">{{ users.occupation }}</p>
-      <p class="location">
-        <i class="fas fa-map-marker-alt"></i> {{ users.address }}
-      </p>
-      <p class="birthday" v-if="formattedBirthday">
-        <i class="fas fa-birthday-cake"></i>Sinh Nhật: {{ formattedBirthday }}
-      </p>
-      <p class="gender" v-if="users.gender">
-        <i class="fas fa-venus-mars"></i>Giới Tính: {{ users.gender }}
-      </p>
-
-      <div class="social-links">
-        <i class="fab fa-facebook-f social-icon"></i>
-        <i class="fab fa-twitter social-icon"></i>
-        <i class="fab fa-linkedin-in social-icon"></i>
-        <i class="fab fa-youtube social-icon"></i>
-      </div>
-
-      <div class="stats">
-        <div class="stat">
-          <h3>150</h3>
-          <p>Posts</p>
-        </div>
-        <div class="stat">
-          <h3>300</h3>
-          <p>Followers</p>
-        </div>
-        <div class="stat">
-          <h3>180</h3>
-          <p>Following</p>
-        </div>
-      </div>
-      <div class="last-chapter-section card">
-        <h2>Chương đọc gần nhất: <span>{{ lastChapter - 1 }}</span></h2>
-      </div>
-      <div class="last-episode-section card">
-        <h2>Tập coi gần nhất: <span>{{ lastEpisode - 1 }}</span></h2>
-      </div>
-
     </div>
-    <div class="about-section card">
-      <h2>About Me</h2>
-      <p>
-        {{ users.biography }}
-      </p>
+    <div class="profile">
+      <div class="info-card card">
+        <h2 class="section-title">Thông Tin Cá Nhân</h2>
+        <p v-if="users.occupation"><strong>Nghề nghiệp:</strong> {{ users.occupation }}</p>
+        <p v-if="users.gender"><strong>Giới tính:</strong> {{ users.gender }}</p>
+        <p v-if="users.birthday"><strong>Ngày sinh:</strong> {{ formattedBirthday }}</p>
+        <p v-if="users.address"><strong>Địa chỉ:</strong> {{ users.address }}</p>
+        <p v-if="users.hobbies"><strong>Sở thích:</strong> {{ users.hobbies }}</p>
+        <p v-if="users.biography"><strong>Tiểu sử:</strong> {{ users.biography }}</p>
+        <p v-if="users.phone_number"><strong>Điện Thoại:</strong> {{ users.phone_number }}</p>
+        <p v-if="users.email"><strong>Email:</strong> {{ users.email }}</p>
+      </div>
+      <div class="stats card">
+        <h2 class="section-title">Thống kê tài khoản</h2>
+        <div class="stats-content">
+          <div class="stat">
+            <h3>150</h3>
+            <p>Bài đăng</p>
+          </div>
+          <div class="stat">
+            <h3>300</h3>
+            <p>Người theo dõi</p>
+          </div>
+          <div class="stat">
+            <h3>180</h3>
+            <p>Đang theo dõi</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="history card">
+        <h2 class="section-title">Lịch sử gần đây</h2>
+      <div class="last-chapter-section">
+        <p>Chương đọc gần nhất: <span>{{ lastChapter - 1 }}</span></p>
+      </div>
+      <div class="last-episode-section">
+        <p>Tập coi gần nhất: <span>{{ lastEpisode - 1 }}</span></p>
+      </div>
+      </div>
+      <div class="social-links card">
+        <h2 class="section-title">Kết nối mạng xã hội</h2>
+        <div class="icons">
+          <i class="fab fa-facebook-f"></i>
+          <i class="fab fa-twitter"></i>
+          <i class="fab fa-linkedin-in"></i>
+          <i class="fab fa-youtube"></i>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -495,81 +498,128 @@ onBeforeUnmount(() => {
     }
   }
 
-  .user-info {
-    text-align: center;
-    padding: 10px 20px 20px;
+.profile-page {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-    .username {
-      font-size: 2.5rem;
-      font-weight: bold;
-      margin: 0;
-    }
+.cover-section {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
 
-    .occupation,
-    .location,
-    .birthday,
-    .gender {
-      margin: 5px 0;
-      font-size: 1.2rem;
-      color: #777;
+.cover-img {
+  width: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+}
 
-      i {
-        margin-right: 5px;
-      }
-    }
+.avatar-name-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: -60px;
+}
 
-    .social-links {
-      margin: 10px 0;
+.avatar-img {
+  width: 120px;
+  height: 120px;
+  border: 4px solid white;
+  border-radius: 50%;
+  object-fit: cover;
+  background: white;
+}
 
-      .social-icon {
-        font-size: 1.5rem;
-        margin: 0 10px;
-        color: #333;
-        cursor: pointer;
-        transition: color 0.3s;
+.username {
+  font-size: 24px;
+  font-weight: 600;
+}
 
-        &:hover {
-          color: #007bff;
-        }
-      }
-    }
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-top: 20px;
+}
 
-    .stats {
-      display: flex;
-      justify-content: center;
-      margin: 20px 0;
+.info-card p {
+  margin: 5px 0;
+}
 
-      .stat {
-        margin: 0 20px;
+.section-title {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: #0c713d; 
+  text-transform: uppercase; 
+  margin-bottom: 20px; 
+}
 
-        h3 {
-          font-size: 1.5rem;
-          margin: 0;
-        }
-
-        p {
-          margin: 0;
-          color: #777;
-        }
-      }
-    }
-  }
-
-  .about-section {
-    margin: 20px 0;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-
-    h2 {
-      margin-bottom: 15px;
-      font-size: 1.5rem;
-    }
-  }
+.stats {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-top: 20px;
 }
 
 
+.stats-content {
+  display: flex;
+  justify-content: space-around; 
+  gap: 20px; 
+}
+
+.stat {
+  text-align: center;
+  width: 100%;
+}
+
+.stat h3 {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.stat p {
+  margin-top: 5px;
+  color: #777;
+}
+
+
+.history p {
+  margin: 5px 0;
+}
+
+.social-links .icons {
+  display: flex;
+  justify-content: space-around;
+  font-size: 20px;
+}
+
+}
+
+.username {
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 10px;
+}
+.rate-container {
+display: flex;
+justify-content: center;
+margin-top: 5px;
+margin-bottom: 10px;
+}
+
+  
 .custom-cover {
   width: 100%;
   height: auto;
@@ -629,17 +679,30 @@ onBeforeUnmount(() => {
   justify-content: center;
   z-index: 10;
 }
-.last-chapter-section, .last-episode-section {
-  border-radius: 5px;
+.last-chapter-section,
+    .last-episode-section {
+      margin: 10px auto;
+      padding: 5px 10px;
+      background-color: #fdfdfd;
+      border-radius: 10px;
+      border-left: 5px solid #4fb233;
+      border-right: 5px solid #4fb233;
+      text-align: left;
+      max-width: 500px;
 
-  h2 {
-    font-size: 1.5rem; 
-    
-    span {
-      font-weight: bold; 
-      color: #fb411c; 
+        span {
+          font-weight: bold;
+          color: #fb411c;
+        }
     }
-  }
+
+.profile {
+  max-width: 700px; 
+  margin: 30px auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 </style>

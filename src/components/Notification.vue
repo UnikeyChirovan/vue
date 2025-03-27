@@ -148,7 +148,7 @@ onMounted(() => {
 
 .notification-title {
   text-align: center;
-  color: #2c3e50;
+  color: #0c713d;
   margin-bottom: 10px;
   font-size: 2rem;
 }

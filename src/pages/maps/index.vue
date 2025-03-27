@@ -98,14 +98,14 @@ onMounted(() => {
 .title-centered {
   text-align: center;
   font-size: 2rem;
-  color: #34495e;
+  color: #0c713d;
   margin-bottom: 10px;
 }
 
 .text-left {
   text-align: left;
   font-size: 1.1rem;
-  color: #95a5a6;
+  color: black;
 }
 p{
   margin-top: 0px;

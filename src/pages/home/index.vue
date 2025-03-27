@@ -331,7 +331,7 @@ body {
   font-size: 1.8rem;
   margin-bottom: 20px;
   text-transform: uppercase;
-  color: red;
+  color: #0c713d;
 }
 
 .hero-title {
@@ -400,7 +400,7 @@ body {
 .feature-section-title {
   font-size: 2rem;
   margin-bottom: 50px;
-  color: #34495e;
+  color: #0c713d;
 }
 
 .feature-grid {
@@ -455,7 +455,7 @@ p.feature-percentage {
 .future-projects-title {
   font-size: 2rem;
   margin-bottom: 50px;
-  color: #34495e;
+  color: #0c713d;
 }
 
 .feature-title {
@@ -502,7 +502,7 @@ p.feature-percentage {
 .section-title {
   font-size: 2rem;
   margin-bottom: 50px;
-  color: #34495e;
+  color: #0c713d;
   text-align: center;
 }
 
@@ -522,7 +522,7 @@ p.feature-percentage {
     margin-top: 20px; /* Tạo khoảng cách với video */
     font-size: 16px;
     font-weight: bold;
-    color: rgb(245, 44, 44);
+    color: #0c713d;
 }
 
 

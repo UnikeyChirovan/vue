@@ -150,7 +150,7 @@ onMounted(fetchVideos);
 }
 
 .video-controls button {
-  background: #1e90ff;
+  background: #0c713d;
   color: white;
   border: none;
   padding: 10px 15px;
@@ -167,12 +167,12 @@ onMounted(fetchVideos);
   font-size: 24px;
   margin-top: 10px;
   text-align: center;
-  color: red;
+  color:#0c713d;
 }
 
 .playlist-title {
   text-align: center;
-  color: red;
+  color: #0c713d;
   font-weight: bold;
 }
 
@@ -213,7 +213,7 @@ onMounted(fetchVideos);
 }
 
 .active-video {
-  background: yellowgreen !important;
+  background: #0c713d !important;
   color: white;
   font-weight: bold;
 }
@@ -227,15 +227,15 @@ onMounted(fetchVideos);
 
 .video-info {
   font-size: 14px;
-  color: #1e90ff;
+  color: white;
   font-weight: bold;
 }
 
 .episode-number {
   font-size: 30px;
-  color: #fff;
+  color:#0c713d;
   font-weight: bold;
-  background-color: red;
+  background-color: white;
   padding: 5px 10px; /* Tăng chiều rộng và chiều cao của background */
   border-radius: 5px;
   margin-right: 10px;

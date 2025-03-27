@@ -65,7 +65,7 @@ function formatContent(content, sectionNumber) {
 .section-title {
   font-size: 2rem;
   font-weight: bold;
-  color: #2c3e50;
+  color: #0c713d;
   margin-bottom: 30px;
   text-transform: uppercase;
 }

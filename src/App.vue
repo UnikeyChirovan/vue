@@ -7,6 +7,11 @@
     </n-config-provider>
  </div>
 </template>
+<script setup>
+import { ref } from "vue";
+
+const isDarkMode = ref(false);
+</script>
 <style>
 .n-card-header {
   background-color: rgb(240, 236, 221) !important;

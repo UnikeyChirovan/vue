@@ -139,6 +139,9 @@ onMounted(async () => {
 
 
 <style scoped>
+h2 {
+  color: #0c713d;
+}
 .section-content div {
   margin-bottom: 1em;
 }
