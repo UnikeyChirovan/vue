@@ -15,11 +15,18 @@ export const useCategoryStore = defineStore('categoryStore', () => {
     }
   });
 
-  const getCategoryTitle = (code, page, defaultTitle) => {
-    return isCategoriesReady.value
-      ? categories.value.find((cat) => cat.code === code && cat.page === page)?.name || defaultTitle
-      : defaultTitle;
-  };
+const getCategoryTitle = (code, page, defaultTitle) => {
+  const storedCategories = localStorage.getItem('categories');
+  if (storedCategories) {
+    const parsedCategories = JSON.parse(storedCategories);
+    const foundCategory = parsedCategories.find((cat) => cat.code === code && cat.page === page);
+    if (foundCategory) return foundCategory.name;
+  }
+  return isCategoriesReady.value
+    ? categories.value.find((cat) => cat.code === code && cat.page === page)?.name || defaultTitle
+    : defaultTitle;
+};
+
 
   return {
     categories,
