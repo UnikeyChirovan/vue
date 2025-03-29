@@ -264,15 +264,14 @@ const handleLoginSubmit = async () => {
     const accessToken = response.data.access_token;
     const user = response.data.user;
     const isAdmin = response.data.isAdmin;
-    const sessionId = response.data.session_id;
-    console.log("sessionId", sessionId);
 
-    auth.login(user, isAdmin, accessToken, sessionId); 
+
+    auth.login(user, isAdmin, accessToken); 
 
     resetLoginForm();
     closeLoginModal();
 
-    const beforeStatus = sessionStorage.getItem('Before');
+    const beforeStatus = localStorage.getItem('Before');
     loadingStore.isDataLoading = true;
     if (beforeStatus) {
       // await loadingStore.fetchDataAfterLogin();

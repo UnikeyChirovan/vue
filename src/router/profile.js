@@ -22,6 +22,17 @@ const profile = [
         name: 'profile-settings',
         component: () => import('../pages/profile/settings/index.vue'),
       },
+      // profile của người khác
+      {
+        path: ':id',
+        name: 'profile-info-guest',
+        component: () => import('../pages/profile/guest/index.vue'),
+      },
+      {
+        path: '/not-found/:id',
+        name: 'not-found',
+        component: () => import('../pages/profile/notfound/index.vue'),
+      },
     ],
   },
 ];

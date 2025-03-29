@@ -71,7 +71,8 @@ import {
   NCarouselItem,
   NList,
   NListItem,
-  NProgress
+  NProgress,
+  NAvatar
 } from 'naive-ui';
 import App from './App.vue';
 
@@ -126,7 +127,8 @@ const naive = create({
     NList,
     NListItem,
     NProgress,
-    NText
+    NText,
+    NAvatar
   ],
 });
 

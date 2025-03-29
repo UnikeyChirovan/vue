@@ -42,6 +42,10 @@ import { useRouter } from 'vue-router';
         answer: "Bạn có thể thay đổi mật khẩu trong phần cài đặt tài khoản của mình.",
       },
       {
+        question: "Nếu quên mật khẩu thì làm thế nào?",
+        answer: "Bạn bấm vào nút đăng nhập rồi bấm quên mật khẩu để có thể cấp lại mật khẩu, hoặc có thể liên hệ với chúng tôi",
+      },
+      {
         question: "Làm thế nào để liên hệ với bộ phận hỗ trợ?",
         answer: "Bạn có thể liên hệ với chúng tôi qua email, điện thoại hoặc điền vào form liên hệ trên trang Liên hệ.",
       },

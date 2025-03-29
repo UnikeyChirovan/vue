@@ -70,11 +70,11 @@ export const useLoadingStore = defineStore('loading', () => {
         // })
       ]);
 
-      sessionStorage.setItem('Before', 'ok');
+      localStorage.setItem('Before', 'ok');
     } catch (error) {
       console.error('Error fetching data before login:', error);
       isDataLoading.value = false;
-      sessionStorage.setItem('Before', 'false');
+      localStorage.setItem('Before', 'false');
     }
   }
 

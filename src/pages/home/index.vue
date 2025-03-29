@@ -269,7 +269,7 @@ const fetchFeaturedVideo = async () => {
 };
 
 onMounted(async () => {
-  const beforeStatus = sessionStorage.getItem('Before');
+  const beforeStatus = localStorage.getItem('Before');
   const finalStatus = localStorage.getItem('Final');
   await AOS.init();
   observeLocalStorageChange();

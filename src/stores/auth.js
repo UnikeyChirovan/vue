@@ -8,16 +8,14 @@ export const useAuthStore = defineStore('auth', {
     isAdmin: false,
     user: null,
     accessToken: null,
-    sessionId: null,
   }),
   actions: {
-    async login(userData, isAdmin, accessToken, sessionId, rememberMe) {
+    async login(userData, isAdmin, accessToken, rememberMe) {
       this.isLoggedIn = true;
       this.accessToken = accessToken;
       this.isAdmin = isAdmin;
       this.rememberMe = rememberMe;
       this.user = userData;
-      this.sessionId = sessionId;
     },
     async logout() {
       try {
@@ -33,7 +31,6 @@ export const useAuthStore = defineStore('auth', {
         this.isAdmin = false;
         this.user = null;
         this.accessToken = null;
-        this.sessionId = null;
         localStorage.clear();
         sessionStorage.clear(); 
         router.push({ name: 'home' });
@@ -49,7 +46,6 @@ export const useAuthStore = defineStore('auth', {
         this.isAdmin = false;
         this.user = null;
         this.accessToken = null;
-        this.sessionId = null;
         localStorage.clear();
         sessionStorage.clear(); 
         router.push({ name: 'home' });
@@ -71,7 +67,6 @@ export const useAuthStore = defineStore('auth', {
         this.isAdmin = false;
         this.user = null;
         this.accessToken = null;
-        this.sessionId = null;
         localStorage.clear();
         sessionStorage.clear();
         router.push({ name: 'home' });
@@ -92,7 +87,6 @@ export const useAuthStore = defineStore('auth', {
         this.isAdmin = false;
         this.user = null;
         this.accessToken = null;
-        this.sessionId = null;
         localStorage.clear();
         sessionStorage.clear();
         router.push({ name: 'home' });
@@ -104,6 +98,6 @@ export const useAuthStore = defineStore('auth', {
   },
   persist: {
     storage: localStorage,
-    paths: ['isLoggedIn', 'user', 'isAdmin', 'accessToken', 'sessionId'],
+    paths: ['isLoggedIn', 'user', 'isAdmin', 'accessToken'],
   },
 });

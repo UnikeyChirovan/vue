@@ -5,15 +5,14 @@
     </div>
     <n-form>
       <div class="toggle-all-wrapper">
+        <n-button @click="openBlockedModal" class="block-list-btn">Danh Sách Chặn</n-button>
         <n-button @click="toggleAll" :class="['toggle-all-btn', isAllEnabled ? 'off' : 'on']">
           {{ isAllEnabled ? 'Tắt Hết' : 'Bật Hết' }}
         </n-button>
       </div>
-      <div
-        v-for="(value, key) in visibility"
-        :key="key"
-        class="form-item"
-      >
+      <BlockedListModal ref="blockedModalRef" />
+      
+      <div v-for="(value, key) in visibility" :key="key" class="form-item">
         <label class="form-label">{{ labels[key] }}</label>
         <n-switch v-model:value="visibility[key]" />
       </div>
@@ -25,7 +24,6 @@
   </div>
 </template>
 
-
 <script setup>
 import { useMenuProfile } from '../../../stores/use-menu-profile';
 useMenuProfile().onSelectedKey(['profile-settings']);
@@ -34,6 +32,15 @@ import { useMessage } from 'naive-ui';
 import api from '../../../services/axiosInterceptor';
 import { useAuthStore } from '../../../stores/auth';
 import { useProfileStore } from '../../../stores/profile';
+import BlockedListModal from '../../../components/BlockedListModal.vue';
+
+  // modal
+  const blockedModalRef = ref(null);
+
+  const openBlockedModal = () => {
+    blockedModalRef.value.openModal();
+  };
+
 
 const auth = useAuthStore();
 const profile = useProfileStore();
@@ -50,6 +57,7 @@ const toggleAll = () => {
     visibility.value[key] = newState;
   }
 };
+
 
 
 const visibility = ref({
@@ -159,9 +167,25 @@ h2 {
 
 .toggle-all-wrapper {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 16px;
   padding: 0 10px;
+}
+
+.block-list-btn {
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 16px;
+  background-color: #d9534f;
+  color: white;
+  border: 2px solid #d43f3a;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.block-list-btn:hover {
+  background-color: #c9302c;
 }
 
 .toggle-all-btn {
@@ -190,6 +214,4 @@ h2 {
 .toggle-all-btn:hover.off {
   background-color: #f0f0f0;
 }
-
-
 </style>

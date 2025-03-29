@@ -55,12 +55,12 @@ export async function fetchDataBeforeLogin() {
       updateProgress(90);
       await checkAndUpdateData(apiLinks.companyInfo.getAll, 'companyInfos');
       updateProgress(100);
-    sessionStorage.setItem('Before', 'ok');
+    localStorage.setItem('Before', 'ok');
 
   } catch (error) {
     console.error('Error fetching data before login:', error);
     isDataLoading.value = false;
-    sessionStorage.setItem('Before', 'false');
+    localStorage.setItem('Before', 'false');
   }
 }
 

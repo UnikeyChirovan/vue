@@ -47,7 +47,11 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
-
+  // truy cập vào mà chưa load dữ liệu
+  if (!localStorage.getItem('Before') && to.path !== '/') {
+    return next({ path: '/' });
+  }
+// truy cập mà chưa đăng nhập
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     next({ name: 'home' });
   } else {

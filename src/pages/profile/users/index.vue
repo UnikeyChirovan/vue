@@ -86,6 +86,14 @@
     <div class="rate-container">
       <n-rate color="#4fb233" readonly :default-value="5" />
     </div>
+    <div class="profile-pages">
+      <div class="explore-buttons">
+        <n-button class="custom-button explore" @click="openExploreModal">Khám Phá</n-button>
+        <n-button class="custom-button follow-list" @click="openFollowingModal">Danh Sách</n-button>
+      </div>
+      <ExploreModal ref="exploreModalRef" />
+      <FollowingListModal ref="followingModalRef" />
+    </div> 
     <div class="profile">
       <div class="info-card card">
         <h2 class="section-title">Thông Tin Cá Nhân</h2>
@@ -98,7 +106,7 @@
         <p v-if="users.phone_number"><strong>Điện Thoại:</strong> {{ users.phone_number }}</p>
         <p v-if="users.email"><strong>Email:</strong> {{ users.email }}</p>
       </div>
-      <div class="stats card">
+      <div class="stats card" v-if="followStats">
         <h2 class="section-title">Thống kê tài khoản</h2>
         <div class="stats-content">
           <div class="stat">
@@ -106,11 +114,11 @@
             <p>Bài đăng</p>
           </div>
           <div class="stat">
-            <h3>300</h3>
+            <h3>{{ followStats.followers_count }}</h3>
             <p>Người theo dõi</p>
           </div>
           <div class="stat">
-            <h3>180</h3>
+            <h3>{{ followStats.following_count }}</h3>
             <p>Đang theo dõi</p>
           </div>
         </div>
@@ -149,6 +157,25 @@
   import api from '../../../services/axiosInterceptor.js';
   import dayjs from 'dayjs';
   import AnimalCat24Regular from '@vicons/fluent/AnimalCat24Regular'
+  import ExploreModal from '../../../components/ExploreModal.vue';
+  import FollowingListModal from '../../../components/FollowingListModal.vue';
+  import { useRoute } from 'vue-router';
+  const route = useRoute();
+
+  // modal
+  const exploreModalRef = ref(null);
+
+  const openExploreModal = () => {
+    exploreModalRef.value.openModal();
+  };
+
+  const followingModalRef = ref(null);
+
+  const openFollowingModal = () => {
+    followingModalRef.value.openModal();
+  };
+
+  // 
 
   const authStore = useAuthStore();
   const useGeneral = useGeneralStore()
@@ -185,12 +212,7 @@ const fetchProfile = async () => {
     }
   }
 );
-  onMounted(() => {
-    useMenuProfile().onSelectedKey(['profile-info']);
-    fetchProfile();
-    getLastChapter();
-    getlastEpisode();
-  });
+
   //
   import { h } from "vue";
 import { NIcon } from "naive-ui";
@@ -413,6 +435,25 @@ const getlastEpisode = () => {
 };
 
 
+const followStats = ref(null);
+const userId = route.params.id;
+const getFollowStats = async (userId) => {
+  try {
+    const response = await api.get(`/social/follow-stats/${userId}`);
+    followStats.value = response.data;
+    // console.log('Thống kê follow:', response.data);
+  } catch (error) {
+    console.error('Lỗi khi lấy thống kê follow:', error);
+  }
+};
+
+  onMounted(() => {
+    useMenuProfile().onSelectedKey(['profile-info']);
+    fetchProfile();
+    getFollowStats(userId)
+    getLastChapter();
+    getlastEpisode();
+  });
 
 onBeforeUnmount(() => {
   window.removeEventListener('mousemove', onDrag);
@@ -498,10 +539,9 @@ onBeforeUnmount(() => {
     }
   }
 
-.profile-page {
+.profile-pages {
   max-width: 800px;
-  margin: 30px auto;
-  padding: 20px;
+  margin: 0px auto;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -699,10 +739,47 @@ margin-bottom: 10px;
 .profile {
   max-width: 700px; 
   margin: 30px auto;
-  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.explore-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.custom-button {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.custom-button.explore {
+  background-color: #0c713d; 
+  color: white;
+}
+
+.custom-button.follow-list {
+  background-color: #007BFF;
+  color: white;
+}
+
+.custom-button:hover {
+  opacity: 0.85;
+  transform: translateY(-2px);
+}
+
+.custom-button:active {
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 </style>
