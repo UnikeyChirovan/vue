@@ -21,6 +21,7 @@
     "default-passive-events": "^2.0.0",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
+    "mitt": "^3.0.1",
     "naive-ui": "^2.39.0",
     "pinia": "^2.2.2",
     "pinia-plugin-persistedstate": "^4.0.0-alpha.4",

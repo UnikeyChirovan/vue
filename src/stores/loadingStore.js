@@ -100,12 +100,14 @@ export const useLoadingStore = defineStore('loading', () => {
       const [
         chapters,
         lastChapter,
+        lastEpisode,
         // backgrounds,
         // userSettings,
         // profile,
       ] = await Promise.all([
         apiLinks.story.getChapters(),
         apiLinks.story.getLastReadChapter(),
+        apiLinks.videos.getLastWatchEpisode(),
         // apiLinks.story.getBackgrounds(),
         // apiLinks.story.getSettings(userId),
         // apiLinks.profile.show(userId),
@@ -117,7 +119,10 @@ export const useLoadingStore = defineStore('loading', () => {
       if (chapterId) {
         localStorage.setItem('lastReadChapter', chapterId);
       }
-
+      const episodeId = lastEpisode.data?.episode_id;
+      if (episodeId) {
+        localStorage.setItem('lastWatchEpisode',episodeId );
+      }
       // sessionStorage.setItem('backgrounds', JSON.stringify(backgrounds.data));
       // sessionStorage.setItem('user_settings_early', JSON.stringify(userSettings.data));
       // sessionStorage.setItem('user_profile', JSON.stringify(profile.data));

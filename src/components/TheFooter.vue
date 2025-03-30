@@ -103,6 +103,7 @@ import Sigma from '@vicons/carbon/Sigma';
 import { useMessage } from 'naive-ui';
 import apiLinks from '../services/api-links';
 import api from '../services/axiosInterceptor';
+import eventBus from '../stores/eventBus';
 
 const message = useMessage();
 
@@ -177,6 +178,24 @@ const fetchIntroImage = async () => {
 onMounted(() => {
   getVoteResults();
   fetchIntroImage();
+
+  // Lắng nghe sự kiện mitt khi vote thay đổi
+  eventBus.on('voteUpdated', (updatedVoteResults) => {
+    voteResults.value = updatedVoteResults;
+  });
+
+  // Lắng nghe sự kiện storage khi thay đổi giữa các tab
+  window.addEventListener("storage", () => {
+    const storedVoteResults = localStorage.getItem("voteResults");
+    if (storedVoteResults) {
+      voteResults.value = JSON.parse(storedVoteResults);
+    }
+  });
+});
+
+onUnmounted(() => {
+  eventBus.off('voteUpdated'); // Hủy lắng nghe mitt để tránh memory leak
+  window.removeEventListener("storage", () => {});
 });
 
 </script>

@@ -27,7 +27,7 @@ const apiLinks = {
     getVoteResults: () => api.get('/vote/results'),
   },
   newsletter: {
-    subscribe: (email) => axios.post(`${baseUrls}/api/newsletter/subscribe`, { email }),
+    subscribe: (email) => axios.post(`${baseUrl}/api/newsletter/subscribe`, { email }),
     unsubscribe: () => api.get('/newsletter/unsubscribe'),
     createNotification: (data) => api.post('/newsletter/notifications/create', data),
     getAllNotifications: () => api.get('/newsletter/notifications'),
@@ -140,6 +140,7 @@ const apiLinks = {
     create: (data) => api.post('/video-manager/upload', data),
     update: (id, data) => api.put(`/video-manager/${id}`, data),
     delete: (id) => api.delete(`/video-manager/${id}`),
+    getLastWatchEpisode: () => api.get('/videos/user-episode'),
   },
 
 };

@@ -159,8 +159,6 @@
   import AnimalCat24Regular from '@vicons/fluent/AnimalCat24Regular'
   import ExploreModal from '../../../components/ExploreModal.vue';
   import FollowingListModal from '../../../components/FollowingListModal.vue';
-  import { useRoute } from 'vue-router';
-  const route = useRoute();
 
   // modal
   const exploreModalRef = ref(null);
@@ -436,7 +434,6 @@ const getlastEpisode = () => {
 
 
 const followStats = ref(null);
-const userId = route.params.id;
 const getFollowStats = async (userId) => {
   try {
     const response = await api.get(`/social/follow-stats/${userId}`);
@@ -450,7 +447,7 @@ const getFollowStats = async (userId) => {
   onMounted(() => {
     useMenuProfile().onSelectedKey(['profile-info']);
     fetchProfile();
-    getFollowStats(userId)
+    getFollowStats(id)
     getLastChapter();
     getlastEpisode();
   });

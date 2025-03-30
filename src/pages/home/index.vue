@@ -71,6 +71,7 @@ import 'aos/dist/aos.css';
 import TheHeader from '../../components/TheHeader.vue';
 import TheFooter from '../../components/TheFooter.vue';
 import api from '../../services/axiosInterceptor';
+import eventBus from '../../stores/eventBus';
 import apiLinks from '../../services/api-links';
 import Handshake20Filled from '@vicons/fluent/Handshake20Filled';
 import StarEmphasis24Filled from '@vicons/fluent/StarEmphasis24Filled';
@@ -93,8 +94,8 @@ const message = useMessage();
 const router = useRouter();
 
 const futureProjectTitle = computed(() => categoryStore.getCategoryTitle('2', 'home', 'Dự Án Tương Lai'));
-const firstMeetTitle = computed(() => categoryStore.getCategoryTitle('3', 'home', 'Cho Lần Đầu Gặp Gỡ'));
-const todayFeatureTitle = computed(() => categoryStore.getCategoryTitle('4', 'home', 'Dấu Ấn Hôm Nay'));
+const firstMeetTitle = computed(() => categoryStore.getCategoryTitle('3', 'home', 'Thất Sắc Chi Đạo – Khi Số Phận Gọi Tên'));
+const todayFeatureTitle = computed(() => categoryStore.getCategoryTitle('4', 'home', 'Ý Kiến Của Bạn Quan Trọng!'));
 const notificationTitle = computed(() => categoryStore.getCategoryTitle('1', 'home', 'Theo Dòng Sự Kiện'));
 const voteResults = ref({
   totalVotes: 0,
@@ -168,6 +169,8 @@ const goToStories = () => {
 
 const hoveredFeature = ref(null);
 
+const voteUpdated = ref(false);
+
 const vote = async (choice) => {
   if (!authStore.isLoggedIn) {
     message.warning('Vui lòng đăng nhập để vote!');
@@ -177,37 +180,38 @@ const vote = async (choice) => {
   try {
     const response = await api.post('/vote/createOrUpdate', { choice }); 
     message.success(response.data.message);
+    
     voteStore.userVoteChoice = choice; 
+    voteUpdated.value = true;
+    await updateVoteResults();
   } catch (error) {
-    if (error.response && error.response.data) {
-      message.error(error.response.data.message);
-    } else {
-      message.error('Có lỗi xảy ra. Vui lòng thử lại!');
-    }
+    message.error(error.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại!');
   }
 };
 
-const getVoteResults = async () => {
-  const storedVoteResults = localStorage.getItem('voteResults');
-  
-  if (storedVoteResults) {
-    voteResults.value = JSON.parse(storedVoteResults);
-  } else {
-    try {
-      const response = await api.get('/vote/results');
-      voteResults.value = {
-        totalVotes: response.data.total_users_voted,
-        votesByChoice: response.data.votes_by_choice.reduce((acc, vote) => {
-          acc[vote.choice] = vote.total;
-          return acc;
-        }, {})
-      };
+const updateVoteResults = async () => {
+  try {
+    const response = await api.get('/vote/results');
+
+    voteResults.value = {
+      totalVotes: response.data.total_users_voted,
+      votesByChoice: response.data.votes_by_choice.reduce((acc, vote) => {
+        acc[vote.choice] = vote.total;
+        return acc;
+      }, {})
+    };
+
+    if (voteUpdated.value) {
+      localStorage.removeItem('voteResults');
       localStorage.setItem('voteResults', JSON.stringify(voteResults.value));
-    } catch (error) {
-      console.error('Lỗi khi lấy kết quả vote:', error);
+      voteUpdated.value = false;
+      eventBus.emit('voteUpdated', voteResults.value);
     }
+  } catch (error) {
+    console.error('Lỗi khi cập nhật kết quả vote:', error);
   }
 };
+
 
 const observeLocalStorageChange = () => {
   const originalSetItem = localStorage.setItem;
@@ -284,7 +288,7 @@ onMounted(async () => {
       });
     }
   }
-  await getVoteResults();
+  await updateVoteResults();
   if (authStore.isLoggedIn) {
     await voteStore.getUserVote();
   }

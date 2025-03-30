@@ -354,12 +354,15 @@ const saveSettings = async () => {
       // console.error('Lỗi khi lấy danh sách hình nền:', error);
     } 
   };
-  const handleBackgroundSelection = (selectedValue) => {
+const handleBackgroundSelection = (selectedValue) => {
   const selected = backgroundOptions.value.find(option => option.value === selectedValue);
   if (selected) {
     backgroundStoryId.value = selected.backgroundStoryId; 
+    selectedBackground.value = selected.value; 
+    backgroundImage.value = `${BaseURL}/storage/${selected.value}`;
   }
 };
+
   const fetchUserSettings = async (userId) => {
     try {
       const response = await api.get(`/story/${userId}/settings`);
