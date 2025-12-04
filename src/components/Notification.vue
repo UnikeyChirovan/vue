@@ -182,8 +182,8 @@ onMounted(() => {
 }
 
 .notification-image img {
-  width: 100%;
-  height: auto;
+  width: auto;
+  height: 100%;
   max-height: 100%;
   object-fit: cover;
   border-radius: 10px;
