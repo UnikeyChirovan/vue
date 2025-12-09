@@ -3,24 +3,22 @@
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="custom-modal">
         <div class="modal-header">
-          <h2 class="title">Danh Sách Chặn</h2>
+          <h2 class="title">Danh Sách Theo Dõi</h2>
           <button class="close-btn" @click="closeModal">&times;</button>
         </div>
 
         <div v-if="loading" class="loading">Đang tải...</div>
 
-        <div v-else class="block-list">
-          <div v-for="user in blockList" :key="user.id" class="user-card">
+        <div v-else class="follow-list">
+          <div v-for="user in followingList" :key="user.id" class="user-card">
             <img :src="getAvatarUrl(user)" class="avatar" />
             <p class="user-name">{{ user.name }}</p>
-            <button class="unblock-btn" @click="unblockUser(user.id)">
-              Bỏ chặn
-            </button>
+            <button class="view-btn" @click="goToProfile(user.id)">Chi tiết</button>
           </div>
         </div>
 
         <div class="refresh-container">
-          <button class="refresh-btn" @click="refreshBlockList">Làm mới</button>
+          <button class="refresh-btn" @click="refreshFollowingList">Làm mới</button>
         </div>
       </div>
     </div>
@@ -29,72 +27,67 @@
 
 <script setup>
 import { ref } from 'vue';
-import { useMessage } from 'naive-ui';
+import { useRouter } from 'vue-router';
 import api from '../services/axiosInterceptor';
 
+const router = useRouter();
 const showModal = ref(false);
 const loading = ref(false);
-const blockList = ref([]);
-const message = useMessage();
+const followingList = ref([]);
 const backendUrl = 'http://127.0.0.1:8000';
-const storageKey = 'user_blocked';
+const storageKey = 'user_follow';
 
 const getAvatarUrl = (user) => {
-  return user.avatar
-    ? `${backendUrl}/storage/avatars/${user.id}/${user.avatar}`
-    : 'https://picsum.photos/100';
+  return user.avatar ? `${backendUrl}/storage/avatars/${user.id}/${user.avatar}` : 'https://picsum.photos/100';
 };
 
-const fetchBlockList = async () => {
+const fetchFollowingList = async () => {
   loading.value = true;
 
   const storedData = sessionStorage.getItem(storageKey);
   if (storedData) {
-    blockList.value = JSON.parse(storedData);
+    followingList.value = JSON.parse(storedData);
+    console.log("Dữ liệu lấy từ sessionStorage:", followingList.value);
     loading.value = false;
     return;
   }
-
   try {
-    const response = await api.get('/social/blocked-users');
+    const response = await api.get(`/social/followed-users`);
+    console.log("Dữ liệu API trả về:", response.data);
+
     if (response.data && Array.isArray(response.data.users)) {
-      blockList.value = response.data.users;
-      sessionStorage.setItem(storageKey, JSON.stringify(response.data.users));
+      followingList.value = response.data.users;
+      sessionStorage.setItem(storageKey, JSON.stringify(response.data.users)); // Lưu vào sessionStorage
     } else {
-      blockList.value = [];
+      followingList.value = [];
     }
   } catch (error) {
-    console.error('Lỗi khi tải danh sách chặn:', error);
+    console.error("Lỗi khi tải danh sách theo dõi:", error);
   } finally {
     loading.value = false;
   }
 };
 
-const refreshBlockList = async () => {
-  sessionStorage.removeItem(storageKey);
-  await fetchBlockList();
+const refreshFollowingList = async () => {
+  sessionStorage.removeItem(storageKey); 
+  await fetchFollowingList(); 
 };
 
 const openModal = () => {
   showModal.value = true;
-  fetchBlockList();
+  fetchFollowingList();
 };
 
 const closeModal = () => {
   showModal.value = false;
 };
 
-const unblockUser = async (userId) => {
-  try {
-    await api.delete(`/social/unblock/${userId}`);
-    message.success('Đã bỏ chặn người dùng!');
-    refreshBlockList();
-  } catch (error) {
-    message.error('Lỗi khi bỏ chặn.');
-  }
+const goToProfile = (userId) => {
+  router.push(`/profile/${userId}`);
+  closeModal();
 };
 
-defineExpose({ openModal });
+defineExpose({openModal});
 </script>
 
 <style scoped>
@@ -104,7 +97,7 @@ defineExpose({ openModal });
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5); 
   display: flex;
   align-items: center;
   justify-content: center;
@@ -122,13 +115,14 @@ defineExpose({ openModal });
   padding: 20px;
 }
 
+
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin: -20px -20px 10px -20px;
   padding: 10px 20px;
-  background-color: #d9534f;
+  background-color: #0c713d;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   color: white;
@@ -163,7 +157,7 @@ defineExpose({ openModal });
   font-style: italic;
 }
 
-.block-list {
+.follow-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -193,8 +187,8 @@ defineExpose({ openModal });
   font-weight: bold;
 }
 
-.unblock-btn {
-  background-color: #d9534f;
+.view-btn {
+  background-color: #0c713d;
   color: white;
   border: none;
   padding: 8px 12px;
@@ -203,8 +197,8 @@ defineExpose({ openModal });
   font-size: 14px;
 }
 
-.unblock-btn:hover {
-  background-color: #c9302c;
+.view-btn:hover {
+  background-color: #095d32;
 }
 
 .refresh-container {
@@ -213,7 +207,7 @@ defineExpose({ openModal });
 }
 
 .refresh-btn {
-  background-color: #d9534f;
+  background-color: #0c713d;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -224,7 +218,7 @@ defineExpose({ openModal });
 }
 
 .refresh-btn:hover {
-  background-color: #c9302c;
+  background-color: #095d32;
 }
 
 .fade-zoom-enter-active,

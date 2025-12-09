@@ -131,7 +131,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useRoute } from 'vue-router';
 import { message } from 'ant-design-vue';
@@ -157,7 +157,9 @@ const users = reactive({
 });
 
 const errors = ref({});
-const formFields = [
+
+// Sử dụng computed để đảm bảo formFields luôn nhận được array từ ref
+const formFields = computed(() => [
   {
     name: 'status_id',
     label: 'Tình trạng',
@@ -167,7 +169,7 @@ const formFields = [
       showSearch: true,
       placeholder: 'Tình trạng',
       style: { width: '100%' },
-      options: users_status,
+      options: users_status.value, // Thêm .value để lấy giá trị thực tế
       filterOption: (input, option) =>
         option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0,
       allowClear: true,
@@ -222,7 +224,7 @@ const formFields = [
       showSearch: true,
       placeholder: 'Phòng ban',
       style: { width: '100%' },
-      options: departments,
+      options: departments.value, // Thêm .value để lấy giá trị thực tế
       filterOption: (input, option) =>
         option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0,
       allowClear: true,
@@ -233,13 +235,13 @@ const formFields = [
     label: 'Đổi Mật khẩu',
     component: 'a-checkbox',
   },
-];
+]);
 
 const getUsersEdit = () => {
   api
     .get(`/users/${route.params.id}/edit`)
     .then((response) => {
-      console.log("edit user:", response);
+      console.log('edit user:', response);
       users.username = response.data.users.username;
       users.name = response.data.users.name;
       users.nickname = response.data.users.nickname;
@@ -289,6 +291,7 @@ onMounted(() => {
   getUsersEdit();
 });
 </script>
+
 <style>
 .select-danger {
   border: 1px solid red;

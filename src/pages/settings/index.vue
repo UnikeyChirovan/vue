@@ -8,24 +8,38 @@
     <n-form>
       <!-- Chế độ tối -->
       <div class="form-item">
-       <label class="form-label theme-label">Chế độ tối:</label>
+        <label class="form-label theme-label">Chế độ tối:</label>
         <n-switch v-model:value="isDarkMode" @update:value="toggleTheme" />
+      </div>
+
+      <!-- Nút Hỗ Trợ -->
+      <div class="form-item">
+        <label class="form-label support-label">Hiện nút Hỗ Trợ:</label>
+        <n-switch
+          v-model:value="isSupportButtonEnabled"
+          @update:value="toggleSupportButton"
+        />
       </div>
 
       <!-- Đăng xuất khỏi tất cả thiết bị -->
       <div class="button-wrapper">
-        <n-button type="warning" @click="logoutAllDevices" class="logout-btn">🔒 Đăng xuất tất cả</n-button>
+        <n-button type="warning" @click="logoutAllDevices" class="logout-btn">
+          🔒 Đăng xuất tất cả
+        </n-button>
       </div>
 
       <!-- Xóa tài khoản -->
       <div class="button-wrapper">
-        <n-button type="error" @click="confirmDeleteAccount" class="delete-btn">🗑 Xóa tài khoản</n-button>
+        <n-button type="error" @click="confirmDeleteAccount" class="delete-btn">
+          🗑 Xóa tài khoản
+        </n-button>
       </div>
-      
+
       <!-- Cảnh báo -->
       <div class="warning-message">
         <p>
-          ⚠ Hành động xóa tài khoản này không thể hoàn tác. Toàn bộ dữ liệu sẽ bị xóa vĩnh viễn.
+          ⚠ Hành động xóa tài khoản này không thể hoàn tác. Toàn bộ dữ liệu sẽ
+          bị xóa vĩnh viễn.
         </p>
       </div>
     </n-form>
@@ -33,19 +47,21 @@
   <TheFooter />
 </template>
 
-
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
 import { NSwitch } from 'naive-ui';
 import TheHeader from '../../components/TheHeader.vue';
 import TheFooter from '../../components/TheFooter.vue';
 import { useAuthStore } from '../../stores/auth';
-const auth = useAuthStore();
 import { useMessage } from 'naive-ui';
+
+const auth = useAuthStore();
 const message = useMessage();
 
-
 const isDarkMode = ref(localStorage.getItem('theme') === 'dark');
+const isSupportButtonEnabled = ref(
+  localStorage.getItem('supportButtonEnabled') !== 'false'
+);
 
 const applyTheme = async (dark) => {
   const html = document.documentElement;
@@ -60,11 +76,25 @@ const applyTheme = async (dark) => {
   await nextTick();
 };
 
-
-
 const toggleTheme = (value) => {
   isDarkMode.value = value;
   applyTheme(value);
+};
+
+const toggleSupportButton = (value) => {
+  isSupportButtonEnabled.value = value;
+  localStorage.setItem('supportButtonEnabled', value ? 'true' : 'false');
+
+  // Trigger event để component button lắng nghe
+  window.dispatchEvent(
+    new CustomEvent('supportButtonToggle', { detail: value })
+  );
+
+  if (value) {
+    message.success('Đã bật nút Hỗ Trợ');
+  } else {
+    message.info('Đã tắt nút Hỗ Trợ');
+  }
 };
 
 const isLoading = ref(false);
@@ -82,12 +112,14 @@ const logoutAllDevices = async () => {
     message.success('Bạn đã đăng xuất khỏi tất cả thiết bị!');
   } catch (error) {
     console.error('Lỗi khi đăng xuất:', error);
-    message.error(error.response?.data?.message || 'Có lỗi xảy ra khi đăng xuất. Vui lòng thử lại!');
+    message.error(
+      error.response?.data?.message ||
+        'Có lỗi xảy ra khi đăng xuất. Vui lòng thử lại!'
+    );
   } finally {
     isLoading.value = false;
   }
 };
-
 
 const confirmDeleteAccount = async () => {
   if (confirm('Bạn có chắc chắn muốn xóa tài khoản vĩnh viễn?')) {
@@ -113,7 +145,8 @@ onMounted(() => {
   --light-text: #000000;
 }
 
-html, body {
+html,
+body {
   min-height: 100vh;
   font-family: 'Arial', sans-serif;
 }
@@ -157,13 +190,26 @@ h2 {
   font-weight: 500;
 }
 
+.theme-label {
+  font-size: 18px;
+  font-weight: bold;
+  color: teal;
+}
+
+.support-label {
+  font-size: 18px;
+  font-weight: bold;
+  color: #667eea;
+}
+
 .button-wrapper {
   display: flex;
   justify-content: center;
   margin-top: 20px;
 }
 
-.logout-btn, .delete-btn {
+.logout-btn,
+.delete-btn {
   padding: 12px 24px;
   border-radius: 6px;
   font-weight: bold;
@@ -185,20 +231,13 @@ h2 {
   font-weight: bold;
   color: red;
 }
-.theme-label {
-  font-size: 18px;
-  font-weight: bold;
-  color: teal;
-}
 
-
-/* Áp dụng nền tối toàn bộ trang */
+/* Dark mode styles */
 .dark-mode {
   background-color: var(--dark-bg) !important;
   color: var(--dark-text) !important;
 }
 
-/* Áp dụng cho toàn bộ các thẻ chính */
 .dark-mode body,
 .dark-mode .container,
 .dark-mode .card,
@@ -208,7 +247,6 @@ h2 {
   color: var(--dark-text) !important;
 }
 
-/* Chỉnh màu chữ trên toàn bộ trang */
 .dark-mode p,
 .dark-mode span,
 .dark-mode h1,
@@ -223,64 +261,55 @@ h2 {
   color: var(--dark-text) !important;
 }
 
-/* Chỉnh màu cho card */
 .dark-mode .card {
   background-color: #1e1e1e !important;
   color: var(--dark-text) !important;
 }
 
-/* Chỉnh màu cho header */
 .dark-mode .card-header {
   background-color: #2a2a2a !important;
   color: var(--dark-text) !important;
 }
 
-/* Chỉnh màu cho button */
 .dark-mode button {
   background-color: #333 !important;
   color: var(--dark-text) !important;
   border: 1px solid var(--dark-text) !important;
 }
 
-/* Chỉnh màu link */
 .dark-mode a {
   color: #4da6ff !important;
 }
+
 .dark-mode .sidebar,
 .dark-mode .sidebar a {
   color: var(--dark-text) !important;
 }
 
-/* Bảng dữ liệu */
 .dark-mode table {
   background-color: #1e1e1e !important;
   color: var(--dark-text) !important;
 }
 
-/* Ô trong bảng */
 .dark-mode th,
 .dark-mode td {
   background-color: #1e1e1e !important;
   color: var(--dark-text) !important;
-  border-color: #444 !important; /* Giảm độ sáng của đường kẻ */
+  border-color: #444 !important;
 }
 
-/* Chỉnh màu header của bảng */
 .dark-mode thead {
   background-color: #2a2a2a !important;
   color: var(--dark-text) !important;
 }
 
-/* Chỉnh màu chữ trong sidebar */
 .dark-mode .sidebar {
   background-color: #1a1a1a !important;
   color: var(--dark-text) !important;
 }
 
-/* Nếu có menu dropdown thì chỉnh luôn */
 .dark-mode .dropdown-menu {
   background-color: #2a2a2a !important;
   color: var(--dark-text) !important;
 }
-
 </style>

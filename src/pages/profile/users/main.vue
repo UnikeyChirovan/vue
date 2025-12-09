@@ -1,17 +1,27 @@
 <template>
   <div class="profile-page">
     <div class="cover-section">
-      <img :src="coverUrl ? coverUrl : 'https://via.placeholder.com/1200x300'" alt="Cover Image" class="cover-img" />
-      <button v-if="authStore.user?.id === users.id" class="edit-cover-btn" @click="CoverEdit">Edit Cover</button>
-      <div class="avatar-section">
-      <n-image
-        class="avatar-img"
-        alt="User Profile"
-        :src="avatarUrl || 'https://via.placeholder.com/150'"
+      <img
+        :src="coverUrl ? coverUrl : 'https://picsum.photos/1200x300'"
+        alt="Cover Image"
+        class="cover-img"
       />
+      <button
+        v-if="authStore.user?.id === users.id"
+        class="edit-cover-btn"
+        @click="CoverEdit"
+      >
+        Edit Cover
+      </button>
+      <div class="avatar-section">
+        <n-image
+          class="avatar-img"
+          alt="User Profile"
+          :src="avatarUrl || 'https://picsum.photos/150'"
+        />
         <button
           v-if="authStore.user?.id === users.id"
-         @click="handleCameraClick"
+          @click="handleCameraClick"
           class="camera-btn"
         >
           <i class="fa-solid fa-camera"></i>
@@ -86,7 +96,7 @@
       <h2>Portfolio</h2>
       <div class="projects">
         <div class="project">
-          <img src="https://via.placeholder.com/400x300" alt="Project Image" />
+          <img src="https://picsum.photos/400x300" alt="Project Image" />
           <div class="project-info">
             <h3>Project Title 1</h3>
             <p>Short description of the project.</p>
@@ -94,7 +104,7 @@
         </div>
 
         <div class="project">
-          <img src="https://via.placeholder.com/400x300" alt="Project Image" />
+          <img src="https://picsum.photos/400x300" alt="Project Image" />
           <div class="project-info">
             <h3>Project Title 2</h3>
             <p>Short description of the project.</p>
@@ -111,61 +121,61 @@
 </template>
 
 <script setup>
-  import { storeToRefs } from 'pinia';
-  import { ref, onMounted, computed, watch } from "vue";
-  import { useMessage } from 'naive-ui';
-  import { useAuthStore } from "../../../stores/auth.js";
-  import { useMenuProfile } from "../../../stores/use-menu-profile.js";
-  import { useProfileStore } from '../../../stores/profile.js';
-  import { useGeneralStore } from '../../../stores/general';
-  import dayjs from 'dayjs';
+import { storeToRefs } from 'pinia';
+import { ref, onMounted, computed, watch } from 'vue';
+import { useMessage } from 'naive-ui';
+import { useAuthStore } from '../../../stores/auth.js';
+import { useMenuProfile } from '../../../stores/use-menu-profile.js';
+import { useProfileStore } from '../../../stores/profile.js';
+import { useGeneralStore } from '../../../stores/general';
+import dayjs from 'dayjs';
 
-  const authStore = useAuthStore();
-  const useGeneral = useGeneralStore()
-  const useProfile = useProfileStore();
-  const { isCropperModal, avatarUpdated } = storeToRefs(useGeneral);
+const authStore = useAuthStore();
+const useGeneral = useGeneralStore();
+const useProfile = useProfileStore();
+const { isCropperModal, avatarUpdated } = storeToRefs(useGeneral);
 
-  const id = authStore.user?.id;
-  const users = ref({});
-  const avatarUrl = computed(() => useProfile.avatarUrl);
-  const coverUrl = ref(null);  
-  const message = useMessage();
+const id = authStore.user?.id;
+const users = ref({});
+const avatarUrl = computed(() => useProfile.avatarUrl);
+const coverUrl = ref(null);
+const message = useMessage();
 
-  const handleCameraClick = () => {
-    isCropperModal.value = true;
-  };
+const handleCameraClick = () => {
+  isCropperModal.value = true;
+};
 
-  const formattedBirthday = computed(() => {
-    if (users.value.birthday) {
-      return dayjs(users.value.birthday).format('DD-MM');
-    }
-    return '';
-  });
+const formattedBirthday = computed(() => {
+  if (users.value.birthday) {
+    return dayjs(users.value.birthday).format('DD-MM');
+  }
+  return '';
+});
 
-  const getProfile = async () => {
-    await useProfile.getProfile(id); 
-    users.value = useProfile.users; 
-  };
+const getProfile = async () => {
+  await useProfile.getProfile(id);
+  users.value = useProfile.users;
+};
 
-  watch(
+watch(
   () => avatarUpdated.value,
   (newValue) => {
     if (newValue) {
       console.log('Avatar updated, updating avatarUrl in profile store...');
       useProfile.updateAvatarUrl(`${useProfile.avatarUrl}`);
-      useGeneral.setAvatarUpdated(false); 
+      useGeneral.setAvatarUpdated(false);
     }
   }
 );
-  onMounted(() => {
-    useMenuProfile().onSelectedKey(['profile-info']);
-    getProfile();
-  });
+onMounted(() => {
+  useMenuProfile().onSelectedKey(['profile-info']);
+  getProfile();
+});
 </script>
 
 <style lang="scss" scoped>
 .profile-page {
-  font-family: "Arial", sans-serif;
+  font-family: 'Arial', sans-serif;
   color: #333;
   background-color: #f7f7f7;
 

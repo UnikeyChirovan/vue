@@ -1,10 +1,10 @@
 <template>
   <div class="profile-page">
     <div class="cover-section">
-      <div class="cover-container" v-show="!showChange && !showEdit">
-        <img
-          :src="coverUrl ? coverUrl : 'https://picsum.photos/1200x300'"
-          alt="Cover Image"
+      <div class="cover-container" v-show="!showChange&&!showEdit">
+        <img 
+          :src="coverUrl ? coverUrl : 'https://picsum.photos/1200x300'" 
+          alt="Cover Image" 
           class="cover-img"
           :style="coverStyle"
         />
@@ -24,62 +24,38 @@
 
         <div
           class="custom-cover"
-          :style="{ cursor: 'grab' }"
+          :style="{ cursor: 'grab'}"
           @mousedown="startDrag($event, 'cover')"
           v-if="newCoverUrl"
         >
           <img
-            :src="newCoverUrl"
-            class="img-cover-custom"
+            :src="newCoverUrl" class="img-cover-custom"
             alt="Cover"
             :style="coverStyle"
           />
         </div>
 
         <n-space class="slider-container">
-          <n-slider v-model:value="coverPosition" :min="-1000" :max="0" vertical
-            ><template #thumb>
-              <n-icon-wrapper :size="24" :border-radius="12">
-                <n-icon :size="18" :component="AnimalCat24Regular" />
-              </n-icon-wrapper> </template
-          ></n-slider>
+          <n-slider v-model:value="coverPosition" :min="-1000" :max="0" vertical ><template #thumb>
+            <n-icon-wrapper :size="24" :border-radius="12">
+              <n-icon :size="18" :component="AnimalCat24Regular" />
+            </n-icon-wrapper>
+          </template></n-slider>
         </n-space>
-        <n-button @click="cancelChange" class="cancel-button" type="error"
-          >Hủy</n-button
-        >
-        <n-button @click="saveNewCover" class="save-button" type="info"
-          >Lưu</n-button
-        >
+        <n-button @click="cancelChange" class="cancel-button" type="error">Hủy</n-button>
+        <n-button @click="saveNewCover" class="save-button" type="info">Lưu</n-button>
       </div>
       <div class="cover-edit" v-if="showEdit">
-        <div
-          class="custom-cover"
-          :style="{ cursor: 'grab' }"
-          @mousedown="startDrag($event, 'cover')"
-          v-if="coverUrl"
-        >
-          <img
-            :src="coverUrl"
-            class="img-cover-custom"
-            alt="Cover"
-            :style="coverStyle"
-          />
+        <div class="custom-cover" :style="{ cursor: 'grab'}" @mousedown="startDrag($event, 'cover')" v-if="coverUrl">
+          <img :src="coverUrl" class="img-cover-custom" alt="Cover" :style="coverStyle" />
         </div>
         <n-space class="slider-container">
-          <n-slider
-            v-model:value="coverPosition"
-            :min="-1000"
-            :max="0"
-            vertical
-          />
+          <n-slider v-model:value="coverPosition" :min="-1000" :max="0" vertical />
         </n-space>
-        <n-button @click="cancelEdit" class="cancel-button" type="error"
-          >Hủy</n-button
-        >
-        <n-button @click="saveEditedCover" class="save-button" type="info"
-          >Lưu</n-button
-        >
+        <n-button @click="cancelEdit" class="cancel-button" type="error">Hủy</n-button>
+        <n-button @click="saveEditedCover" class="save-button" type="info">Lưu</n-button>
       </div>
+
 
       <div class="edit-cover-btn" v-if="authStore.user?.id === users.id">
         <n-dropdown :options="options" @select="handleSelect">
@@ -105,55 +81,29 @@
     </div>
     <n-modal v-model:show="showViewModal" title="Xem hình cover">
       <n-image :src="coverUrl" class="full-cover-img" />
-    </n-modal>
+    </n-modal>  
     <h1 class="username">{{ users.name }}</h1>
     <div class="rate-container">
       <n-rate color="#4fb233" readonly :default-value="5" />
     </div>
     <div class="profile-pages">
       <div class="explore-buttons">
-        <n-button class="custom-button explore" @click="openExploreModal"
-          >Khám Phá</n-button
-        >
-        <n-button class="custom-button follow-list" @click="openFollowingModal"
-          >Danh Sách</n-button
-        >
-        <n-button class="custom-button inbox" @click="openChatInbox">
-          <i class="fa-solid fa-envelope me-2"></i>
-          Hộp Thư
-          <span v-if="chatStore.totalUnreadMessages > 0" class="inbox-badge">
-            {{ chatStore.totalUnreadMessages }}
-          </span>
-        </n-button>
+        <n-button class="custom-button explore" @click="openExploreModal">Khám Phá</n-button>
+        <n-button class="custom-button follow-list" @click="openFollowingModal">Danh Sách</n-button>
       </div>
       <ExploreModal ref="exploreModalRef" />
       <FollowingListModal ref="followingModalRef" />
-      <ChatInboxModal ref="chatInboxModalRef" />
-    </div>
+    </div> 
     <div class="profile">
       <div class="info-card card">
         <h2 class="section-title">Thông Tin Cá Nhân</h2>
-        <p v-if="users.occupation">
-          <strong>Nghề nghiệp:</strong> {{ users.occupation }}
-        </p>
-        <p v-if="users.gender">
-          <strong>Giới tính:</strong> {{ users.gender }}
-        </p>
-        <p v-if="users.birthday">
-          <strong>Ngày sinh:</strong> {{ formattedBirthday }}
-        </p>
-        <p v-if="users.address">
-          <strong>Địa chỉ:</strong> {{ users.address }}
-        </p>
-        <p v-if="users.hobbies">
-          <strong>Sở thích:</strong> {{ users.hobbies }}
-        </p>
-        <p v-if="users.biography">
-          <strong>Tiểu sử:</strong> {{ users.biography }}
-        </p>
-        <p v-if="users.phone_number">
-          <strong>Điện Thoại:</strong> {{ users.phone_number }}
-        </p>
+        <p v-if="users.occupation"><strong>Nghề nghiệp:</strong> {{ users.occupation }}</p>
+        <p v-if="users.gender"><strong>Giới tính:</strong> {{ users.gender }}</p>
+        <p v-if="users.birthday"><strong>Ngày sinh:</strong> {{ formattedBirthday }}</p>
+        <p v-if="users.address"><strong>Địa chỉ:</strong> {{ users.address }}</p>
+        <p v-if="users.hobbies"><strong>Sở thích:</strong> {{ users.hobbies }}</p>
+        <p v-if="users.biography"><strong>Tiểu sử:</strong> {{ users.biography }}</p>
+        <p v-if="users.phone_number"><strong>Điện Thoại:</strong> {{ users.phone_number }}</p>
         <p v-if="users.email"><strong>Email:</strong> {{ users.email }}</p>
       </div>
       <div class="stats card" v-if="followStats">
@@ -176,16 +126,12 @@
 
       <div class="history card">
         <h2 class="section-title">Lịch sử gần đây</h2>
-        <div class="last-chapter-section">
-          <p>
-            Chương đọc gần nhất: <span>{{ lastChapter - 1 }}</span>
-          </p>
-        </div>
-        <div class="last-episode-section">
-          <p>
-            Tập coi gần nhất: <span>{{ lastEpisode - 1 }}</span>
-          </p>
-        </div>
+      <div class="last-chapter-section">
+        <p>Chương đọc gần nhất: <span>{{ lastChapter - 1 }}</span></p>
+      </div>
+      <div class="last-episode-section">
+        <p>Tập coi gần nhất: <span>{{ lastEpisode - 1 }}</span></p>
+      </div>
       </div>
       <div class="social-links card">
         <h2 class="section-title">Kết nối mạng xã hội</h2>
@@ -201,84 +147,76 @@
 </template>
 
 <script setup>
-import { storeToRefs } from 'pinia';
-import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue';
-import { useMessage } from 'naive-ui';
-import { useAuthStore } from '../../../stores/auth.js';
-import { useMenuProfile } from '../../../stores/use-menu-profile.js';
-import { useProfileStore } from '../../../stores/profile.js';
-import { useGeneralStore } from '../../../stores/general';
-import api from '../../../services/axiosInterceptor.js';
-import dayjs from 'dayjs';
-import AnimalCat24Regular from '@vicons/fluent/AnimalCat24Regular';
-import ExploreModal from '../../../components/ExploreModal.vue';
-import FollowingListModal from '../../../components/FollowingListModal.vue';
-import ChatInboxModal from '../../../components/ChatInboxModal.vue';
-import { useChatStore } from '../../../stores/chatStore.js';
+  import { storeToRefs } from 'pinia';
+  import { ref, onMounted, computed, watch, onBeforeUnmount } from "vue";
+  import { useMessage } from 'naive-ui';
+  import { useAuthStore } from "../../../stores/auth.js";
+  import { useMenuProfile } from "../../../stores/use-menu-profile.js";
+  import { useProfileStore } from '../../../stores/profile.js';
+  import { useGeneralStore } from '../../../stores/general';
+  import api from '../../../services/axiosInterceptor.js';
+  import dayjs from 'dayjs';
+  import AnimalCat24Regular from '@vicons/fluent/AnimalCat24Regular'
+  import ExploreModal from '../../../components/ExploreModal.vue';
+  import FollowingListModal from '../../../components/FollowingListModal.vue';
 
-// Thêm ref cho modal
-const chatInboxModalRef = ref(null);
-const chatStore = useChatStore();
-// Thêm method
-const openChatInbox = () => {
-  chatInboxModalRef.value.openModal();
-};
+  // modal
+  const exploreModalRef = ref(null);
 
-// modal
-const exploreModalRef = ref(null);
+  const openExploreModal = () => {
+    exploreModalRef.value.openModal();
+  };
 
-const openExploreModal = () => {
-  exploreModalRef.value.openModal();
-};
+  const followingModalRef = ref(null);
 
-const followingModalRef = ref(null);
+  const openFollowingModal = () => {
+    followingModalRef.value.openModal();
+  };
 
-const openFollowingModal = () => {
-  followingModalRef.value.openModal();
-};
+  // 
 
-//
+  const authStore = useAuthStore();
+  const useGeneral = useGeneralStore()
+  const useProfile = useProfileStore();
+  const { cover_position } = storeToRefs(useProfile);
+  const { isCropperModal, avatarUpdated } = storeToRefs(useGeneral);
 
-const authStore = useAuthStore();
-const useGeneral = useGeneralStore();
-const useProfile = useProfileStore();
-const { cover_position } = storeToRefs(useProfile);
-const { isCropperModal, avatarUpdated } = storeToRefs(useGeneral);
+  const id = authStore.user?.id;
+  const { users, avatarUrl, coverUrl } = storeToRefs(useProfile);
+  const message = useMessage();
 
-const id = authStore.user?.id;
-const { users, avatarUrl, coverUrl } = storeToRefs(useProfile);
-const message = useMessage();
+  const handleCameraClick = () => {
+    isCropperModal.value = true;
+  };
 
-const handleCameraClick = () => {
-  isCropperModal.value = true;
-};
-
-const formattedBirthday = computed(() => {
-  if (users.value.birthday) {
-    return dayjs(users.value.birthday).format('DD-MM');
-  }
-  return '';
-});
+  const formattedBirthday = computed(() => {
+    if (users.value.birthday) {
+      return dayjs(users.value.birthday).format('DD-MM');
+    }
+    return '';
+  });
 
 const fetchProfile = async () => {
-  await useProfile.getProfile(id);
+  await useProfile.getProfile(id); 
 };
 
-watch(
+  watch(
   () => avatarUpdated.value,
   (newValue) => {
     if (newValue) {
       // console.log('Avatar updated, updating avatarUrl in profile store...');
       useProfile.updateAvatarUrl(`${useProfile.avatarUrl}`);
-      useGeneral.setAvatarUpdated(false);
+      useGeneral.setAvatarUpdated(false); 
     }
   }
 );
 
-//
-import { h } from 'vue';
-import { NIcon } from 'naive-ui';
-import { Pencil, Eye, CloudUpload } from '@vicons/ionicons5';
+  //
+  import { h } from "vue";
+import { NIcon } from "naive-ui";
+import {
+  Pencil, Eye, CloudUpload
+} from "@vicons/ionicons5";
 
 function renderIcon(icon) {
   return () => h(NIcon, null, { default: () => h(icon) });
@@ -286,27 +224,28 @@ function renderIcon(icon) {
 
 const options = [
   {
-    label: 'Coi Hình',
-    key: 'viewcover',
+    label: "Coi Hình",
+    key: "viewcover",
     icon: renderIcon(Eye),
   },
   {
-    label: 'Thay Hình',
-    key: 'changecover',
+    label: "Thay Hình",
+    key: "changecover",
     icon: renderIcon(CloudUpload),
   },
   {
-    label: 'Sửa Hình',
-    key: 'settingcover',
+    label: "Sửa Hình",
+    key: "settingcover",
     icon: renderIcon(Pencil),
-  },
+  }
 ];
+
 
 const uploadHeaders = {
   Authorization: `Bearer ${authStore.accessToken}`,
 };
 
-const dragging = ref(false);
+const dragging = ref(false); 
 let startY = 0;
 let originalCoverPosition = 0;
 
@@ -348,13 +287,13 @@ const onDrag = (event) => {
 
   cover_position.value += deltaY;
   coverStyle.value.transform = `translateY(${cover_position.value}px)`;
-  // console.log('Dragging... Current cover position:', useProfile.users.cover_position);
-  // console.log('Cover style transform:', cover_position.value);
+      // console.log('Dragging... Current cover position:', useProfile.users.cover_position);
+    // console.log('Cover style transform:', cover_position.value);
 };
 
 const stopDrag = () => {
   dragging.value = false;
-  // console.log('Drag stopped. Final cover position:', useProfile.users.cover_position);
+      // console.log('Drag stopped. Final cover position:', useProfile.users.cover_position);
 
   window.removeEventListener('mousemove', onDrag);
   window.removeEventListener('mouseup', stopDrag);
@@ -364,20 +303,20 @@ const stopDrag = () => {
 const cancelDrag = () => {
   users.cover_position = originalCoverPosition;
   coverStyle.value.transform = `translateY(${users.cover_position}px)`;
-  // console.log('Drag cancelled. Restoring cover position:', originalCoverPosition);
+      // console.log('Drag cancelled. Restoring cover position:', originalCoverPosition);
 
   stopDrag();
   message.info('Thao tác kéo đã bị hủy và vị trí đã được khôi phục.');
 };
-const newCoverFile = ref(null);
+const newCoverFile = ref(null); 
 
 const handleUpload = ({ file }) => {
   const reader = new FileReader();
   reader.onload = (event) => {
     newCoverUrl.value = event.target.result;
-    // console.log('New cover URL set:', newCoverUrl.value);
+            // console.log('New cover URL set:', newCoverUrl.value);
   };
-  newCoverFile.value = file.file;
+  newCoverFile.value = file.file; 
   reader.readAsDataURL(file.file);
 };
 
@@ -388,41 +327,39 @@ const saveNewCover = () => {
   }
 
   const formData = new FormData();
-  formData.append('file', newCoverFile.value);
-  formData.append('position', cover_position.value);
+  formData.append('file', newCoverFile.value); 
+  formData.append('position', cover_position.value); 
 
-  api
-    .post(`link/upload/cover`, formData, {
-      headers: {
-        ...uploadHeaders,
-        'Content-Type': 'multipart/form-data',
-      },
-    })
-    .then((response) => {
-      // console.log('res', response)
-      if (response.status === 200) {
-        useProfile.updateCoverPosition(response.data.positionY);
-        useProfile.updateCoverUrl(response.data.url);
-        showChange.value = false;
-        message.success('Cover đã được lưu thành công!');
-      }
-    })
-    .catch((error) => {
-      // console.error('Error saving new cover:', error);
-      message.error('Lưu hình cover thất bại!');
-    });
+  api.post(`link/upload/cover`, formData, {
+    headers: {
+      ...uploadHeaders,
+      'Content-Type': 'multipart/form-data',
+    },
+  }).then(response => {
+    // console.log('res', response)
+    if (response.status === 200) {
+      useProfile.updateCoverPosition(response.data.positionY);
+      useProfile.updateCoverUrl(response.data.url);
+      showChange.value = false;
+      message.success('Cover đã được lưu thành công!');
+    }
+  }).catch(error => {
+    // console.error('Error saving new cover:', error);
+    message.error('Lưu hình cover thất bại!');
+  });
 };
 const cancelChange = () => {
   showChange.value = false;
-  newCoverUrl.value = null;
+  newCoverUrl.value = null; 
   message.info('Đã hủy thao tác thay đổi hình cover.');
 };
 
 const cancelEdit = () => {
   showEdit.value = false;
-  cover_position.value = originalCoverPosition;
+  cover_position.value = originalCoverPosition; 
   message.info('Đã hủy thao tác chỉnh sửa hình cover.');
 };
+
 
 const showViewModal = ref(false);
 const showChange = ref(false);
@@ -440,61 +377,61 @@ const handleSelect = (key) => {
       break;
     case 'settingcover':
       showEdit.value = true;
-      showChange.value = false;
+      showChange.value = false; 
       break;
     default:
       break;
   }
 };
 
+
+
 const saveEditedCover = () => {
   const payload = {
-    position: cover_position.value,
+    position: cover_position.value, 
   };
-  api
-    .patch(`link/update/cover-position`, payload, {
-      headers: uploadHeaders,
-    })
-    .then((response) => {
-      console.log(response);
-      if (response.status === 200) {
-        useProfile.updateCoverPosition(response.data.positionY);
-        showEdit.value = false;
-        message.success('Vị trí cover đã được lưu thành công!');
-      }
-    })
-    .catch((error) => {
-      console.error('Error saving cover position:', error);
-      message.error('Lưu vị trí cover thất bại!');
-    });
+  api.patch(`link/update/cover-position`, payload, {
+    headers: uploadHeaders,
+  })
+  .then(response => {
+    console.log(response)
+    if (response.status === 200) {
+      useProfile.updateCoverPosition(response.data.positionY);
+      showEdit.value = false; 
+      message.success('Vị trí cover đã được lưu thành công!');
+    }
+  })
+  .catch(error => {
+    console.error('Error saving cover position:', error);
+    message.error('Lưu vị trí cover thất bại!');
+  });
 };
 
-const lastChapter = ref('');
+const lastChapter = ref("");
 
 const getLastChapter = () => {
-  api
-    .get(`/story/user-chapter`)
-    .then((response) => {
+  api.get(`/story/user-chapter`)
+    .then(response => {
       console.log('Fetch successful');
       lastChapter.value = response.data.chapter_id;
     })
-    .catch((error) => {
+    .catch(error => {
       console.error('Error fetching the chapter:', error);
     });
 };
-const lastEpisode = ref('');
+const lastEpisode = ref("");
 
 const getlastEpisode = () => {
-  api
-    .get(`/videos/user-episode`)
-    .then((response) => {
+  api.get(`/videos/user-episode`)
+    .then(response => {
       console.log('Fetch successful');
       lastEpisode.value = response.data.episode_id;
     })
-    .catch((error) => {
+    .catch(error => {
       console.error('Error fetching the episode:', error);
     });
 };
+
 
 const followStats = ref(null);
 const getFollowStats = async (userId) => {
@@ -507,24 +444,26 @@ const getFollowStats = async (userId) => {
   }
 };
 
-onMounted(() => {
-  useMenuProfile().onSelectedKey(['profile-info']);
-  fetchProfile();
-  getFollowStats(id);
-  getLastChapter();
-  getlastEpisode();
-});
+  onMounted(() => {
+    useMenuProfile().onSelectedKey(['profile-info']);
+    fetchProfile();
+    getFollowStats(id)
+    getLastChapter();
+    getlastEpisode();
+  });
 
 onBeforeUnmount(() => {
   window.removeEventListener('mousemove', onDrag);
   window.removeEventListener('mouseup', stopDrag);
   window.removeEventListener('keydown', onKeyDown);
 });
+
+
 </script>
 
 <style lang="scss" scoped>
 .profile-page {
-  font-family: 'Arial', sans-serif;
+  font-family: "Arial", sans-serif;
   color: #333;
   background-color: #f7f7f7;
 
@@ -590,126 +529,118 @@ onBeforeUnmount(() => {
       border-radius: 50%;
       cursor: pointer;
       transition: background-color 0.3s ease;
-      width: 40px;
-      height: 40px;
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
 
       &:hover {
         background-color: #cbd5e1;
       }
-
-      i {
-        color: #333;
-      }
     }
   }
 
-  .profile-pages {
-    max-width: 800px;
-    margin: 0px auto;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
+.profile-pages {
+  max-width: 800px;
+  margin: 0px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-  .cover-section {
-    position: relative;
-    border-radius: 12px;
-    overflow: hidden;
-  }
+.cover-section {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
 
-  .cover-img {
-    width: 100%;
-    border-radius: 12px;
-    object-fit: cover;
-  }
+.cover-img {
+  width: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+}
 
-  .avatar-name-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    margin-top: -60px;
-  }
+.avatar-name-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: -60px;
+}
 
-  .avatar-img {
-    width: 120px;
-    height: 120px;
-    border: 4px solid white;
-    border-radius: 50%;
-    object-fit: cover;
-    background: white;
-  }
+.avatar-img {
+  width: 120px;
+  height: 120px;
+  border: 4px solid white;
+  border-radius: 50%;
+  object-fit: cover;
+  background: white;
+}
 
-  .username {
-    font-size: 24px;
-    font-weight: 600;
-  }
+.username {
+  font-size: 24px;
+  font-weight: 600;
+}
 
-  .card {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    margin-top: 20px;
-  }
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-top: 20px;
+}
 
-  .info-card p {
-    margin: 5px 0;
-  }
+.info-card p {
+  margin: 5px 0;
+}
 
-  .section-title {
-    text-align: center;
-    font-size: 18px;
-    font-weight: bold;
-    color: #0c713d;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-  }
+.section-title {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  color: #0c713d; 
+  text-transform: uppercase; 
+  margin-bottom: 20px; 
+}
 
-  .stats {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    margin-top: 20px;
-  }
+.stats {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-top: 20px;
+}
 
-  .stats-content {
-    display: flex;
-    justify-content: space-around;
-    gap: 20px;
-  }
 
-  .stat {
-    text-align: center;
-    width: 100%;
-  }
+.stats-content {
+  display: flex;
+  justify-content: space-around; 
+  gap: 20px; 
+}
 
-  .stat h3 {
-    font-size: 22px;
-    font-weight: bold;
-    margin: 0;
-  }
+.stat {
+  text-align: center;
+  width: 100%;
+}
 
-  .stat p {
-    margin-top: 5px;
-    color: #777;
-  }
+.stat h3 {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 0;
+}
 
-  .history p {
-    margin: 5px 0;
-  }
+.stat p {
+  margin-top: 5px;
+  color: #777;
+}
 
-  .social-links .icons {
-    display: flex;
-    justify-content: space-around;
-    font-size: 20px;
-  }
+
+.history p {
+  margin: 5px 0;
+}
+
+.social-links .icons {
+  display: flex;
+  justify-content: space-around;
+  font-size: 20px;
+}
+
 }
 
 .username {
@@ -719,12 +650,13 @@ onBeforeUnmount(() => {
   margin-top: 10px;
 }
 .rate-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 5px;
-  margin-bottom: 10px;
+display: flex;
+justify-content: center;
+margin-top: 5px;
+margin-bottom: 10px;
 }
 
+  
 .custom-cover {
   width: 100%;
   height: auto;
@@ -745,6 +677,7 @@ onBeforeUnmount(() => {
     transition: transform 0.2s ease;
   }
 }
+
 
 .upload-container {
   position: absolute;
@@ -773,6 +706,7 @@ onBeforeUnmount(() => {
   max-width: 20%;
 }
 
+
 .slider-container {
   position: absolute;
   right: 20px;
@@ -783,24 +717,24 @@ onBeforeUnmount(() => {
   z-index: 10;
 }
 .last-chapter-section,
-.last-episode-section {
-  margin: 10px auto;
-  padding: 5px 10px;
-  background-color: #fdfdfd;
-  border-radius: 10px;
-  border-left: 5px solid #4fb233;
-  border-right: 5px solid #4fb233;
-  text-align: left;
-  max-width: 500px;
+    .last-episode-section {
+      margin: 10px auto;
+      padding: 5px 10px;
+      background-color: #fdfdfd;
+      border-radius: 10px;
+      border-left: 5px solid #4fb233;
+      border-right: 5px solid #4fb233;
+      text-align: left;
+      max-width: 500px;
 
-  span {
-    font-weight: bold;
-    color: #fb411c;
-  }
-}
+        span {
+          font-weight: bold;
+          color: #fb411c;
+        }
+    }
 
 .profile {
-  max-width: 700px;
+  max-width: 700px; 
   margin: 30px auto;
   display: flex;
   flex-direction: column;
@@ -826,12 +760,12 @@ onBeforeUnmount(() => {
 }
 
 .custom-button.explore {
-  background-color: #0c713d;
+  background-color: #0c713d; 
   color: white;
 }
 
 .custom-button.follow-list {
-  background-color: #007bff;
+  background-color: #007BFF;
   color: white;
 }
 
@@ -844,26 +778,6 @@ onBeforeUnmount(() => {
   transform: translateY(0);
   box-shadow: none;
 }
-.custom-button.inbox {
-  background-color: #17a2b8;
-  color: white;
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
 
-.inbox-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: #ff3b30;
-  color: white;
-  font-size: 11px;
-  font-weight: bold;
-  padding: 2px 6px;
-  border-radius: 10px;
-  min-width: 18px;
-  text-align: center;
-}
 </style>
+

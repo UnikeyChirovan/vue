@@ -50,9 +50,9 @@ const admin = [
       },
       // Quản lý Email đã đăng ký
       {
-      path: 'mails',
-      name: 'admin-mails',
-      component: () => import('../pages/admin/mails/index.vue'),
+        path: 'mails',
+        name: 'admin-mails',
+        component: () => import('../pages/admin/mails/index.vue'),
       },
       // Quản lý stories
       {
@@ -119,12 +119,14 @@ const admin = [
       {
         path: 'future-project/create/:lastIndex?',
         name: 'admin-future-project-create',
-        component: () => import('../pages/admin/company/futureProject/create.vue'),
+        component: () =>
+          import('../pages/admin/company/futureProject/create.vue'),
       },
       {
         path: 'future-project/:id/edit',
         name: 'admin-future-project-edit',
-        component: () => import('../pages/admin/company/futureProject/edit.vue'),
+        component: () =>
+          import('../pages/admin/company/futureProject/edit.vue'),
       },
 
       // Feature
@@ -251,6 +253,11 @@ const admin = [
         path: 'settings',
         name: 'admin-settings',
         component: () => import('../pages/admin/settings/index.vue'),
+      },
+      {
+        path: 'support-statistics',
+        name: 'admin-support-statistics',
+        component: () => import('../pages/support/SupportStatistics.vue'),
       },
     ],
   },

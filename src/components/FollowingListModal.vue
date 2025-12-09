@@ -13,12 +13,25 @@
           <div v-for="user in followingList" :key="user.id" class="user-card">
             <img :src="getAvatarUrl(user)" class="avatar" />
             <p class="user-name">{{ user.name }}</p>
-            <button class="view-btn" @click="goToProfile(user.id)">Chi tiết</button>
+            <div class="user-actions">
+              <button class="view-btn" @click="goToProfile(user.id)">
+                Chi tiết
+              </button>
+              <ChatButton
+                :user-id="user.id"
+                :user-name="user.name"
+                :user-avatar="getAvatarUrl(user)"
+                :allow-chat="true"
+                :is-following="true"
+              />
+            </div>
           </div>
         </div>
 
         <div class="refresh-container">
-          <button class="refresh-btn" @click="refreshFollowingList">Làm mới</button>
+          <button class="refresh-btn" @click="refreshFollowingList">
+            Làm mới
+          </button>
         </div>
       </div>
     </div>
@@ -29,6 +42,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '../services/axiosInterceptor';
+import ChatButton from './ChatButton.vue';
 
 const router = useRouter();
 const showModal = ref(false);
@@ -38,7 +52,9 @@ const backendUrl = 'http://127.0.0.1:8000';
 const storageKey = 'user_follow';
 
 const getAvatarUrl = (user) => {
-  return user.avatar ? `${backendUrl}/storage/avatars/${user.id}/${user.avatar}` : 'https://via.placeholder.com/100';
+  return user.avatar
+    ? `${backendUrl}/storage/avatars/${user.id}/${user.avatar}`
+    : 'https://picsum.photos/100';
 };
 
 const fetchFollowingList = async () => {
@@ -47,30 +63,30 @@ const fetchFollowingList = async () => {
   const storedData = sessionStorage.getItem(storageKey);
   if (storedData) {
     followingList.value = JSON.parse(storedData);
-    console.log("Dữ liệu lấy từ sessionStorage:", followingList.value);
+    console.log('Dữ liệu lấy từ sessionStorage:', followingList.value);
     loading.value = false;
     return;
   }
   try {
     const response = await api.get(`/social/followed-users`);
-    console.log("Dữ liệu API trả về:", response.data);
+    console.log('Dữ liệu API trả về:', response.data);
 
     if (response.data && Array.isArray(response.data.users)) {
       followingList.value = response.data.users;
-      sessionStorage.setItem(storageKey, JSON.stringify(response.data.users)); // Lưu vào sessionStorage
+      sessionStorage.setItem(storageKey, JSON.stringify(response.data.users));
     } else {
       followingList.value = [];
     }
   } catch (error) {
-    console.error("Lỗi khi tải danh sách theo dõi:", error);
+    console.error('Lỗi khi tải danh sách theo dõi:', error);
   } finally {
     loading.value = false;
   }
 };
 
 const refreshFollowingList = async () => {
-  sessionStorage.removeItem(storageKey); 
-  await fetchFollowingList(); 
+  sessionStorage.removeItem(storageKey);
+  await fetchFollowingList();
 };
 
 const openModal = () => {
@@ -87,7 +103,7 @@ const goToProfile = (userId) => {
   closeModal();
 };
 
-defineExpose({openModal});
+defineExpose({ openModal });
 </script>
 
 <style scoped>
@@ -97,7 +113,7 @@ defineExpose({openModal});
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5); 
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -114,7 +130,6 @@ defineExpose({openModal});
   z-index: 1000;
   padding: 20px;
 }
-
 
 .modal-header {
   display: flex;
@@ -185,6 +200,12 @@ defineExpose({openModal});
   flex: 1;
   margin: 0;
   font-weight: bold;
+}
+
+.user-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .view-btn {

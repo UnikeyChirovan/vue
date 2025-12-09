@@ -3,24 +3,35 @@
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="custom-modal">
         <div class="modal-header">
-          <h2 class="title">Danh Sách Chặn</h2>
-          <button class="close-btn" @click="closeModal">&times;</button>
+          <h2 class="title">Khám Phá Người Dùng</h2>
+          <button class="close-btn" @click="closeModal">×</button>
         </div>
 
         <div v-if="loading" class="loading">Đang tải...</div>
 
-        <div v-else class="block-list">
-          <div v-for="user in blockList" :key="user.id" class="user-card">
+        <div v-else class="explore-list">
+          <div
+            v-for="user in exploreStore.userList"
+            :key="user.id"
+            class="user-card"
+          >
             <img :src="getAvatarUrl(user)" class="avatar" />
             <p class="user-name">{{ user.name }}</p>
-            <button class="unblock-btn" @click="unblockUser(user.id)">
-              Bỏ chặn
+            <button class="view-btn" @click="goToProfile(user.id)">
+              Chi tiết
             </button>
           </div>
         </div>
 
-        <div class="refresh-container">
-          <button class="refresh-btn" @click="refreshBlockList">Làm mới</button>
+        <div class="footer-actions">
+          <p>Lượt đổi còn lại: {{ exploreStore.remainingAttempts }}</p>
+          <button
+            class="refresh-btn"
+            :disabled="exploreStore.remainingAttempts === 0"
+            @click="refreshList"
+          >
+            Đổi danh sách
+          </button>
         </div>
       </div>
     </div>
@@ -28,70 +39,50 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useMessage } from 'naive-ui';
-import api from '../services/axiosInterceptor';
+import { ref, onMounted } from 'vue';
+import { useExploreStore } from '../stores/exploreStore';
+import { useRouter } from 'vue-router';
 
+const exploreStore = useExploreStore();
+const router = useRouter();
 const showModal = ref(false);
 const loading = ref(false);
-const blockList = ref([]);
-const message = useMessage();
+
 const backendUrl = 'http://127.0.0.1:8000';
-const storageKey = 'user_blocked';
 
 const getAvatarUrl = (user) => {
-  return user.avatar
-    ? `${backendUrl}/storage/avatars/${user.id}/${user.avatar}`
-    : 'https://picsum.photos/100';
+  if (!user.avatar) return 'https://picsum.photos/100';
+  return `${backendUrl}/storage/avatars/${user.id}/${user.avatar}`;
 };
 
-const fetchBlockList = async () => {
+const fetchAndSetUsers = async () => {
+  if (exploreStore.remainingAttempts === 0) return;
+  if (exploreStore.userList.length > 0) return;
+
   loading.value = true;
-
-  const storedData = sessionStorage.getItem(storageKey);
-  if (storedData) {
-    blockList.value = JSON.parse(storedData);
-    loading.value = false;
-    return;
-  }
-
   try {
-    const response = await api.get('/social/blocked-users');
-    if (response.data && Array.isArray(response.data.users)) {
-      blockList.value = response.data.users;
-      sessionStorage.setItem(storageKey, JSON.stringify(response.data.users));
-    } else {
-      blockList.value = [];
-    }
-  } catch (error) {
-    console.error('Lỗi khi tải danh sách chặn:', error);
+    await exploreStore.fetchRandomUsers();
   } finally {
     loading.value = false;
   }
 };
 
-const refreshBlockList = async () => {
-  sessionStorage.removeItem(storageKey);
-  await fetchBlockList();
-};
-
 const openModal = () => {
   showModal.value = true;
-  fetchBlockList();
+  fetchAndSetUsers();
 };
 
 const closeModal = () => {
   showModal.value = false;
 };
 
-const unblockUser = async (userId) => {
-  try {
-    await api.delete(`/social/unblock/${userId}`);
-    message.success('Đã bỏ chặn người dùng!');
-    refreshBlockList();
-  } catch (error) {
-    message.error('Lỗi khi bỏ chặn.');
-  }
+const refreshList = () => {
+  exploreStore.refreshUserList();
+};
+
+const goToProfile = (userId) => {
+  router.push(`/profile/${userId}`);
+  closeModal();
 };
 
 defineExpose({ openModal });
@@ -104,7 +95,7 @@ defineExpose({ openModal });
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5); /* Lớp nền mờ */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -128,7 +119,7 @@ defineExpose({ openModal });
   align-items: center;
   margin: -20px -20px 10px -20px;
   padding: 10px 20px;
-  background-color: #d9534f;
+  background-color: #0c713d;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   color: white;
@@ -163,13 +154,12 @@ defineExpose({ openModal });
   font-style: italic;
 }
 
-.block-list {
+.explore-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
   max-height: 400px;
   overflow-y: auto;
-  padding: 10px;
 }
 
 .user-card {
@@ -183,7 +173,7 @@ defineExpose({ openModal });
 .avatar {
   width: 50px;
   height: 50px;
-  border-radius: 25%;
+  border-radius: 50%;
   object-fit: cover;
 }
 
@@ -193,8 +183,8 @@ defineExpose({ openModal });
   font-weight: bold;
 }
 
-.unblock-btn {
-  background-color: #d9534f;
+.view-btn {
+  background-color: #0c713d;
   color: white;
   border: none;
   padding: 8px 12px;
@@ -202,36 +192,32 @@ defineExpose({ openModal });
   cursor: pointer;
   font-size: 14px;
 }
-
-.unblock-btn:hover {
-  background-color: #c9302c;
+.view-btn:hover {
+  background-color: #095d32;
 }
 
-.refresh-container {
-  display: flex;
-  justify-content: center;
+.footer-actions {
+  margin-top: 20px;
+  text-align: center;
 }
 
 .refresh-btn {
-  background-color: #d9534f;
+  background-color: #0c713d;
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
+  padding: 8px 14px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
 }
-
-.refresh-btn:hover {
-  background-color: #c9302c;
+.refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .fade-zoom-enter-active,
 .fade-zoom-leave-active {
   transition: all 0.3s ease;
 }
-
 .fade-zoom-enter-from,
 .fade-zoom-leave-to {
   opacity: 0;

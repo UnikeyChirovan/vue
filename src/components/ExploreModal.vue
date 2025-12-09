@@ -10,10 +10,25 @@
         <div v-if="loading" class="loading">Đang tải...</div>
 
         <div v-else class="explore-list">
-          <div v-for="user in exploreStore.userList" :key="user.id" class="user-card">
+          <div
+            v-for="user in exploreStore.userList"
+            :key="user.id"
+            class="user-card"
+          >
             <img :src="getAvatarUrl(user)" class="avatar" />
             <p class="user-name">{{ user.name }}</p>
-            <button class="view-btn" @click="goToProfile(user.id)">Chi tiết</button>
+            <div class="user-actions">
+              <button class="view-btn" @click="goToProfile(user.id)">
+                Chi tiết
+              </button>
+              <ChatButton
+                :user-id="user.id"
+                :user-name="user.name"
+                :user-avatar="getAvatarUrl(user)"
+                :allow-chat="user.allow_messages || false"
+                :is-following="user.is_following || false"
+              />
+            </div>
           </div>
         </div>
 
@@ -36,6 +51,7 @@
 import { ref, onMounted } from 'vue';
 import { useExploreStore } from '../stores/exploreStore';
 import { useRouter } from 'vue-router';
+import ChatButton from './ChatButton.vue';
 
 const exploreStore = useExploreStore();
 const router = useRouter();
@@ -45,13 +61,13 @@ const loading = ref(false);
 const backendUrl = 'http://127.0.0.1:8000';
 
 const getAvatarUrl = (user) => {
-  if (!user.avatar) return 'https://via.placeholder.com/100';
+  if (!user.avatar) return 'https://picsum.photos/100';
   return `${backendUrl}/storage/avatars/${user.id}/${user.avatar}`;
 };
 
 const fetchAndSetUsers = async () => {
   if (exploreStore.remainingAttempts === 0) return;
-  if (exploreStore.userList.length > 0) return; 
+  if (exploreStore.userList.length > 0) return;
 
   loading.value = true;
   try {
@@ -89,7 +105,7 @@ defineExpose({ openModal });
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.5); /* Lớp nền mờ */
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -106,7 +122,6 @@ defineExpose({ openModal });
   z-index: 1000;
   padding: 20px;
 }
-
 
 .modal-header {
   display: flex;
@@ -143,7 +158,6 @@ defineExpose({ openModal });
   color: red;
 }
 
-
 .loading {
   text-align: center;
   padding: 20px;
@@ -179,6 +193,12 @@ defineExpose({ openModal });
   font-weight: bold;
 }
 
+.user-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .view-btn {
   background-color: #0c713d;
   color: white;
@@ -188,6 +208,7 @@ defineExpose({ openModal });
   cursor: pointer;
   font-size: 14px;
 }
+
 .view-btn:hover {
   background-color: #095d32;
 }
@@ -205,6 +226,7 @@ defineExpose({ openModal });
   border-radius: 4px;
   cursor: pointer;
 }
+
 .refresh-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -214,6 +236,7 @@ defineExpose({ openModal });
 .fade-zoom-leave-active {
   transition: all 0.3s ease;
 }
+
 .fade-zoom-enter-from,
 .fade-zoom-leave-to {
   opacity: 0;

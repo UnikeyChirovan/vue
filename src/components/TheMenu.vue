@@ -4,6 +4,11 @@
     v-model:selectedKeys="selectedKeys"
     mode="inline"
   >
+    <a-menu-item key="admin-support-statistics">
+      <RouterLink :to="{ name: 'admin-support-statistics' }">
+        <span><i class="fa-solid fa-headset me-1"></i>QUẢN LÝ CSKH</span>
+      </RouterLink>
+    </a-menu-item>
     <a-menu-item key="admin-users">
       <RouterLink :to="{ name: 'admin-users' }">
         <span><i class="fa-solid fa-user me-1"></i>Quản lý tài khoản</span>
@@ -31,7 +36,9 @@
     </a-menu-item>
     <a-menu-item key="admin-company">
       <RouterLink :to="{ name: 'admin-company' }">
-        <span><i class="fa-solid fa-layer-group me-1"></i>Thông tin công ty</span>
+        <span
+          ><i class="fa-solid fa-layer-group me-1"></i>Thông tin công ty</span
+        >
       </RouterLink>
     </a-menu-item>
     <a-menu-item key="admin-categories">
@@ -61,7 +68,9 @@
     </a-menu-item>
     <a-menu-item key="admin-contacts">
       <RouterLink :to="{ name: 'admin-contacts' }">
-        <span><i class="fa-regular fa-paper-plane me-1"></i>Quản lý liên hệ</span>
+        <span
+          ><i class="fa-regular fa-paper-plane me-1"></i>Quản lý liên hệ</span
+        >
       </RouterLink>
     </a-menu-item>
     <a-menu-item key="admin-blacklists">

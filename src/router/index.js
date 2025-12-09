@@ -15,6 +15,7 @@ import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfService from './TermsOfService';
 import FAQ from './faq';
 import animators from './animator';
+import supportRoutes from './support';
 
 const routes = [
   ...admin,
@@ -26,6 +27,7 @@ const routes = [
   ...settings,
   ...stories,
   ...profile,
+  ...supportRoutes,
   ...PasswordReset,
   ...PasswordResetRequest,
   ...PrivacyPolicy,
@@ -38,11 +40,11 @@ const router = createRouter({
   routes,
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
-      return savedPosition; 
+      return savedPosition;
     } else {
-      return { top: 0 }; 
+      return { top: 0 };
     }
-  }
+  },
 });
 
 router.beforeEach(async (to, from, next) => {
@@ -51,9 +53,16 @@ router.beforeEach(async (to, from, next) => {
   if (!localStorage.getItem('Before') && to.path !== '/') {
     return next({ path: '/' });
   }
-// truy cập mà chưa đăng nhập
-  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
-    next({ name: 'home' });
+  // truy cập mà chưa đăng nhập
+  if (to.meta.requiresManager) {
+    const user = authStore.user;
+    if (!user || ![1, 3].includes(user.department_id)) {
+      return next({ name: 'home' });
+    }
+  }
+
+  if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    return next({ name: 'home' });
   } else {
     next();
   }
