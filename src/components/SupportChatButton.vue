@@ -10,16 +10,16 @@
     :style="buttonStyle"
     @mousedown="startDrag"
   >
-    <button class="support-button" @click.stop="openSupportChat">
+    <button class="support-button" @click.stop="handleClick">
       <i class="fa-solid fa-headset"></i>
       <span class="support-text">Hỗ Trợ</span>
       <span v-if="unreadCount > 0" class="support-badge">
         {{ unreadCount }}
       </span>
-      <!-- Close button inside support button -->
-      <button class="close-support-btn" @click.stop="closeSupportButton">
+
+      <span class="close-support-btn" @click.stop="closeSupportButton">
         <i class="fa-solid fa-xmark"></i>
-      </button>
+      </span>
     </button>
   </div>
 </template>
@@ -43,7 +43,9 @@ const position = ref({
 });
 
 const isDragging = ref(false);
+const hasDragged = ref(false); // Track if actually dragged
 const dragStart = ref({ x: 0, y: 0 });
+const dragThreshold = 5; // Minimum pixels to consider as drag
 
 // Support button enabled state
 const isSupportButtonEnabled = ref(
@@ -67,12 +69,10 @@ const shouldShowButton = computed(() => {
 
   const routeName = route.name;
 
-  // Ẩn nếu là trang admin
   if (routeName && routeName.toString().startsWith('admin-')) {
     return false;
   }
 
-  // Ẩn nếu trong danh sách hidden
   if (hiddenRoutes.includes(routeName)) {
     return false;
   }
@@ -91,38 +91,58 @@ const buttonStyle = computed(() => {
 
 // Drag functions
 const startDrag = (e) => {
-  if (
-    e.target.closest('.support-button') &&
-    !e.target.closest('.support-button').contains(e.target)
-  ) {
+  // Ngăn drag nếu click vào nút close
+  if (e.target.closest('.close-support-btn')) {
     return;
   }
 
   isDragging.value = true;
+  hasDragged.value = false; // Reset drag flag
+
   dragStart.value = {
     x: e.clientX - (position.value.x ?? window.innerWidth - 90),
     y: e.clientY - position.value.y,
+    startX: e.clientX,
+    startY: e.clientY,
   };
 
   document.addEventListener('mousemove', onDrag);
   document.addEventListener('mouseup', stopDrag);
+
+  // Prevent text selection during drag
+  e.preventDefault();
 };
 
 const onDrag = (e) => {
   if (!isDragging.value) return;
 
-  const newX = e.clientX - dragStart.value.x;
-  const newY = e.clientY - dragStart.value.y;
+  // Calculate distance moved
+  const deltaX = Math.abs(e.clientX - dragStart.value.startX);
+  const deltaY = Math.abs(e.clientY - dragStart.value.startY);
 
-  // Constrain to viewport
-  const maxX = window.innerWidth - 80;
-  const maxY = window.innerHeight - 60;
+  // If moved more than threshold, mark as dragged
+  if (deltaX > dragThreshold || deltaY > dragThreshold) {
+    hasDragged.value = true;
+  }
 
-  position.value.x = Math.max(0, Math.min(newX, maxX));
-  position.value.y = Math.max(0, Math.min(newY, maxY));
+  // Only update position if actually dragging
+  if (hasDragged.value) {
+    const newX = e.clientX - dragStart.value.x;
+    const newY = e.clientY - dragStart.value.y;
 
-  // Save to localStorage
-  localStorage.setItem('supportButtonPosition', JSON.stringify(position.value));
+    // Constrain to viewport
+    const maxX = window.innerWidth - 80;
+    const maxY = window.innerHeight - 60;
+
+    position.value.x = Math.max(0, Math.min(newX, maxX));
+    position.value.y = Math.max(0, Math.min(newY, maxY));
+
+    // Save to localStorage
+    localStorage.setItem(
+      'supportButtonPosition',
+      JSON.stringify(position.value)
+    );
+  }
 };
 
 const stopDrag = () => {
@@ -131,17 +151,31 @@ const stopDrag = () => {
   document.removeEventListener('mouseup', stopDrag);
 };
 
+// Handle click - only open if not dragged
+const handleClick = () => {
+  // Only open chat if we didn't actually drag
+  if (!hasDragged.value) {
+    openSupportChat();
+  }
+
+  // Reset drag flag
+  hasDragged.value = false;
+};
+
 // Open support chat
 const openSupportChat = () => {
-  if (!isDragging.value) {
-    supportStore.openChat();
-  }
+  supportStore.openChat();
 };
 
 // Close support button
 const closeSupportButton = () => {
   isSupportButtonEnabled.value = false;
   localStorage.setItem('supportButtonEnabled', 'false');
+
+  window.dispatchEvent(
+    new CustomEvent('supportButtonToggle', { detail: false })
+  );
+
   message.info('Đã tắt nút Hỗ Trợ. Bạn có thể bật lại trong phần Cài Đặt.');
 };
 
@@ -162,9 +196,9 @@ onMounted(() => {
       console.error('Error parsing saved position:', e);
     }
   } else {
-    // Default position: center-right
     position.value.x = window.innerWidth - 90;
   }
+
   // Listen for toggle from settings
   const handleToggle = (event) => {
     isSupportButtonEnabled.value = event.detail;

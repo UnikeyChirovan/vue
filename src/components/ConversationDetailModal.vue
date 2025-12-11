@@ -1,7 +1,6 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="conversation-modal">
-      <!-- Header -->
       <div class="modal-header">
         <div class="user-info">
           <img
@@ -41,7 +40,6 @@
         </div>
       </div>
 
-      <!-- Messages -->
       <div class="messages-container" ref="messagesContainer">
         <div
           v-for="msg in messages"
@@ -66,7 +64,6 @@
         </div>
       </div>
 
-      <!-- Input (chỉ hiện khi đã claim và chưa resolved) -->
       <div v-if="canReply" class="message-input-container">
         <input
           v-model="messageText"
@@ -85,7 +82,6 @@
       </div>
     </div>
 
-    <!-- Transfer Modal -->
     <div
       v-if="showTransferModal"
       class="transfer-modal-overlay"
@@ -130,7 +126,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch } from 'vue';
+import { ref, computed, onMounted, nextTick, watch, onUnmounted } from 'vue';
 import { useSupportChatStore } from '../stores/supportChatStore';
 import { useAuthStore } from '../stores/auth';
 import supportApi from '../services/support-api';
@@ -156,8 +152,8 @@ const sending = ref(false);
 const loading = ref(false);
 const resolving = ref(false);
 const transferring = ref(false);
+let messagePollingInterval = null;
 
-// Transfer modal
 const showTransferModal = ref(false);
 const availableManagers = ref([]);
 const selectedManagerId = ref(null);
@@ -173,12 +169,9 @@ const getAvatarUrl = (userId, avatar) => {
 
   return `${backendUrl}/storage/avatars/${userId}/${avatar}`;
 };
-// const supportAvatar =
-//   'https://ui-avatars.com/api/?name=Support+Team&background=667eea&color=fff';
-const supportAvatar = computed(() => {
-  return '/image/ST.jpg';
-});
-// Computed
+
+const supportAvatar = computed(() => '/image/ST.jpg');
+
 const canReply = computed(() => {
   return (
     props.conversation.status === 'active' &&
@@ -200,17 +193,17 @@ const canResolve = computed(() => {
   );
 });
 
-// Methods
 const loadMessages = async () => {
   loading.value = true;
   try {
-    const response = await supportApi.getConversations('my_active');
-    const conv = response.data.conversations.find(
-      (c) => c.id === props.conversation.id
+    const response = await supportApi.getConversationMessages(
+      props.conversation.id
     );
-    if (conv && conv.messages) {
-      messages.value = conv.messages;
+
+    if (response.data.messages) {
+      messages.value = response.data.messages;
     }
+
     scrollToBottom();
   } catch (error) {
     console.error('Error loading messages:', error);
@@ -232,10 +225,14 @@ const sendMessage = async () => {
       text
     );
 
-    messages.value.push(response);
+    const exists = messages.value.find((m) => m.id === response.id);
+
+    if (!exists) {
+      messages.value.push(response);
+    }
+
     scrollToBottom();
 
-    // Mark as read
     await supportApi.markAsReadByManager(props.conversation.id);
   } catch (error) {
     console.error('Error sending message:', error);
@@ -266,7 +263,6 @@ const resolveConversation = async () => {
 const loadManagers = async () => {
   try {
     const response = await supportApi.getManagers();
-    // Loại bỏ manager hiện tại
     availableManagers.value = response.data.managers.filter(
       (m) => m.id !== props.conversation.assigned_to
     );
@@ -322,7 +318,19 @@ const scrollToBottom = () => {
   });
 };
 
-// Watch for new messages
+const startMessagePolling = () => {
+  messagePollingInterval = setInterval(() => {
+    loadMessages();
+  }, 3000);
+};
+
+const stopMessagePolling = () => {
+  if (messagePollingInterval) {
+    clearInterval(messagePollingInterval);
+    messagePollingInterval = null;
+  }
+};
+
 watch(
   () => messages.value.length,
   () => {
@@ -334,10 +342,15 @@ onMounted(() => {
   loadMessages();
   loadManagers();
 
-  // Mark as read when opened
+  startMessagePolling();
+
   if (props.conversation.unread_count > 0) {
     supportApi.markAsReadByManager(props.conversation.id);
   }
+});
+
+onUnmounted(() => {
+  stopMessagePolling();
 });
 </script>
 
@@ -567,7 +580,6 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
-/* Transfer Modal */
 .transfer-modal-overlay {
   position: fixed;
   top: 0;

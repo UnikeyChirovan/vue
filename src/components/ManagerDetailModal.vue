@@ -4,7 +4,12 @@
       <div class="modal-header">
         <div v-if="!loading" class="manager-info">
           <img
-            :src="managerStats.manager?.avatar || defaultAvatar"
+            :src="
+              getAvatarUrl(
+                managerStats.manager?.id,
+                managerStats.manager?.avatar
+              )
+            "
             :alt="managerStats.manager?.name"
             class="manager-avatar"
           />
@@ -178,7 +183,19 @@ const managerStats = ref({
   transferred_count: 0,
 });
 
-const defaultAvatar = 'https://picsum.photos/50';
+const backendUrl = 'http://127.0.0.1:8000';
+
+const getAvatarUrl = (userId, avatar) => {
+  if (!avatar) return 'https://picsum.photos/50';
+
+  // Nếu avatar đã là full URL thì dùng luôn
+  if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
+    return avatar;
+  }
+
+  // Nếu chỉ là filename thì ghép với backendUrl
+  return `${backendUrl}/storage/avatars/${userId}/${avatar}`;
+};
 
 const periodLabel = computed(() => {
   const labels = {

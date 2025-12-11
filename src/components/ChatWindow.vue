@@ -117,6 +117,8 @@
 <script setup>
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { useChatStore } from '../stores/chatStore';
+import { useMessage } from 'naive-ui';
+const message = useMessage();
 
 const props = defineProps({
   chat: {
@@ -234,7 +236,7 @@ const deleteMessage = async (message) => {
     closeContextMenu();
   } catch (error) {
     console.error('Error deleting message:', error);
-    alert('Không thể xóa tin nhắn');
+    message.error('Không thể xóa tin nhắn');
   }
 };
 
@@ -260,7 +262,7 @@ const deleteAllMessages = async () => {
     showDeleteConfirm.value = false;
   } catch (error) {
     console.error('Error deleting all messages:', error);
-    alert('Không thể xóa tin nhắn');
+    message.error('Không thể xóa tin nhắn');
   }
 };
 

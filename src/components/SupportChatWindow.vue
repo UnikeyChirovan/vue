@@ -1,7 +1,6 @@
 <template>
   <transition name="slide-up">
     <div v-if="supportStore.isOpen" class="support-chat-window">
-      <!-- Header -->
       <div class="chat-header">
         <div class="header-info">
           <div class="support-avatar">
@@ -21,7 +20,6 @@
         </button>
       </div>
 
-      <!-- Messages -->
       <div class="chat-messages" ref="messagesContainer">
         <div v-if="loading" class="loading-state">
           <i class="fa-solid fa-spinner fa-spin"></i>
@@ -56,7 +54,6 @@
         </div>
       </div>
 
-      <!-- Offline Notice -->
       <div v-if="!supportStore.supportOnline" class="offline-notice">
         <i class="fa-solid fa-info-circle"></i>
         <span
@@ -65,9 +62,14 @@
         >
       </div>
 
-      <!-- Rating (if resolved) -->
       <div v-if="showRating" class="rating-section">
-        <p>Đánh giá trải nghiệm của bạn:</p>
+        <div class="rating-header">
+          <i class="fa-solid fa-check-circle"></i>
+          <h4>Vấn đề của bạn đã được giải quyết!</h4>
+        </div>
+
+        <p>Vui lòng đánh giá trải nghiệm của bạn:</p>
+
         <div class="rating-stars">
           <i
             v-for="star in 5"
@@ -79,17 +81,25 @@
             @click="selectRating(star)"
           ></i>
         </div>
+
         <textarea
           v-model="ratingComment"
           placeholder="Nhận xét (tùy chọn)"
           rows="2"
         ></textarea>
-        <button @click="submitRating" class="submit-rating-btn">
-          Gửi đánh giá
-        </button>
+
+        <div class="rating-actions">
+          <button @click="skipRating" class="skip-rating-btn">Bỏ qua</button>
+          <button
+            @click="submitRating"
+            class="submit-rating-btn"
+            :disabled="selectedRating === 0"
+          >
+            Gửi đánh giá
+          </button>
+        </div>
       </div>
 
-      <!-- Input -->
       <div v-else class="chat-input">
         <input
           v-model="messageText"
@@ -111,39 +121,43 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick, onMounted } from 'vue';
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { useSupportChatStore } from '../stores/supportChatStore';
 import { useAuthStore } from '../stores/auth';
+import { useProfileStore } from '../stores/profile';
+import { useMessage } from 'naive-ui';
 
 const supportStore = useSupportChatStore();
 const authStore = useAuthStore();
+const profileStore = useProfileStore();
 
+const message = useMessage();
 const messageText = ref('');
 const messagesContainer = ref(null);
 const loading = ref(false);
 
-// Rating state
 const showRating = ref(false);
 const selectedRating = ref(0);
 const ratingComment = ref('');
 
-// Avatar
-// const supportTeamAvatar = computed(() => {
-//   // TODO: Replace with actual support team avatar from settings
-//   return 'https://ui-avatars.com/api/?name=Support+Team&background=667eea&color=fff';
-// });
-const supportTeamAvatar = computed(() => {
-  return '/image/ST.jpg';
-});
+const backendUrl = 'http://127.0.0.1:8000';
+
+const supportTeamAvatar = computed(() => '/image/ST.jpg');
 
 const userAvatar = computed(() => {
-  return authStore.user?.avatar || 'https://picsum.photos/40';
+  if (profileStore.avatarUrl) {
+    return profileStore.avatarUrl;
+  }
+
+  if (profileStore.users?.avatar && authStore.user?.id) {
+    return `${backendUrl}/storage/avatars/${authStore.user.id}/${profileStore.users.avatar}`;
+  }
+
+  return 'https://picsum.photos/40';
 });
 
-// Messages
 const messages = computed(() => supportStore.messages);
 
-// Load conversation
 const loadConversation = async () => {
   loading.value = true;
   try {
@@ -157,7 +171,6 @@ const loadConversation = async () => {
   }
 };
 
-// Send message
 const sendMessage = async () => {
   if (!messageText.value.trim()) return;
   if (!supportStore.supportOnline) return;
@@ -170,16 +183,14 @@ const sendMessage = async () => {
     scrollToBottom();
   } catch (error) {
     console.error('Error sending message:', error);
-    messageText.value = text; // Restore message on error
+    messageText.value = text;
   }
 };
 
-// Close chat
 const closeChat = () => {
   supportStore.closeChat();
 };
 
-// Rating
 const selectRating = (star) => {
   selectedRating.value = star;
 };
@@ -192,15 +203,39 @@ const submitRating = async () => {
       selectedRating.value,
       ratingComment.value
     );
+
     showRating.value = false;
     selectedRating.value = 0;
     ratingComment.value = '';
+
+    supportStore.conversation = null;
+    supportStore.messages = [];
+
+    setTimeout(() => {
+      message.info(
+        'Cảm ơn bạn đã đánh giá! Nếu cần hỗ trợ thêm, hãy liên hệ lại.'
+      );
+    }, 300);
   } catch (error) {
     console.error('Error submitting rating:', error);
   }
 };
 
-// Format time
+const skipRating = async () => {
+  try {
+    await supportStore.rateConversation(0, 'Skipped by user');
+
+    showRating.value = false;
+    selectedRating.value = 0;
+    ratingComment.value = '';
+
+    supportStore.conversation = null;
+    supportStore.messages = [];
+  } catch (error) {
+    console.error('Error skipping rating:', error);
+  }
+};
+
 const formatTime = (timestamp) => {
   if (!timestamp) return '';
   const date = new Date(timestamp);
@@ -209,7 +244,6 @@ const formatTime = (timestamp) => {
   return `${hours}:${minutes}`;
 };
 
-// Scroll to bottom
 const scrollToBottom = () => {
   nextTick(() => {
     if (messagesContainer.value) {
@@ -218,7 +252,6 @@ const scrollToBottom = () => {
   });
 };
 
-// Watch for new messages
 watch(
   () => supportStore.messages.length,
   () => {
@@ -226,18 +259,16 @@ watch(
   }
 );
 
-// Watch for resolved status
-// Watch for resolved status
 watch(
   () => supportStore.conversation?.status,
-  (newStatus) => {
-    if (newStatus === 'resolved') {
+  (newStatus, oldStatus) => {
+    if (newStatus === 'resolved' && oldStatus !== 'resolved') {
       showRating.value = true;
+      scrollToBottom();
     }
   }
 );
 
-// Watch for open state
 watch(
   () => supportStore.isOpen,
   (isOpen) => {
@@ -247,10 +278,17 @@ watch(
   }
 );
 
-onMounted(() => {
+onMounted(async () => {
   if (supportStore.isOpen) {
     loadConversation();
   }
+  if (!profileStore.users?.id && authStore.user?.id) {
+    await profileStore.getProfile(authStore.user.id);
+  }
+});
+
+onUnmounted(() => {
+  supportStore.stopSupportOnlinePolling();
 });
 </script>
 
@@ -459,6 +497,25 @@ onMounted(() => {
   border-top: 1px solid #e0e0e0;
 }
 
+.rating-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: #4caf50;
+}
+
+.rating-header i {
+  font-size: 24px;
+}
+
+.rating-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
 .rating-section p {
   margin: 0 0 12px 0;
   font-weight: 600;
@@ -492,11 +549,15 @@ onMounted(() => {
   margin-bottom: 12px;
 }
 
+.rating-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.skip-rating-btn,
 .submit-rating-btn {
-  width: 100%;
+  flex: 1;
   padding: 10px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
   border: none;
   border-radius: 8px;
   font-weight: 600;
@@ -504,8 +565,27 @@ onMounted(() => {
   transition: opacity 0.2s;
 }
 
-.submit-rating-btn:hover {
+.skip-rating-btn {
+  background: #e0e0e0;
+  color: #666;
+}
+
+.skip-rating-btn:hover {
+  opacity: 0.8;
+}
+
+.submit-rating-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.submit-rating-btn:hover:not(:disabled) {
   opacity: 0.9;
+}
+
+.submit-rating-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .chat-input {
@@ -573,7 +653,6 @@ onMounted(() => {
   transform: translateY(20px);
 }
 
-/* Mobile responsive */
 @media (max-width: 768px) {
   .support-chat-window {
     width: 100%;

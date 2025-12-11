@@ -41,6 +41,10 @@ const supportApi = {
   getConversations: (type) =>
     api.get('/support/manage/conversations', { params: { type } }),
 
+  // Thêm vào supportApi object
+  getConversationMessages: (conversationId) =>
+    api.get(`/support/manage/conversations/${conversationId}/messages`),
+
   // Claim conversation
   claimConversation: (conversationId) =>
     api.post(`/support/manage/conversations/${conversationId}/claim`),

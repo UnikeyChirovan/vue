@@ -257,7 +257,7 @@ const admin = [
       {
         path: 'support-statistics',
         name: 'admin-support-statistics',
-        component: () => import('../pages/support/SupportStatistics.vue'),
+        component: () => import('../pages/admin/support/SupportStatistics.vue'),
       },
     ],
   },

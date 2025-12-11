@@ -152,8 +152,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import supportApi from '../../services/support-api';
-import ManagerDetailModal from '../../components/ManagerDetailModal.vue';
+import supportApi from '../../../services/support-api';
+import ManagerDetailModal from '../../../components/ManagerDetailModal.vue';
 import { useMessage } from 'naive-ui';
 
 const message = useMessage();

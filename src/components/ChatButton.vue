@@ -16,6 +16,8 @@ import { computed, ref, watch } from 'vue';
 import { useChatStore } from '../stores/chatStore';
 import { useAuthStore } from '../stores/auth';
 import apiLinks from '../services/api-links';
+import { useMessage } from 'naive-ui';
+const message = useMessage();
 
 const props = defineProps({
   userId: {
@@ -72,7 +74,7 @@ const handleChatClick = async () => {
     });
   } catch (error) {
     console.error('Error opening chat:', error);
-    alert('Không thể mở chat. Vui lòng thử lại.');
+    message.error('Không thể mở chat. Vui lòng thử lại.');
   } finally {
     loading.value = false;
   }

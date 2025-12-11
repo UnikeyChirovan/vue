@@ -48,7 +48,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick } from 'vue';
 import { NSwitch } from 'naive-ui';
 import TheHeader from '../../components/TheHeader.vue';
 import TheFooter from '../../components/TheFooter.vue';
@@ -134,6 +134,18 @@ const confirmDeleteAccount = async () => {
 
 onMounted(() => {
   applyTheme(isDarkMode.value);
+
+  // Listen for toggle from button
+  const handleToggle = (event) => {
+    isSupportButtonEnabled.value = event.detail;
+  };
+
+  window.addEventListener('supportButtonToggle', handleToggle);
+
+  // Cleanup
+  onUnmounted(() => {
+    window.removeEventListener('supportButtonToggle', handleToggle);
+  });
 });
 </script>
 
