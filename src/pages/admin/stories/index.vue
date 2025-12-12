@@ -3,7 +3,12 @@
     <div class="row mb-3">
       <div class="col-12 d-flex justify-content-end">
         <a-button type="primary">
-          <router-link :to="{ name: 'admin-stories-create', params: { lastIndex: chapters.length } }">
+          <router-link
+            :to="{
+              name: 'admin-stories-create',
+              params: { lastIndex: chapters.length },
+            }"
+          >
             <i class="fa-solid fa-plus"></i> Thêm Chương
           </router-link>
         </a-button>
@@ -11,7 +16,11 @@
     </div>
     <div class="row">
       <div class="col-12">
-        <a-table :dataSource="chapters" :columns="columns" :scroll="scrollOptions">
+        <a-table
+          :dataSource="chapters"
+          :columns="columns"
+          :scroll="scrollOptions"
+        >
           <template #bodyCell="{ column, index, record }">
             <template v-if="column.key === 'index'">
               <span>{{ index + 1 }}</span>
@@ -26,7 +35,9 @@
               <span>{{ record.chapter_number }}</span>
             </template>
             <template v-if="column.key === 'action'">
-              <router-link :to="{ name: 'admin-stories-edit', params: { id: record.id } }">
+              <router-link
+                :to="{ name: 'admin-stories-edit', params: { id: record.id } }"
+              >
                 <a-button type="primary" class="me-sm-2 me-2 mb-2">
                   <i class="fa-solid fa-pen-to-square"></i>
                 </a-button>
@@ -95,7 +106,7 @@ const columns = [
 const getChapters = async () => {
   try {
     const response = await api.get('/story/chapters');
-    chapters.value = response.data; 
+    chapters.value = response.data;
   } catch (error) {
     console.error(error);
     if (error.response.status === 429) {
@@ -108,16 +119,15 @@ const isModalVisible = ref(false);
 const chapterIdToDelete = ref(null);
 const deleteChapter = (id) => {
   chapterIdToDelete.value = id;
-  isModalVisible.value = true; 
+  isModalVisible.value = true;
 };
 const handleOk = () => {
   api
-    .delete(`/story/chapters/${chapterIdToDelete.value}`) 
+    .delete(`/story/chapters/${chapterIdToDelete.value}`)
     .then((res) => {
-      console.log('dữ liệu', res)
       if (res.status === 204) {
         message.success('Xóa chương thành công');
-        getChapters(); 
+        getChapters();
       }
     })
     .catch((err) => {

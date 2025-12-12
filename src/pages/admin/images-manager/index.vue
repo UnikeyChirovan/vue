@@ -11,9 +11,12 @@
     </div>
     <div class="row">
       <div class="col-12">
-        <a-table :dataSource="backgrounds" :columns="columns" :scroll="scrollOptions">
+        <a-table
+          :dataSource="backgrounds"
+          :columns="columns"
+          :scroll="scrollOptions"
+        >
           <template #bodyCell="{ column, index, record }">
-
             <template v-if="column.key === 'index'">
               <span>{{ index + 1 }}</span>
             </template>
@@ -23,16 +26,29 @@
             </template>
 
             <template v-if="column.key === 'background_image'">
-              <img :src="getImageUrl(record.image_path)" alt="Background" style="width: 100px; height: auto;" />
+              <img
+                :src="getImageUrl(record.image_path)"
+                alt="Background"
+                style="width: 100px; height: auto"
+              />
             </template>
 
             <template v-if="column.key === 'action'">
-              <router-link :to="{ name: 'admin-images-manager-edit', params: { id: record.id } }">
+              <router-link
+                :to="{
+                  name: 'admin-images-manager-edit',
+                  params: { id: record.id },
+                }"
+              >
                 <a-button type="primary" class="me-sm-2 me-2 mb-2">
                   <i class="fa-solid fa-pen-to-square"></i>
                 </a-button>
               </router-link>
-              <a-button type="primary" danger @click="deleteBackground(record.id)">
+              <a-button
+                type="primary"
+                danger
+                @click="deleteBackground(record.id)"
+              >
                 <i class="fa-solid fa-trash"></i>
               </a-button>
             </template>
@@ -41,7 +57,12 @@
       </div>
     </div>
 
-    <a-modal v-model:visible="isModalVisible" title="Xác nhận xóa hình nền" @ok="handleOk" @cancel="handleCancel">
+    <a-modal
+      v-model:visible="isModalVisible"
+      title="Xác nhận xóa hình nền"
+      @ok="handleOk"
+      @cancel="handleCancel"
+    >
       <p>Bạn có chắc chắn muốn xóa hình nền này không?</p>
     </a-modal>
   </a-card>
@@ -53,13 +74,12 @@ import { message } from 'ant-design-vue';
 import api from '../../../services/axiosInterceptor';
 import { useMenu } from '../../../stores/use-menu';
 
-
 const backgrounds = ref([]);
 const isMobile = ref(window.innerWidth < 600);
 const scrollOptions = computed(() => {
   return isMobile.value ? { x: 1200 } : { x: 576 };
 });
-const BaseURL = 'http://127.0.0.1:8000'
+const BaseURL = 'http://127.0.0.1:8000';
 
 const columns = [
   {
@@ -86,16 +106,13 @@ const columns = [
   },
 ];
 
-
 const getImageUrl = (path) => {
   return `${BaseURL}/storage/${path}`;
 };
 
-
 const getBackgrounds = async () => {
   try {
     const response = await api.get('image-manager');
-    console.log('image', response)
     backgrounds.value = response.data;
   } catch (error) {
     console.error(error);
@@ -103,15 +120,13 @@ const getBackgrounds = async () => {
   }
 };
 
-
 const isModalVisible = ref(false);
 const backgroundIdToDelete = ref(null);
 
 const deleteBackground = (id) => {
   backgroundIdToDelete.value = id;
-  isModalVisible.value = true; 
+  isModalVisible.value = true;
 };
-
 
 const handleOk = async () => {
   try {
@@ -124,7 +139,6 @@ const handleOk = async () => {
     isModalVisible.value = false;
   }
 };
-
 
 const handleCancel = () => {
   isModalVisible.value = false;

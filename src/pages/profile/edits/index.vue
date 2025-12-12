@@ -6,7 +6,11 @@
           <div class="row mb-4">
             <div class="col-12 d-flex justify-content-center mb-3">
               <div class="custom-avatar">
-                <img :src="avatarUrl || '../../../assets/users.jpg'" alt="Avatar" class="img-avatar" />
+                <img
+                  :src="avatarUrl || '../../../assets/users.jpg'"
+                  alt="Avatar"
+                  class="img-avatar"
+                />
               </div>
             </div>
             <div class="col-12 d-flex justify-content-center mb-2">
@@ -19,8 +23,13 @@
           <div class="row">
             <div class="col-12 d-flex justify-content-center mb-3">
               <div class="custom-cover">
-                <img :src="coverUrl || '../../../assets/cover.jpg'" alt="Cover" class="img-cover-custom" :style="{ transform: `translateY(${coverStyle}px)` }" />
-              </div>         
+                <img
+                  :src="coverUrl || '../../../assets/cover.jpg'"
+                  alt="Cover"
+                  class="img-cover-custom"
+                  :style="{ transform: `translateY(${coverStyle}px)` }"
+                />
+              </div>
             </div>
             <div class="col-12 d-flex justify-content-center">
               <a-button type="danger" class="ms-2" @click="deleteCover">
@@ -39,7 +48,9 @@
             <div class="col-12 col-sm-4 text-start text-sm-end">
               <label>
                 <span v-if="field.required" class="text-danger me-1">*</span>
-                <span :class="{ 'text-danger': errors[field.name] }">{{ field.label }}:</span>
+                <span :class="{ 'text-danger': errors[field.name] }"
+                  >{{ field.label }}:</span
+                >
               </label>
             </div>
             <div class="col-12 col-sm-8">
@@ -57,7 +68,9 @@
                 {{ field.label }}
               </a-checkbox>
               <div class="w-100"></div>
-              <small v-if="errors[field.name]" class="text-danger">{{ errors[field.name][0] }}</small>
+              <small v-if="errors[field.name]" class="text-danger">{{
+                errors[field.name][0]
+              }}</small>
             </div>
           </div>
         </div>
@@ -70,7 +83,9 @@
             <div class="col-12 col-sm-4 text-start text-sm-end">
               <label>
                 <span v-if="field.required" class="text-danger me-1">*</span>
-                <span :class="{ 'text-danger': errors[field.name] }">{{ field.label }}:</span>
+                <span :class="{ 'text-danger': errors[field.name] }"
+                  >{{ field.label }}:</span
+                >
               </label>
             </div>
             <div class="col-12 col-sm-8">
@@ -88,7 +103,9 @@
                 {{ field.label }}
               </a-checkbox>
               <div class="w-100"></div>
-              <small v-if="errors[field.name]" class="text-danger">{{ errors[field.name][0] }}</small>
+              <small v-if="errors[field.name]" class="text-danger">{{
+                errors[field.name][0]
+              }}</small>
             </div>
           </div>
           <div class="row mb-3" v-if="users.change_password">
@@ -106,7 +123,9 @@
                 :class="{ 'input-danger': errors.password }"
               />
               <div class="w-100"></div>
-              <small v-if="errors.password" class="text-danger">{{ errors.password[0] }}</small>
+              <small v-if="errors.password" class="text-danger">{{
+                errors.password[0]
+              }}</small>
             </div>
           </div>
 
@@ -155,9 +174,9 @@ import dayjs from 'dayjs';
 import { Style } from 'ckeditor5';
 
 const authStore = useAuthStore();
-const useProfile = useProfileStore()
+const useProfile = useProfileStore();
 let coverStyle = useProfile.cover_position * 0.2213;
-console.log(coverStyle)
+//console.log(coverStyle)
 const id = authStore.user?.id;
 const router = useRouter();
 const users = reactive({
@@ -305,7 +324,7 @@ const formFields_2 = [
 const avatarUrl = ref(null);
 const coverUrl = ref(null);
 
-const backendUrl = "http://127.0.0.1:8000";
+const backendUrl = 'http://127.0.0.1:8000';
 const deleteAvatar = async () => {
   try {
     await api.delete(`/link/${id}/avatar`);
@@ -358,7 +377,7 @@ const getUsersEdit = () => {
 
 const updateUsers = () => {
   const payload = { ...users };
-  
+
   if (payload.birthday) {
     payload.birthday = payload.birthday.format('DD-MM-YYYY');
   }
@@ -386,7 +405,6 @@ const updateUsers = () => {
     });
 };
 
-
 const filterOption = (input, option) => {
   return option.label.toLowerCase().includes(input.toLowerCase());
 };
@@ -398,7 +416,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
 .select-danger {
   border: 1px solid red;
 }
@@ -412,7 +429,7 @@ onMounted(() => {
   height: 150px;
   border-radius: 50%;
   overflow: hidden;
-  border: 4px solid #4fb233; 
+  border: 4px solid #4fb233;
 }
 
 .img-avatar {
@@ -421,30 +438,30 @@ onMounted(() => {
   object-fit: cover;
 }
 
-
 .custom-cover {
-  width: 250px; 
+  width: 250px;
   height: calc(250px / 2.1);
-  overflow: hidden; 
+  overflow: hidden;
   position: relative;
   border: 4px solid #4fb233;
 }
 
 .img-cover-custom {
   width: 100%;
-  object-fit: cover; 
+  object-fit: cover;
   position: absolute;
   top: 25%;
   left: 0;
 }
 
-.custom-cover::before, .custom-cover::after {
-  content: "";
+.custom-cover::before,
+.custom-cover::after {
+  content: '';
   position: absolute;
   left: 0;
   right: 0;
-  height: 25%; 
-  background-color: rgba(0, 0, 0, 0.3); 
+  height: 25%;
+  background-color: rgba(0, 0, 0, 0.3);
   z-index: 1;
 }
 
@@ -453,7 +470,7 @@ onMounted(() => {
 }
 
 .custom-cover::after {
-  bottom: 0; 
+  bottom: 0;
 }
 
 .ms-2 {

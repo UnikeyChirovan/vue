@@ -161,7 +161,7 @@ const apiLinks = {
     delete: (id) => api.delete(`/features/${id}`),
   },
   videos: {
-    getAll: () => api.get('/video-manager'),
+    getAll: () => api.get('/videos'),
     getDetail: (id) => api.get(`/video-manager/${id}`),
     create: (data) => api.post('/video-manager/upload', data),
     update: (id, data) => api.put(`/video-manager/${id}`, data),

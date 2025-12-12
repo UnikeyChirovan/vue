@@ -11,7 +11,11 @@
     </div>
     <div class="row">
       <div class="col-12">
-        <a-table :dataSource="notifications" :columns="columns" :scroll="scrollOptions">
+        <a-table
+          :dataSource="notifications"
+          :columns="columns"
+          :scroll="scrollOptions"
+        >
           <template #bodyCell="{ column, index, record }">
             <template v-if="column.key === 'index'">
               <span>{{ index + 1 }}</span>
@@ -20,15 +24,25 @@
               <span>{{ record.title }}</span>
             </template>
             <template v-if="column.key === 'image'">
-              <img :src="`${baseUrl}/storage/${record.image_paths[0]}`" alt="Notification Image" style="max-width: 100px;" />
+              <img
+                :src="`${baseUrl}/storage/${record.image_paths[0]}`"
+                alt="Notification Image"
+                style="max-width: 100px"
+              />
             </template>
             <template v-if="column.key === 'action'">
-              <router-link :to="{ name: 'admin-news-edit', params: { id: record.id } }">
+              <router-link
+                :to="{ name: 'admin-news-edit', params: { id: record.id } }"
+              >
                 <a-button type="primary" class="me-sm-2 me-2 mb-2">
                   <i class="fa-solid fa-pen-to-square"></i>
                 </a-button>
               </router-link>
-              <a-button type="primary" danger @click="deleteNotification(record.id)">
+              <a-button
+                type="primary"
+                danger
+                @click="deleteNotification(record.id)"
+              >
                 <i class="fa-solid fa-trash"></i>
               </a-button>
             </template>
@@ -54,9 +68,9 @@ import { message } from 'ant-design-vue';
 import { useMenu } from '../../../stores/use-menu';
 import api from '../../../services/axiosInterceptor';
 
-const baseUrl = "http://127.0.0.1:8000";
+const baseUrl = 'http://127.0.0.1:8000';
 
-const notifications = ref([]); 
+const notifications = ref([]);
 const isMobile = ref(window.innerWidth < 600);
 const scrollOptions = computed(() => {
   return isMobile.value ? { x: 1200 } : { x: 576 };
@@ -90,8 +104,7 @@ const columns = [
 const getNotifications = async () => {
   try {
     const response = await api.get('/user-notifications');
-    console.log('dữ liệu', response);
-    notifications.value = response.data; 
+    notifications.value = response.data;
   } catch (error) {
     console.error(error);
     if (error.response.status === 429) {
@@ -108,11 +121,11 @@ const deleteNotification = (id) => {
 };
 const handleOk = () => {
   api
-    .delete(`/user-notifications/${notificationIdToDelete.value}`) 
+    .delete(`/user-notifications/${notificationIdToDelete.value}`)
     .then((res) => {
       if (res.status === 204) {
         message.success('Xóa thông báo thành công');
-        getNotifications(); 
+        getNotifications();
       }
     })
     .catch((err) => {

@@ -11,38 +11,42 @@
       </n-form-item>
 
       <n-form-item label="Nội dung">
-        <n-input v-model:value="formValue.content" placeholder="Nhập nội dung" type="textarea" />
+        <n-input
+          v-model:value="formValue.content"
+          placeholder="Nhập nội dung"
+          type="textarea"
+        />
       </n-form-item>
 
       <n-button type="primary" @click="submitForm">Gởi thông báo</n-button>
     </n-form>
   </n-card>
-
-  <pre>{{ JSON.stringify(formValue, null, 2) }}</pre>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useMessage } from 'naive-ui'
+import { ref, onMounted } from 'vue';
+import { useMessage } from 'naive-ui';
 import api from '../../../services/axiosInterceptor';
 import { useMenu } from '../../../stores/use-menu';
 
-const formRef = ref(null);
 const message = useMessage();
 
 const formValue = ref({
   title: '',
-  content: ''
+  content: '',
 });
 
 const submitForm = async () => {
   if (!formValue.value.title || !formValue.value.content) {
-    message.warning("Vui lòng nhập đầy đủ tiêu đề và nội dung.");
+    message.warning('Vui lòng nhập đầy đủ tiêu đề và nội dung.');
     return;
   }
 
   try {
-    const response = await api.post('/newsletter/notifications/create', formValue.value);
+    const response = await api.post(
+      '/newsletter/notifications/create',
+      formValue.value
+    );
     message.success(response.data.success);
     formValue.value.title = '';
     formValue.value.content = '';

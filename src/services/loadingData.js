@@ -24,12 +24,10 @@ async function checkAndUpdateData(apiCall, localKey) {
     const serverTimestamp = data.last_updated;
     if (localTimestamp === serverTimestamp) {
       fetchNewData = false;
-      console.log(`${localKey} data is up-to-date.`);
     }
     if (fetchNewData) {
       localStorage.setItem(localKey, JSON.stringify(data[localKey]));
       localStorage.setItem(`${localKey}_last_updated`, serverTimestamp);
-      console.log(`${localKey} data updated.`);
     }
   } catch (error) {
     console.error(`Error fetching ${localKey} data:`, error);
@@ -41,22 +39,24 @@ export async function fetchDataBeforeLogin() {
   loadingProgress.value = 0;
 
   try {
-      await checkAndUpdateData(apiLinks.heroSlides.getAll, 'heroSlides');
-      updateProgress(15);
-      await checkAndUpdateData(apiLinks.futureProjects.getAll, 'futureProjects');
-      updateProgress(30);
-      await checkAndUpdateData(apiLinks.features.getAll, 'features');
-      updateProgress(45);
-      await checkAndUpdateData(apiLinks.categories.getAll, 'categories');
-      updateProgress(60);
-      await checkAndUpdateData(apiLinks.imageManager.getImages, 'images');
-      updateProgress(75);
-      await checkAndUpdateData(apiLinks.votes.getVoteResults, 'total_users_voted');
-      updateProgress(90);
-      await checkAndUpdateData(apiLinks.companyInfo.getAll, 'companyInfos');
-      updateProgress(100);
+    await checkAndUpdateData(apiLinks.heroSlides.getAll, 'heroSlides');
+    updateProgress(15);
+    await checkAndUpdateData(apiLinks.futureProjects.getAll, 'futureProjects');
+    updateProgress(30);
+    await checkAndUpdateData(apiLinks.features.getAll, 'features');
+    updateProgress(45);
+    await checkAndUpdateData(apiLinks.categories.getAll, 'categories');
+    updateProgress(60);
+    await checkAndUpdateData(apiLinks.imageManager.getImages, 'images');
+    updateProgress(75);
+    await checkAndUpdateData(
+      apiLinks.votes.getVoteResults,
+      'total_users_voted'
+    );
+    updateProgress(90);
+    await checkAndUpdateData(apiLinks.companyInfo.getAll, 'companyInfos');
+    updateProgress(100);
     localStorage.setItem('Before', 'ok');
-
   } catch (error) {
     console.error('Error fetching data before login:', error);
     isDataLoading.value = false;
@@ -76,8 +76,12 @@ export async function fetchDataAfterLogin() {
     const notificationId = notifications.data[0]?.id;
 
     if (notificationId) {
-      const notificationDetail = await apiLinks.notifications.getDetail(notificationId);
-      sessionStorage.setItem('notification_detail', JSON.stringify(notificationDetail.data));
+      const notificationDetail =
+        await apiLinks.notifications.getDetail(notificationId);
+      sessionStorage.setItem(
+        'notification_detail',
+        JSON.stringify(notificationDetail.data)
+      );
       updateProgress(20);
     }
 
@@ -90,7 +94,10 @@ export async function fetchDataAfterLogin() {
     updateProgress(40);
 
     const profileEdit = await apiLinks.profile.edit(userId);
-    sessionStorage.setItem('user_profile_edit', JSON.stringify(profileEdit.data));
+    sessionStorage.setItem(
+      'user_profile_edit',
+      JSON.stringify(profileEdit.data)
+    );
     updateProgress(50);
 
     const chapters = await apiLinks.story.getChapters();
@@ -100,18 +107,27 @@ export async function fetchDataAfterLogin() {
 
     if (chapterId) {
       const chapterDetail = await apiLinks.story.getChapter(chapterId);
-      sessionStorage.setItem('chapter_detail', JSON.stringify(chapterDetail.data));
+      sessionStorage.setItem(
+        'chapter_detail',
+        JSON.stringify(chapterDetail.data)
+      );
       updateProgress(70);
     }
 
     const backgrounds = await apiLinks.story.getBackgrounds();
-    sessionStorage.setItem('story_backgrounds', JSON.stringify(backgrounds.data));
+    sessionStorage.setItem(
+      'story_backgrounds',
+      JSON.stringify(backgrounds.data)
+    );
     updateProgress(80);
     const backgroundId = backgrounds.data[0]?.id;
 
     if (backgroundId) {
       const backgroundImage = await apiLinks.story.getImage(backgroundId);
-      sessionStorage.setItem('background_image', JSON.stringify(backgroundImage.data));
+      sessionStorage.setItem(
+        'background_image',
+        JSON.stringify(backgroundImage.data)
+      );
       updateProgress(90);
     }
 
@@ -126,5 +142,3 @@ export async function fetchDataAfterLogin() {
     sessionStorage.setItem('After', 'false');
   }
 }
-
-

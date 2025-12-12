@@ -1,5 +1,5 @@
 // import axios from 'axios';
-// import { useAuthStore } from '../stores/auth'; 
+// import { useAuthStore } from '../stores/auth';
 
 // const api = axios.create({
 //   baseURL: 'http://127.0.0.1:8000/api',
@@ -57,13 +57,13 @@
 
 // export default api;
 import axios from 'axios';
-import { useAuthStore } from '../stores/auth'; 
+import { useAuthStore } from '../stores/auth';
 
 const api = axios.create({
   baseURL: 'http://127.0.0.1:8000/api',
   withCredentials: true,
   headers: {
-    'Accept': 'application/json',
+    Accept: 'application/json',
     'Content-Type': 'application/json',
   },
 });
@@ -78,7 +78,7 @@ function subscribeTokenRefresh(callback) {
 
 // Gọi các lệnh đợi với token mới
 function onRefreshed(newAccessToken) {
-  refreshSubscribers.map(callback => callback(newAccessToken));
+  refreshSubscribers.map((callback) => callback(newAccessToken));
   refreshSubscribers = [];
 }
 
@@ -118,7 +118,8 @@ api.interceptors.response.use(
             authStore.accessToken = newAccessToken;
 
             // Đặt Authorization cho lệnh gốc và thực hiện lại lệnh
-            originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+            originalRequest.headers['Authorization'] =
+              `Bearer ${newAccessToken}`;
             onRefreshed(newAccessToken);
             isRefreshing = false;
 
@@ -135,7 +136,8 @@ api.interceptors.response.use(
         // Đợi cho đến khi refresh token hoàn tất
         return new Promise((resolve) => {
           subscribeTokenRefresh((newAccessToken) => {
-            originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+            originalRequest.headers['Authorization'] =
+              `Bearer ${newAccessToken}`;
             resolve(api(originalRequest));
           });
         });

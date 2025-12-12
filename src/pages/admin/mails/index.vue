@@ -5,7 +5,12 @@
         <i class="fa-solid fa-file-pdf"></i> Xuất PDF
       </a-button>
     </div>
-    <a-table :dataSource="emails" :columns="columns" :scroll="scrollOptions" bordered>
+    <a-table
+      :dataSource="emails"
+      :columns="columns"
+      :scroll="scrollOptions"
+      bordered
+    >
       <template #bodyCell="{ column, index, record }">
         <template v-if="column.key === 'index'">
           <span>{{ index + 1 }}</span>
@@ -21,11 +26,11 @@
   </a-card>
 </template>
 
-
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import dayjs from 'dayjs';
 import api from '../../../services/axiosInterceptor';
+import { useMenu } from '../../../stores/use-menu';
 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -57,7 +62,6 @@ const exportPDF = () => {
   doc.save('danh-sach-email.pdf');
 };
 
-
 const emails = ref([]);
 const isMobile = ref(window.innerWidth < 600);
 const scrollOptions = computed(() => {
@@ -87,6 +91,7 @@ onMounted(() => {
   window.addEventListener('resize', () => {
     isMobile.value = window.innerWidth < 600;
   });
+  useMenu().onSelectedKey(['admin-mails']);
 });
 </script>
 

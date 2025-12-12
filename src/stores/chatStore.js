@@ -136,10 +136,6 @@ export const useChatStore = defineStore('chat', () => {
           conversation.user_id
         );
         newChat.online = statusRes.data.online;
-        console.log(
-          `✓ User ${conversation.user_id} online:`,
-          statusRes.data.online
-        );
       } catch (error) {
         console.error('Error fetching online status:', error);
       }

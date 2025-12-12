@@ -362,7 +362,7 @@ export const useSupportChatStore = defineStore('supportChat', {
     playNotificationSound() {
       if (!this.isOpen) {
         const audio = new Audio('/notification.mp3');
-        audio.play().catch((err) => console.log('Audio play failed:', err));
+        audio.play().catch(() => {});
       }
     },
 

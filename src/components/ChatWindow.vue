@@ -244,9 +244,7 @@ const deleteMessage = async (message) => {
 const copyMessage = (message) => {
   if (!message) return;
 
-  navigator.clipboard.writeText(message.text).then(() => {
-    console.log('Đã sao chép tin nhắn');
-  });
+  navigator.clipboard.writeText(message.text);
   closeContextMenu();
 };
 

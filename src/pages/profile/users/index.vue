@@ -456,7 +456,7 @@ const saveEditedCover = () => {
       headers: uploadHeaders,
     })
     .then((response) => {
-      console.log(response);
+      //console.log(response);
       if (response.status === 200) {
         useProfile.updateCoverPosition(response.data.positionY);
         showEdit.value = false;
@@ -475,7 +475,7 @@ const getLastChapter = () => {
   api
     .get(`/story/user-chapter`)
     .then((response) => {
-      console.log('Fetch successful');
+      //console.log('Fetch successful');
       lastChapter.value = response.data.chapter_id;
     })
     .catch((error) => {
@@ -488,7 +488,7 @@ const getlastEpisode = () => {
   api
     .get(`/videos/user-episode`)
     .then((response) => {
-      console.log('Fetch successful');
+      //console.log('Fetch successful');
       lastEpisode.value = response.data.episode_id;
     })
     .catch((error) => {

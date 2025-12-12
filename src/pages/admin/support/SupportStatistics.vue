@@ -155,6 +155,7 @@ import { ref, onMounted } from 'vue';
 import supportApi from '../../../services/support-api';
 import ManagerDetailModal from '../../../components/ManagerDetailModal.vue';
 import { useMessage } from 'naive-ui';
+import { useMenu } from '../../../stores/use-menu';
 
 const message = useMessage();
 
@@ -173,18 +174,16 @@ const statistics = ref({
 
 const selectedManagerId = ref(null);
 
-// Thêm vào phần script setup, sau phần khai báo const
+// Backend URL
 const backendUrl = 'http://127.0.0.1:8000';
 
 const getAvatarUrl = (userId, avatar) => {
   if (!avatar) return 'https://picsum.photos/50';
 
-  // Nếu avatar đã là full URL thì dùng luôn
   if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
     return avatar;
   }
 
-  // Nếu chỉ là filename thì ghép với backendUrl
   return `${backendUrl}/storage/avatars/${userId}/${avatar}`;
 };
 
@@ -201,10 +200,6 @@ const loadStatistics = async () => {
   try {
     const response = await supportApi.getStatistics(period.value);
     statistics.value = response.data;
-    console.log(
-      'Manager avatars:',
-      statistics.value.top_managers.map((m) => m.manager.avatar)
-    );
   } catch (error) {
     console.error('Error loading statistics:', error);
     message.error('Lỗi khi tải thống kê');
@@ -237,6 +232,7 @@ const formatDuration = (seconds) => {
 
 onMounted(() => {
   loadStatistics();
+  useMenu().onSelectedKey(['admin-support-statistics']);
 });
 </script>
 

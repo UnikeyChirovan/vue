@@ -307,7 +307,7 @@ onMounted(async () => {
     try {
       const statusRes = await apiLinks.users.getOnlineStatus(id);
       userOnlineStatus.value = statusRes.data.online;
-      console.log(`✓ User ${id} online:`, statusRes.data.online);
+      //console.log(`✓ User ${id} online:`, statusRes.data.online);
     } catch (error) {
       console.error('Error fetching online status:', error);
       userOnlineStatus.value = false;

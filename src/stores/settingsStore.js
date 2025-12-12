@@ -9,15 +9,9 @@ export const settingsStore = defineStore('settings', () => {
     document.documentElement.classList.toggle('dark', darkMode.value);
   };
 
-  const logoutAllDevices = () => {
-    console.log('Logging out from all devices...');
-    // Gọi API đăng xuất khỏi tất cả thiết bị
-  };
+  const logoutAllDevices = () => {};
 
-  const deleteAccount = () => {
-    console.log('Deleting account...');
-    // Gọi API xóa tài khoản
-  };
+  const deleteAccount = () => {};
 
   return { darkMode, toggleDarkMode, logoutAllDevices, deleteAccount };
 });

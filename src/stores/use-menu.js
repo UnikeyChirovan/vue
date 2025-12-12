@@ -13,10 +13,15 @@ export const useMenu = defineStore('menuId', () => {
     openKeys.value = data;
   };
 
+  const clearSelectedKey = () => {
+    selectedKeys.value = [];
+  };
+
   return {
     selectedKeys,
     openKeys,
     onSelectedKey,
     onOpenKeys,
+    clearSelectedKey,
   };
 });

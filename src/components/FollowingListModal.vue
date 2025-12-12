@@ -63,13 +63,11 @@ const fetchFollowingList = async () => {
   const storedData = sessionStorage.getItem(storageKey);
   if (storedData) {
     followingList.value = JSON.parse(storedData);
-    console.log('Dữ liệu lấy từ sessionStorage:', followingList.value);
     loading.value = false;
     return;
   }
   try {
     const response = await api.get(`/social/followed-users`);
-    console.log('Dữ liệu API trả về:', response.data);
 
     if (response.data && Array.isArray(response.data.users)) {
       followingList.value = response.data.users;

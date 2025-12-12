@@ -241,7 +241,6 @@ const getUsersEdit = () => {
   api
     .get(`/users/${route.params.id}/edit`)
     .then((response) => {
-      console.log('edit user:', response);
       users.username = response.data.users.username;
       users.name = response.data.users.name;
       users.nickname = response.data.users.nickname;

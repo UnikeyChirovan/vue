@@ -4,13 +4,25 @@
       <!-- Name Input -->
       <div class="mb-3">
         <label for="name">Tên Danh Mục</label>
-        <input v-model="form.name" type="text" id="name" required class="form-control" />
+        <input
+          v-model="form.name"
+          type="text"
+          id="name"
+          required
+          class="form-control"
+        />
       </div>
 
       <!-- Code Input -->
       <div class="mb-3">
         <label for="code">Mã Số</label>
-        <input v-model="form.code" type="text" id="code" required class="form-control" />
+        <input
+          v-model="form.code"
+          type="text"
+          id="code"
+          required
+          class="form-control"
+        />
       </div>
 
       <!-- Page Dropdown -->
@@ -18,7 +30,13 @@
         <label for="page">Trang</label>
         <select v-model="form.page" id="page" required class="form-control">
           <option value="">Chọn trang</option>
-          <option v-for="option in pageOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+          <option
+            v-for="option in pageOptions"
+            :key="option.value"
+            :value="option.value"
+          >
+            {{ option.label }}
+          </option>
         </select>
       </div>
 
@@ -41,7 +59,7 @@ const router = useRouter();
 const form = ref({
   name: '',
   code: '',
-  page: '', 
+  page: '',
 });
 
 const pageOptions = ref([]);
@@ -53,7 +71,7 @@ const getCategory = async () => {
     form.value.code = response.data.code;
     form.value.page = response.data.page;
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     message.error('Không thể lấy thông tin danh mục');
   }
 };
@@ -61,10 +79,9 @@ const getCategory = async () => {
 const fetchPageOptions = async () => {
   try {
     const response = await api.get('/categories/page-options');
-    console.log('dữ liệu', response);
-    pageOptions.value = response.data.pageOptions; 
+    pageOptions.value = response.data.pageOptions;
   } catch (error) {
-    console.log('lỗi', error);
+    //console.log('lỗi', error);
     message.error('Không thể lấy danh sách trang');
   }
 };
@@ -74,18 +91,18 @@ const submitForm = async () => {
     await api.put(`/categories/${route.params.id}`, {
       name: form.value.name,
       code: form.value.code,
-      page: form.value.page, 
+      page: form.value.page,
     });
     message.success('Danh mục đã được cập nhật thành công');
     await router.push({ name: 'admin-categories' });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     message.error('Đã xảy ra lỗi khi cập nhật danh mục');
   }
 };
 
 onMounted(() => {
-  fetchPageOptions(); 
+  fetchPageOptions();
   getCategory();
   useMenu().onSelectedKey(['admin-categories']);
 });

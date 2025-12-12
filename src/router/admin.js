@@ -5,6 +5,12 @@ const admin = [
     component: () => import('../layouts/admin.vue'),
     meta: { requiresAuth: true },
     children: [
+      // Dashboard
+      {
+        path: '',
+        name: 'admin-dashboard',
+        component: () => import('../pages/admin/index.vue'),
+      },
       // Quản Lý NewsLetters
       {
         path: 'news',

@@ -131,7 +131,7 @@ const listItem = reactive([
 
   {
     name: 'Quản Lý',
-    link: 'admin-support-statistics',
+    link: 'admin-dashboard',
     icon: 'fas fa-user-secret',
     requiresLogin: false,
     isAdmin: true,

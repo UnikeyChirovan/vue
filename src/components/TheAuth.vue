@@ -35,17 +35,19 @@
           @submit.prevent="handleRegisterSubmit"
           v-for="(field, index) in formFields"
         >
-        <n-form-item :key="index" :label="field.label" :for="field.model">
-          <component
-            :is="field.component"
-            v-model:value="users[field.model]"
-            :type="field.type || 'text'"
-            :id="field.model"
-            :placeholder="field.placeholder"
-            :allow-clear="field.allowClear"
-            v-bind="field.type === 'password' ? { 'show-password-on': 'click' } : {}"
-          />
-        </n-form-item>
+          <n-form-item :key="index" :label="field.label" :for="field.model">
+            <component
+              :is="field.component"
+              v-model:value="users[field.model]"
+              :type="field.type || 'text'"
+              :id="field.model"
+              :placeholder="field.placeholder"
+              :allow-clear="field.allowClear"
+              v-bind="
+                field.type === 'password' ? { 'show-password-on': 'click' } : {}
+              "
+            />
+          </n-form-item>
           <div v-if="errors[field.model]" class="error">
             {{ errors[field.model][0] }}
           </div>
@@ -122,7 +124,9 @@
               </n-checkbox>
             </div>
             <div class="col-12 col-sm-6 d-sm-flex justify-content-sm-center">
-              <router-link to="/password-reset-request">Quên mật khẩu?</router-link>
+              <router-link to="/password-reset-request"
+                >Quên mật khẩu?</router-link
+              >
             </div>
           </div>
           <n-button
@@ -145,114 +149,114 @@
       </n-dropdown>
     </div>
   </div>
-
 </template>
 
 <script setup>
-  import { ref, reactive } from 'vue';
-  import { useMessage } from 'naive-ui';
-  import { useRouter } from 'vue-router';
-  import { useAuthStore } from '../stores/auth';
-  import LoadingModal from './LoadingModal.vue';
-  import { useLoadingStore } from '../stores/loadingStore';
-  const loadingStore = useLoadingStore();
-  const auth = useAuthStore();
+import { ref, reactive } from 'vue';
+import { useMessage } from 'naive-ui';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/auth';
+import LoadingModal from './LoadingModal.vue';
+import { useLoadingStore } from '../stores/loadingStore';
+const loadingStore = useLoadingStore();
+const auth = useAuthStore();
 
-  const router = useRouter();
+const router = useRouter();
 
-  const showRegister = ref(false);
-  const showLogin = ref(false);
-  const users = reactive({
-    username: '',
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
-    nickname: '',
-    status_id: 5,
-    department_id: 2,
-  });
-  const loading = ref(false);
-  const errors = ref({});
-  const errorsLogin = ref({});
-  const usernameOrEmail = ref('');
-  const password = ref('');
-  const rememberMe = ref(false);
-  const message = useMessage();
+const showRegister = ref(false);
+const showLogin = ref(false);
+const users = reactive({
+  username: '',
+  name: '',
+  email: '',
+  password: '',
+  password_confirmation: '',
+  nickname: '',
+  status_id: 5,
+  department_id: 2,
+});
+const loading = ref(false);
+const errors = ref({});
+const errorsLogin = ref({});
+const usernameOrEmail = ref('');
+const password = ref('');
+const rememberMe = ref(false);
+const message = useMessage();
 
-  const formFields = [
-    {
-      label: 'Tên Tài khoản',
-      model: 'username',
-      component: 'n-input',
-      placeholder: 'Tên Tài khoản',
-      allowClear: true,
-      required: true,
-    },
-    {
-      label: 'Họ và Tên',
-      model: 'name',
-      component: 'n-input',
-      placeholder: 'Họ và Tên',
-      allowClear: true,
-      required: true,
-    },
-    {
-      label: 'Biệt Danh',
-      model: 'nickname',
-      component: 'n-input',
-      placeholder: 'Tên muốn thể hiện',
-      allowClear: true,
-      required: true,
-    },
-    {
-      label: 'Email',
-      model: 'email',
-      component: 'n-input',
-      placeholder: 'Email',
-      allowClear: true,
-      required: true,
-    },
-    {
-      label: 'Mật khẩu',
-      model: 'password',
-      component: 'n-input',
-      placeholder: 'Mật khẩu',
-      type: 'password',
-      allowClear: true,
-      required: true,
-    },
-    {
-      label: 'Xác nhận mật khẩu',
-      model: 'password_confirmation',
-      component: 'n-input',
-      placeholder: 'Xác nhận mật khẩu',
-      type: 'password',
-      allowClear: true,
-      required: true,
-    },
-  ];
+const formFields = [
+  {
+    label: 'Tên Tài khoản',
+    model: 'username',
+    component: 'n-input',
+    placeholder: 'Tên Tài khoản',
+    allowClear: true,
+    required: true,
+  },
+  {
+    label: 'Họ và Tên',
+    model: 'name',
+    component: 'n-input',
+    placeholder: 'Họ và Tên',
+    allowClear: true,
+    required: true,
+  },
+  {
+    label: 'Biệt Danh',
+    model: 'nickname',
+    component: 'n-input',
+    placeholder: 'Tên muốn thể hiện',
+    allowClear: true,
+    required: true,
+  },
+  {
+    label: 'Email',
+    model: 'email',
+    component: 'n-input',
+    placeholder: 'Email',
+    allowClear: true,
+    required: true,
+  },
+  {
+    label: 'Mật khẩu',
+    model: 'password',
+    component: 'n-input',
+    placeholder: 'Mật khẩu',
+    type: 'password',
+    allowClear: true,
+    required: true,
+  },
+  {
+    label: 'Xác nhận mật khẩu',
+    model: 'password_confirmation',
+    component: 'n-input',
+    placeholder: 'Xác nhận mật khẩu',
+    type: 'password',
+    allowClear: true,
+    required: true,
+  },
+];
 
-  function handleRegisterSubmit() {
-    loading.value = true;
-    apiLinks.auth.register(users)
-      .then((res) => {
-        if (res.status === 200) {
-          message.success(res.data.message);
-          resetRegisterForm();
-          closeRegisterModal();
-        }
-      })
-      .catch((err) => {
-        if (err.response && err.response.status === 422) {
-          errors.value = err.response.data.errors;
-        } else {
-        }
-      })
-      .finally(() => {
-        loading.value = false;
-      });
-  }
+function handleRegisterSubmit() {
+  loading.value = true;
+  apiLinks.auth
+    .register(users)
+    .then((res) => {
+      if (res.status === 200) {
+        message.success(res.data.message);
+        resetRegisterForm();
+        closeRegisterModal();
+      }
+    })
+    .catch((err) => {
+      if (err.response && err.response.status === 422) {
+        errors.value = err.response.data.errors;
+      } else {
+      }
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
 const handleLoginSubmit = async () => {
   try {
     const response = await apiLinks.auth.login({
@@ -260,13 +264,12 @@ const handleLoginSubmit = async () => {
       password: password.value,
       rememberMe: rememberMe.value,
     });
-    console.log("dữ liệu trả về", response);
+    console.log('dữ liệu trả về', response);
     const accessToken = response.data.access_token;
     const user = response.data.user;
     const isAdmin = response.data.isAdmin;
 
-
-    auth.login(user, isAdmin, accessToken); 
+    auth.login(user, isAdmin, accessToken);
 
     resetLoginForm();
     closeLoginModal();
@@ -304,109 +307,108 @@ const handleLoginSubmit = async () => {
         message.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
       }
     } else {
-      message.error('Không thể kết nối tới server. Vui lòng kiểm tra kết nối mạng.');
+      message.error(
+        'Không thể kết nối tới server. Vui lòng kiểm tra kết nối mạng.'
+      );
     }
   }
 };
+function openLoginModal() {
+  showRegister.value = false;
+  showLogin.value = true;
+}
 
-  function openLoginModal() {
-    showRegister.value = false;
-    showLogin.value = true;
-  }
+function openRegisterModal() {
+  showLogin.value = false;
+  showRegister.value = true;
+}
 
-  function openRegisterModal() {
-    showLogin.value = false;
-    showRegister.value = true;
-  }
+function closeRegisterModal() {
+  showRegister.value = false;
+  // resetRegisterForm();
+}
 
-  function closeRegisterModal() {
-    showRegister.value = false;
-    // resetRegisterForm();
-  }
+function closeLoginModal() {
+  showLogin.value = false;
+  // resetLoginForm();
+}
 
-  function closeLoginModal() {
-    showLogin.value = false;
-    // resetLoginForm();
-  }
-
-  function resetRegisterForm() {
-    Object.keys(users).forEach((key) => {
-      users[key] = key === 'status_id' ? 5 : key === 'department_id' ? 2 : '';
-    });
-    errors.value = {};
-  }
-
-  function resetLoginForm() {
-    usernameOrEmail.value = '';
-    password.value = '';
-    errorsLogin.value = {};
-  }
-
-  const segmented = reactive({
-    content: true,
-    footer: 'soft',
+function resetRegisterForm() {
+  Object.keys(users).forEach((key) => {
+    users[key] = key === 'status_id' ? 5 : key === 'department_id' ? 2 : '';
   });
+  errors.value = {};
+}
 
-  import { h } from 'vue';
-  import { NIcon } from 'naive-ui';
-  import {
-    Settings as SettingsIcon,
-    LogOutOutline as LogoutIcon,
-    PersonCircleOutline as UserIcon,
-  } from '@vicons/ionicons5';
+function resetLoginForm() {
+  usernameOrEmail.value = '';
+  password.value = '';
+  errorsLogin.value = {};
+}
+
+const segmented = reactive({
+  content: true,
+  footer: 'soft',
+});
+
+import { h } from 'vue';
+import { NIcon } from 'naive-ui';
+import {
+  Settings as SettingsIcon,
+  LogOutOutline as LogoutIcon,
+  PersonCircleOutline as UserIcon,
+} from '@vicons/ionicons5';
 import apiLinks from '../services/api-links';
 
-  function renderIcon(icon) {
-    return () => {
-      return h(NIcon, null, {
-        default: () => h(icon),
-      });
-    };
+function renderIcon(icon) {
+  return () => {
+    return h(NIcon, null, {
+      default: () => h(icon),
+    });
+  };
+}
+
+const options = [
+  {
+    label: 'Profile',
+    key: 'profile',
+    icon: renderIcon(UserIcon),
+  },
+  {
+    label: 'Settings',
+    key: 'settings',
+    icon: renderIcon(SettingsIcon),
+  },
+  {
+    label: 'Logout',
+    key: 'logout',
+    icon: renderIcon(LogoutIcon),
+  },
+];
+
+async function handleSelect(key) {
+  // const authStore = useAuthStore();
+
+  switch (key) {
+    case 'profile':
+      router.push({ name: 'profile-info' });
+      break;
+    case 'settings':
+      router.push({ name: 'settings' });
+      break;
+    case 'logout':
+      try {
+        await auth.logout();
+        message.success('Đăng xuất thành công, hẹn gặp lại!');
+      } catch (error) {
+        message.error('Xin lỗi về sự bất tiện');
+      }
+      break;
+    default:
+      router.push({ name: 'home' });
+      break;
   }
-
-  const options = [
-    {
-      label: 'Profile',
-      key: 'profile',
-      icon: renderIcon(UserIcon),
-    },
-    {
-      label: 'Settings',
-      key: 'settings',
-      icon: renderIcon(SettingsIcon),
-    },
-    {
-      label: 'Logout',
-      key: 'logout',
-      icon: renderIcon(LogoutIcon),
-    },
-  ];
-
-  async function handleSelect(key) {
-    // const authStore = useAuthStore();
-
-    switch (key) {
-      case 'profile':
-        router.push({ name: 'profile-info' });
-        break;
-      case 'settings':
-        router.push({ name: 'settings' });
-        break;
-      case 'logout':
-        try {
-          await auth.logout();
-          message.success('Đăng xuất thành công, hẹn gặp lại!')
-        } catch (error) {
-          message.error("Xin lỗi về sự bất tiện")
-        }
-        break;
-      default:
-        router.push({ name: 'home' });
-        break;
-    }
-  }
-
-
+}
 </script>
 
 <style scoped>

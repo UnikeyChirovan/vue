@@ -161,7 +161,7 @@ watch(
   () => avatarUpdated.value,
   (newValue) => {
     if (newValue) {
-      console.log('Avatar updated, updating avatarUrl in profile store...');
+      //('Avatar updated, updating avatarUrl in profile store...');
       useProfile.updateAvatarUrl(`${useProfile.avatarUrl}`);
       useGeneral.setAvatarUpdated(false);
     }
