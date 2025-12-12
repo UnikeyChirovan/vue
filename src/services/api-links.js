@@ -127,7 +127,7 @@ const apiLinks = {
     deleteCategory: (id) => api.delete(`/categories/${id}`),
   },
   noauth: {
-    postContact: (data) => axios.post(`${baseUrl}/noauth/contact`, data),
+    postContact: (data) => axios.post(`${baseUrl}/api/noauth/contact`, data),
     getContacts: () => api.get('/noauth/contacts'),
     deleteContact: (id) => api.delete(`/noauth/contacts/${id}`),
     replyEmail: (data) => api.post('/noauth/reply-email', data),
@@ -162,10 +162,10 @@ const apiLinks = {
   },
   videos: {
     getAll: () => api.get('/videos'),
-    getDetail: (id) => api.get(`/video-manager/${id}`),
-    create: (data) => api.post('/video-manager/upload', data),
-    update: (id, data) => api.put(`/video-manager/${id}`, data),
-    delete: (id) => api.delete(`/video-manager/${id}`),
+    getDetail: (id) => api.get(`/videos/${id}`),
+    create: (data) => api.post('/videos/upload', data),
+    update: (id, data) => api.put(`/videos/${id}`, data),
+    delete: (id) => api.delete(`/videos/${id}`),
     getLastWatchEpisode: () => api.get('/videos/user-episode'),
   },
   chat: {
