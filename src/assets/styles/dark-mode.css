@@ -1,0 +1,557 @@
+/* ========== DARK MODE - MAXIMUM STRENGTH V3 ========== */
+/* Priority: Override EVERYTHING with high specificity */
+
+:root {
+  --dm-black: #000000;
+  --dm-bg: #0d0d0d;
+  --dm-bg-light: #1a1a1a;
+  --dm-card: #222222;
+  --dm-elevated: #2d2d2d;
+  --dm-white: #ffffff;
+  --dm-bright: #f8f8f8;
+  --dm-gray: #b8b8b8;
+  --dm-muted: #808080;
+  --dm-border: #404040;
+  --dm-green: #0c713d;
+  --dm-green-hover: #0f8a4a;
+}
+
+/* ========== ABSOLUTE FORCE - PURE BLACK ========== */
+html.dark-mode {
+  background: var(--dm-bg) !important;
+}
+
+html.dark-mode body {
+  background: var(--dm-bg) !important;
+  color: var(--dm-white) !important;
+}
+
+html.dark-mode #app {
+  background: var(--dm-bg) !important;
+  color: var(--dm-white) !important;
+}
+
+/* ========== NAVBAR - MAXIMUM OVERRIDE ========== */
+html.dark-mode nav,
+html.dark-mode nav *,
+html.dark-mode header,
+html.dark-mode header *,
+html.dark-mode .navbar,
+html.dark-mode .navbar * {
+  background-color: var(--dm-green) !important;
+  background-image: none !important;
+  color: var(--dm-white) !important;
+  border-color: transparent !important;
+  text-shadow: none !important;
+}
+
+html.dark-mode nav a,
+html.dark-mode header a,
+html.dark-mode .navbar a {
+  color: var(--dm-white) !important;
+  text-decoration: none !important;
+}
+
+html.dark-mode nav a:hover,
+html.dark-mode header a:hover,
+html.dark-mode .navbar a:hover {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  color: var(--dm-white) !important;
+}
+
+html.dark-mode nav .active,
+html.dark-mode header .active,
+html.dark-mode .navbar .active {
+  background-color: rgba(255, 255, 255, 0.25) !important;
+  color: var(--dm-white) !important;
+  border-bottom: 3px solid rgba(255, 255, 255, 0.5) !important;
+}
+
+/* ========== TEXT - ABSOLUTE WHITE ========== */
+html.dark-mode h1,
+html.dark-mode h2,
+html.dark-mode h3,
+html.dark-mode h4,
+html.dark-mode h5,
+html.dark-mode h6,
+html.dark-mode p,
+html.dark-mode span:not([class*='icon']),
+html.dark-mode div:not([class*='icon']),
+html.dark-mode label,
+html.dark-mode a,
+html.dark-mode li,
+html.dark-mode td,
+html.dark-mode th,
+html.dark-mode strong,
+html.dark-mode em,
+html.dark-mode small {
+  color: var(--dm-white) !important;
+  text-shadow: none !important;
+}
+
+/* Secondary text */
+html.dark-mode .description,
+html.dark-mode .subtitle,
+html.dark-mode .text-muted,
+html.dark-mode small.muted,
+html.dark-mode [class*='description'],
+html.dark-mode [class*='subtitle'] {
+  color: var(--dm-gray) !important;
+}
+
+/* ========== CARDS - MAXIMUM OVERRIDE ========== */
+html.dark-mode .card,
+html.dark-mode .card *:not(i):not(.fa):not([class*='btn']),
+html.dark-mode .panel,
+html.dark-mode .panel *:not(i):not(.fa):not([class*='btn']),
+html.dark-mode .box,
+html.dark-mode [class*='card'],
+html.dark-mode [class*='panel'] {
+  background-color: var(--dm-card) !important;
+  background-image: none !important;
+  color: var(--dm-white) !important;
+  border-color: var(--dm-border) !important;
+}
+
+html.dark-mode .card-header,
+html.dark-mode .card-header *,
+html.dark-mode .panel-header,
+html.dark-mode .panel-header * {
+  background-color: var(--dm-elevated) !important;
+  background-image: none !important;
+  color: var(--dm-white) !important;
+}
+
+/* ========== NAIVE UI - FORCE OVERRIDE ========== */
+html.dark-mode .n-card {
+  background-color: var(--dm-card) !important;
+  background-image: none !important;
+}
+
+html.dark-mode .n-card > .n-card-header,
+html.dark-mode .n-card .n-card-header {
+  background-color: var(--dm-elevated) !important;
+  background-image: none !important;
+  color: var(--dm-white) !important;
+}
+
+html.dark-mode .n-card-header * {
+  color: var(--dm-white) !important;
+}
+
+html.dark-mode .n-dropdown-menu,
+html.dark-mode .n-dropdown-menu * {
+  background-color: var(--dm-elevated) !important;
+  background-image: none !important;
+  color: var(--dm-white) !important;
+  border-color: var(--dm-border) !important;
+}
+
+html.dark-mode .n-dropdown-option:hover {
+  background-color: var(--dm-card) !important;
+}
+
+html.dark-mode .n-input,
+html.dark-mode .n-select,
+html.dark-mode .n-input__input-el,
+html.dark-mode .n-input__textarea-el {
+  background-color: var(--dm-elevated) !important;
+  color: var(--dm-white) !important;
+  border-color: var(--dm-border) !important;
+}
+
+html.dark-mode .n-input::placeholder,
+html.dark-mode .n-input__input-el::placeholder,
+html.dark-mode .n-input__textarea-el::placeholder {
+  color: var(--dm-muted) !important;
+}
+
+/* ========== ANT DESIGN - FORCE OVERRIDE ========== */
+html.dark-mode .ant-card {
+  background-color: var(--dm-card) !important;
+  background-image: none !important;
+}
+
+html.dark-mode .ant-card-header {
+  background-color: var(--dm-elevated) !important;
+  background-image: none !important;
+  color: var(--dm-white) !important;
+  border-bottom-color: var(--dm-border) !important;
+}
+
+html.dark-mode .ant-input,
+html.dark-mode .ant-select,
+html.dark-mode .ant-picker {
+  background-color: var(--dm-elevated) !important;
+  color: var(--dm-white) !important;
+  border-color: var(--dm-border) !important;
+}
+
+html.dark-mode .ant-select-selector {
+  background-color: var(--dm-elevated) !important;
+  color: var(--dm-white) !important;
+}
+
+html.dark-mode .ant-table {
+  background-color: var(--dm-card) !important;
+}
+
+html.dark-mode .ant-table-thead > tr > th {
+  background-color: var(--dm-elevated) !important;
+  color: var(--dm-white) !important;
+  border-color: var(--dm-border) !important;
+}
+
+html.dark-mode .ant-table-tbody > tr > td {
+  background-color: var(--dm-card) !important;
+  color: var(--dm-white) !important;
+  border-color: var(--dm-border) !important;
+}
+
+html.dark-mode .ant-table-tbody > tr:hover > td {
+  background-color: var(--dm-elevated) !important;
+}
+
+/* ========== BUTTONS - SMART OVERRIDE ========== */
+html.dark-mode
+  button:not([class*='btn-']):not(.action-btn):not([style*='gradient']) {
+  background-color: var(--dm-elevated) !important;
+  background-image: none !important;
+  color: var(--dm-white) !important;
+  border-color: var(--dm-border) !important;
+}
+
+html.dark-mode button:not([class*='btn-']):not(.action-btn):hover {
+  background-color: var(--dm-card) !important;
+  border-color: var(--dm-green) !important;
+}
+
+/* Keep gradient buttons beautiful */
+html.dark-mode .action-btn,
+html.dark-mode [class*='btn-primary'],
+html.dark-mode [class*='btn-success'],
+html.dark-mode [class*='btn-danger'],
+html.dark-mode [class*='btn-warning'],
+html.dark-mode button[style*='linear-gradient'],
+html.dark-mode .logout-btn,
+html.dark-mode .delete-btn {
+  /* Do NOT override - keep original gradient */
+}
+
+/* ========== FORMS - MAXIMUM OVERRIDE ========== */
+html.dark-mode input,
+html.dark-mode input[type='text'],
+html.dark-mode input[type='email'],
+html.dark-mode input[type='password'],
+html.dark-mode input[type='number'],
+html.dark-mode textarea,
+html.dark-mode select {
+  background-color: var(--dm-elevated) !important;
+  background-image: none !important;
+  color: var(--dm-white) !important;
+  border: 1px solid var(--dm-border) !important;
+}
+
+html.dark-mode input::placeholder,
+html.dark-mode textarea::placeholder {
+  color: var(--dm-muted) !important;
+}
+
+html.dark-mode input:focus,
+html.dark-mode textarea:focus,
+html.dark-mode select:focus {
+  background-color: var(--dm-card) !important;
+  border-color: var(--dm-green) !important;
+  box-shadow: 0 0 0 2px rgba(15, 138, 74, 0.25) !important;
+}
+
+/* ========== TABLES - MAXIMUM OVERRIDE ========== */
+html.dark-mode table,
+html.dark-mode table * {
+  background-color: var(--dm-card) !important;
+  background-image: none !important;
+  color: var(--dm-white) !important;
+  border-color: var(--dm-border) !important;
+}
+
+html.dark-mode thead,
+html.dark-mode thead * {
+  background-color: var(--dm-elevated) !important;
+  background-image: none !important;
+}
+
+html.dark-mode tbody tr:hover,
+html.dark-mode tbody tr:hover * {
+  background-color: var(--dm-elevated) !important;
+}
+
+/* ========== SIDEBAR ========== */
+html.dark-mode aside,
+html.dark-mode aside *,
+html.dark-mode .sidebar,
+html.dark-mode .sidebar * {
+  background-color: var(--dm-bg-light) !important;
+  background-image: none !important;
+  color: var(--dm-white) !important;
+}
+
+html.dark-mode .sidebar a:hover {
+  background-color: var(--dm-elevated) !important;
+}
+
+/* ========== FOOTER ========== */
+html.dark-mode footer,
+html.dark-mode footer *,
+html.dark-mode .footer,
+html.dark-mode .footer * {
+  background-color: var(--dm-bg-light) !important;
+  background-image: none !important;
+  color: var(--dm-white) !important;
+}
+
+/* ========== DROPDOWN & MENU ========== */
+html.dark-mode .dropdown-menu,
+html.dark-mode .dropdown-menu *,
+html.dark-mode .menu,
+html.dark-mode .menu *,
+html.dark-mode [class*='menu'],
+html.dark-mode [class*='dropdown'] {
+  background-color: var(--dm-elevated) !important;
+  background-image: none !important;
+  color: var(--dm-white) !important;
+}
+
+html.dark-mode .dropdown-menu a:hover,
+html.dark-mode .menu a:hover {
+  background-color: var(--dm-card) !important;
+}
+
+/* ========== MODAL ========== */
+html.dark-mode .modal,
+html.dark-mode .modal *:not([class*='btn']),
+html.dark-mode .dialog,
+html.dark-mode .dialog *:not([class*='btn']) {
+  background-color: var(--dm-card) !important;
+  background-image: none !important;
+  color: var(--dm-white) !important;
+}
+
+html.dark-mode .modal-header {
+  border-bottom-color: var(--dm-border) !important;
+}
+
+html.dark-mode .modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.9) !important;
+}
+
+/* ========== LINKS ========== */
+html.dark-mode a {
+  color: var(--dm-green-hover) !important;
+}
+
+html.dark-mode a:hover {
+  color: #14c267 !important;
+}
+
+/* But navbar links stay white */
+html.dark-mode nav a,
+html.dark-mode header a,
+html.dark-mode .navbar a {
+  color: var(--dm-white) !important;
+}
+
+/* ========== SCROLLBAR ========== */
+html.dark-mode ::-webkit-scrollbar {
+  width: 12px;
+  background-color: var(--dm-bg);
+}
+
+html.dark-mode ::-webkit-scrollbar-track {
+  background: var(--dm-bg);
+}
+
+html.dark-mode ::-webkit-scrollbar-thumb {
+  background: var(--dm-elevated);
+  border-radius: 6px;
+  border: 2px solid var(--dm-bg);
+}
+
+html.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: var(--dm-border);
+}
+
+/* ========== DIVIDERS ========== */
+html.dark-mode hr,
+html.dark-mode .divider,
+html.dark-mode .section-divider {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--dm-border),
+    transparent
+  ) !important;
+  border-color: var(--dm-border) !important;
+}
+
+/* ========== ALERTS & BANNERS ========== */
+html.dark-mode .alert,
+html.dark-mode [class*='alert'],
+html.dark-mode [class*='banner'] {
+  border-color: var(--dm-border) !important;
+}
+
+html.dark-mode .warning-banner,
+html.dark-mode .alert-warning {
+  background: linear-gradient(135deg, #3d2800 0%, #4d3300 100%) !important;
+  border-left: 4px solid #ff9800 !important;
+}
+
+html.dark-mode .warning-banner *,
+html.dark-mode .alert-warning * {
+  color: #ffcc80 !important;
+}
+
+html.dark-mode .alert-info {
+  background-color: #1a2840 !important;
+  color: #7cb3ff !important;
+}
+
+html.dark-mode .alert-success {
+  background-color: #1a3a1a !important;
+  color: #81c784 !important;
+}
+
+html.dark-mode .alert-danger {
+  background-color: #3d1a1a !important;
+  color: #ef5350 !important;
+}
+
+/* ========== CKEDITOR - KEEP WHITE EDITOR ========== */
+html.dark-mode .ck.ck-editor__editable,
+html.dark-mode .ck-content {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  /* Editor content stays white for readability */
+}
+
+html.dark-mode .ck.ck-toolbar,
+html.dark-mode .ck-toolbar {
+  background-color: var(--dm-elevated) !important;
+  border-color: var(--dm-border) !important;
+}
+
+html.dark-mode .editor-container__editor-wrapper {
+  background-color: var(--dm-card) !important;
+}
+
+/* ========== ICONS - INTELLIGENT HANDLING ========== */
+/* White icons by default */
+html.dark-mode i:not([style*='color']):not([class*='color']),
+html.dark-mode .fa:not([style*='color']),
+html.dark-mode .fas:not([style*='color']),
+html.dark-mode .far:not([style*='color']),
+html.dark-mode .fab:not([style*='color']) {
+  color: var(--dm-white) !important;
+}
+
+/* But keep colored icons in special containers */
+html.dark-mode [class*='icon'] i,
+html.dark-mode [class*='-icon'] i,
+html.dark-mode .header-icon i,
+html.dark-mode .setting-icon i,
+html.dark-mode .action-icon i,
+html.dark-mode [style*='gradient'] i {
+  /* Keep original color */
+}
+
+/* ========== BADGES & TAGS ========== */
+html.dark-mode .badge,
+html.dark-mode .tag,
+html.dark-mode .chip {
+  background-color: var(--dm-elevated) !important;
+  color: var(--dm-white) !important;
+  border: 1px solid var(--dm-border) !important;
+}
+
+/* ========== SETTINGS PAGE SPECIFIC ========== */
+html.dark-mode .settings-wrapper {
+  background: linear-gradient(180deg, var(--dm-bg) 0%, #121212 100%) !important;
+}
+
+html.dark-mode .header-section {
+  background-color: var(--dm-card) !important;
+  background-image: none !important;
+}
+
+html.dark-mode .setting-card,
+html.dark-mode .action-card {
+  background-color: var(--dm-card) !important;
+  background-image: none !important;
+}
+
+/* ========== PREVENT OVERRIDE ON IMAGES ========== */
+html.dark-mode img {
+  /* Do not change images */
+}
+
+html.dark-mode svg:not(.fa):not([class*='icon']) {
+  /* Do not change SVG illustrations */
+}
+
+/* ========== CONTAINERS - CLEAN BLACK ========== */
+html.dark-mode .container,
+html.dark-mode .wrapper,
+html.dark-mode main,
+html.dark-mode section:not([style*='background-image']),
+html.dark-mode article {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+html.dark-mode [class*='wrapper']:not([style*='background-image']) {
+  background-image: none !important;
+}
+
+/* ========== REMOVE ALL UNWANTED GRADIENTS ========== */
+html.dark-mode
+  div:not([class*='btn']):not(.action-btn):not([class*='icon']):not(
+    [class*='gradient']
+  ):not([style*='background-image']) {
+  background-image: none !important;
+}
+
+/* ========== PRINT MODE ========== */
+@media print {
+  html.dark-mode,
+  html.dark-mode * {
+    background-color: white !important;
+    background-image: none !important;
+    color: black !important;
+  }
+}
+
+/* ========== FINAL NUCLEAR OPTION ========== */
+/* Force override App.vue inline styles */
+html.dark-mode .n-card > .n-card-header[style] {
+  background-color: var(--dm-elevated) !important;
+}
+
+html.dark-mode .n-dropdown-menu[style] {
+  background-color: var(--dm-elevated) !important;
+}
+
+/* Force white text on everything except special cases */
+html.dark-mode * {
+  color: var(--dm-white) !important;
+}
+
+/* Restore icon colors */
+html.dark-mode i,
+html.dark-mode svg path {
+  color: inherit !important;
+}
+
+/* Restore button colors */
+html.dark-mode button {
+  color: inherit !important;
+}

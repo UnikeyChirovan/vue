@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
-import { CkeditorPlugin } from '@ckeditor/ckeditor5-vue'; 
+import { CkeditorPlugin } from '@ckeditor/ckeditor5-vue';
 import router from './router';
 import axios from 'axios';
 import api from './services/axiosInterceptor';
@@ -9,7 +9,6 @@ import apiLinks from './services/api-links';
 // import 'default-passive-events'; // xử lý tự động passive là true
 window.axios = axios;
 axios.defaults.withCredentials = true;
-
 
 import {
   Input,
@@ -28,6 +27,8 @@ import {
   DatePicker,
   Radio,
   Upload,
+  Tag,
+  Pagination,
 } from 'ant-design-vue';
 import {
   create,
@@ -72,7 +73,7 @@ import {
   NList,
   NListItem,
   NProgress,
-  NAvatar
+  NAvatar,
 } from 'naive-ui';
 import App from './App.vue';
 
@@ -82,7 +83,6 @@ import 'ant-design-vue/dist/antd.css';
 import 'bootstrap/dist/css/bootstrap-grid.min.css';
 import 'bootstrap/dist/css/bootstrap-utilities.min.css';
 import './mystyle.css';
-
 const naive = create({
   components: [
     NButton,
@@ -128,7 +128,7 @@ const naive = create({
     NListItem,
     NProgress,
     NText,
-    NAvatar
+    NAvatar,
   ],
 });
 
@@ -153,9 +153,10 @@ app.use(Layout);
 app.use(DatePicker);
 app.use(Radio);
 app.use(Upload);
+app.use(Pagination);
+app.use(Tag);
 app.use(naive);
-app.use( CkeditorPlugin );
-
+app.use(CkeditorPlugin);
 
 app.mount('#app');
 app.config.globalProperties.$message = message;

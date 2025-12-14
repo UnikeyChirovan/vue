@@ -4,30 +4,56 @@
       <!-- Title Input -->
       <div class="mb-3">
         <label for="title">Tiêu đề</label>
-        <input v-model="form.title" type="text" id="title" required class="form-control" />
+        <input
+          v-model="form.title"
+          type="text"
+          id="title"
+          required
+          class="form-control"
+        />
       </div>
 
       <!-- Section Number -->
       <div class="mb-3">
         <label for="sectionNumber">Phần số</label>
-        <input v-model="form.section_number" type="number" id="sectionNumber" required class="form-control" />
+        <input
+          v-model="form.section_number"
+          type="number"
+          id="sectionNumber"
+          required
+          class="form-control"
+        />
       </div>
 
       <!-- File Upload -->
       <div class="mb-3">
         <label for="file">Chọn tệp .txt để nhập nội dung</label>
-        <input @change="handleFileUpload" type="file" id="file" accept=".txt" class="form-control" />
+        <input
+          @change="handleFileUpload"
+          type="file"
+          id="file"
+          accept=".txt"
+          class="form-control"
+        />
       </div>
 
       <!-- Content Sections -->
       <div v-for="(section, index) in form.content" :key="index" class="mb-3">
         <label>Đoạn {{ index + 1 }}</label>
-        <textarea v-model="form.content[index]" rows="3" class="form-control"></textarea>
-        <a-button @click="removeSection(index)" danger class="mt-2">Xóa đoạn</a-button>
+        <textarea
+          v-model="form.content[index]"
+          rows="3"
+          class="form-control"
+        ></textarea>
+        <a-button @click="removeSection(index)" danger class="mt-2"
+          >Xóa đoạn</a-button
+        >
       </div>
 
       <a-button @click="addSection" class="mb-3">Thêm đoạn</a-button>
-      <a-button @click="showConfirmDelete" danger class="mb-3 ms-3">Xóa Toàn Bộ</a-button>
+      <a-button @click="showConfirmDelete" danger class="mb-3 ms-3"
+        >Xóa Toàn Bộ</a-button
+      >
       <a-button type="primary" html-type="submit">Lưu thay đổi</a-button>
     </form>
 
@@ -44,7 +70,9 @@
     <!-- Scroll Buttons -->
     <ScrollButtons>
       <template v-slot:top-button>
-        <a-button type="primary"><i class="fa-solid fa-arrow-down"></i></a-button>
+        <a-button type="primary"
+          ><i class="fa-solid fa-arrow-down"></i
+        ></a-button>
       </template>
       <template v-slot:bottom-button>
         <a-button type="primary"><i class="fa-solid fa-arrow-up"></i></a-button>

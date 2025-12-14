@@ -1,0 +1,817 @@
+<template>
+  <div class="background-image-container"></div>
+  <TheHeader />
+  <div class="reading-wrapper">
+    <div class="custom-solid-layer"></div>
+    <div class="custom-background-layer"></div>
+    <div class="container text-center">
+      <div class="story-header">
+        <h1 class="story-title">{{ storyName }}</h1>
+        <hr class="custom-hr" />
+        <h2 class="author-name">
+          <em>{{ authorName }}</em>
+        </h2>
+      </div>
+
+      <!-- Navigation Controls - Giống Index2 -->
+      <div class="navigation-controls">
+        <n-button
+          @click="prevChapter"
+          :disabled="
+            chapterStore.selectedChapter ===
+            chapterStore.chapterOptions[0]?.value
+          "
+          type="primary"
+          class="nav-button"
+        >
+          <i class="fas fa-chevron-left"></i>
+          <span class="nav-text">Chương trước</span>
+        </n-button>
+        <div class="chapter-select-container">
+          <n-select
+            v-model:value="chapterStore.selectedChapter"
+            :options="chapterStore.chapterOptions"
+            @update:value="updateChapterAndFetchContent"
+            class="chapter-select"
+          />
+        </div>
+        <n-button
+          @click="nextChapter"
+          :disabled="
+            chapterStore.selectedChapter === chapterStore.chapterOptions.length
+          "
+          type="primary"
+          class="nav-button"
+        >
+          <span class="nav-text">Chương tiếp</span>
+          <i class="fas fa-chevron-right"></i>
+        </n-button>
+      </div>
+
+      <div class="text-center snowflake-divider">
+        <span class="snowflake">&#10052;</span>
+        <span class="snowflake">&#10052;</span>
+        <span class="snowflake">&#10052;</span>
+      </div>
+
+      <div class="chapter-section">
+        <h3 class="chapter-title">{{ currentChapterTitle }}</h3>
+        <div v-if="chapterContent.length" class="chapter-content">
+          <p
+            v-for="(paragraph, index) in chapterContent"
+            :key="index"
+            class="paragraph"
+          >
+            {{ paragraph }}
+          </p>
+        </div>
+        <div v-else class="loading-content">
+          <div class="spinner"></div>
+          <p>Đang tải nội dung...</p>
+        </div>
+      </div>
+
+      <div class="text-center snowflake-divider">
+        <span class="snowflake">&#10052;</span>
+        <span class="snowflake">&#10052;</span>
+        <span class="snowflake">&#10052;</span>
+      </div>
+
+      <div class="navigation-controls bottom">
+        <n-button
+          @click="prevChapter"
+          :disabled="
+            chapterStore.selectedChapter ===
+            chapterStore.chapterOptions[0]?.value
+          "
+          type="primary"
+          class="nav-button"
+        >
+          <i class="fas fa-chevron-left"></i>
+          <span class="nav-text">Chương trước</span>
+        </n-button>
+        <div class="chapter-select-container">
+          <n-select
+            v-model:value="chapterStore.selectedChapter"
+            :options="chapterStore.chapterOptions"
+            @update:value="updateChapterAndFetchContent"
+            class="chapter-select"
+          />
+        </div>
+        <n-button
+          @click="nextChapter"
+          :disabled="
+            chapterStore.selectedChapter === chapterStore.chapterOptions.length
+          "
+          type="primary"
+          class="nav-button"
+        >
+          <span class="nav-text">Chương tiếp</span>
+          <i class="fas fa-chevron-right"></i>
+        </n-button>
+      </div>
+    </div>
+  </div>
+  <SettingsModal />
+  <TableofContent />
+  <TheFooter />
+</template>
+
+<script setup>
+import { ref, onMounted, watch } from 'vue';
+import { useChapterStore } from '../../stores/chapterStore';
+import { NButton, NSelect } from 'naive-ui';
+import TheHeader from '../../components/TheHeader.vue';
+import api from '../../services/axiosInterceptor';
+import SettingsModal from '../../components/SettingsModal.vue';
+import TableofContent from '../../components/TableofContent.vue';
+import TheFooter from '../../components/TheFooter.vue';
+
+const chapterStore = useChapterStore();
+const storyName = ref('');
+const authorName = ref('');
+const chapterContent = ref([]);
+const currentChapterTitle = ref('');
+
+const isFetching = ref(false);
+
+const fetchChapterContent = async (chapterNumber) => {
+  let chapterDetail = JSON.parse(localStorage.getItem('chapter_detail')) || [];
+  if (!Array.isArray(chapterDetail)) {
+    chapterDetail = [];
+  }
+  const cachedChapter = chapterDetail.find(
+    (chapter) => chapter[`chapter-${chapterNumber}`]
+  );
+
+  if (cachedChapter) {
+    const { title, content } = cachedChapter[`chapter-${chapterNumber}`];
+    chapterContent.value = content;
+    currentChapterTitle.value = title;
+    if (chapterStore.selectedChapter !== chapterNumber) {
+      chapterStore.setSelectedChapter(chapterNumber);
+    }
+    window.scrollTo(0, 0);
+    return;
+  }
+  try {
+    if (isFetching.value) return;
+    isFetching.value = true;
+
+    const response = await api.get(`/story/chapters/${chapterNumber}`);
+    const { content, title } = response.data;
+
+    chapterContent.value = content;
+    currentChapterTitle.value = title;
+    chapterDetail.push({ [`chapter-${chapterNumber}`]: { title, content } });
+    localStorage.setItem('chapter_detail', JSON.stringify(chapterDetail));
+
+    if (chapterStore.selectedChapter !== chapterNumber) {
+      chapterStore.setSelectedChapter(chapterNumber);
+    }
+
+    window.scrollTo(0, 0);
+  } catch (error) {
+    console.error('Lỗi khi lấy nội dung chương:', error);
+  } finally {
+    isFetching.value = false;
+  }
+};
+
+const fetchChaptersList = async () => {
+  try {
+    let chapters = localStorage.getItem('chapters');
+    if (chapters) {
+      chapters = JSON.parse(chapters);
+    } else {
+      const response = await api.get('/story/chapters');
+      chapters = response.data;
+      localStorage.setItem('chapters', JSON.stringify(chapters));
+    }
+
+    const options = chapters.map((chapter) => ({
+      label: `Chương ${chapter.chapter_number}`,
+      value: chapter.id,
+      title: chapter.title,
+    }));
+    chapterStore.setChapterOptions(options);
+
+    const story = chapters[0]?.story_name || 'Tên truyện không xác định';
+    const author = chapters[0]?.author || 'Tác giả không xác định';
+    storyName.value = story;
+    authorName.value = author;
+    localStorage.setItem('storyName', story);
+    localStorage.setItem('authorName', author);
+
+    if (chapterStore.selectedChapter === null && options.length) {
+      chapterStore.setSelectedChapter(options[0].value);
+    }
+  } catch (error) {
+    console.error('Lỗi khi lấy danh sách chương:', error);
+  }
+};
+
+const prevChapter = () => {
+  if (chapterStore.selectedChapter > 0) {
+    chapterStore.setSelectedChapter(chapterStore.selectedChapter - 1);
+  }
+};
+
+const nextChapter = () => {
+  if (chapterStore.selectedChapter < chapterStore.chapterOptions.length) {
+    chapterStore.setSelectedChapter(chapterStore.selectedChapter + 1);
+  }
+};
+
+const updateChapterAndFetchContent = (newChapter) => {
+  if (chapterStore.selectedChapter !== newChapter) {
+    chapterStore.setSelectedChapter(newChapter);
+  }
+};
+
+const fetchLastReadChapter = async () => {
+  try {
+    const lastChapterId = localStorage.getItem('lastReadChapter');
+
+    if (lastChapterId) {
+      chapterStore.setSelectedChapter(lastChapterId);
+      fetchChapterContent(lastChapterId);
+      return;
+    }
+
+    const response = await api.get(`/story/user-chapter`);
+    if (response.data) {
+      const chapterId = response.data?.chapter_id;
+      chapterStore.setSelectedChapter(chapterId);
+      fetchChapterContent(chapterId);
+    }
+  } catch (error) {
+    console.error('Lỗi khi lấy chương cuối cùng:', error);
+  }
+};
+
+const saveChapterProgress = async (chapterId) => {
+  try {
+    await api.post(`/story/user-chapter`, { chapter_id: chapterId });
+  } catch (error) {
+    console.error('Lỗi khi lưu chương:', error);
+  }
+};
+
+watch(
+  () => chapterStore.selectedChapter,
+  (newChapter, oldChapter) => {
+    if (newChapter !== oldChapter && newChapter !== null) {
+      fetchChapterContent(newChapter);
+      localStorage.setItem('lastReadChapter', newChapter);
+      saveChapterProgress(newChapter);
+    }
+  }
+);
+
+onMounted(() => {
+  const lastReadChapter = localStorage.getItem('lastReadChapter');
+  const savedStoryName = localStorage.getItem('storyName');
+  const savedAuthorName = localStorage.getItem('authorName');
+
+  if (savedStoryName) {
+    storyName.value = savedStoryName;
+  }
+
+  if (savedAuthorName) {
+    authorName.value = savedAuthorName;
+  }
+  if (lastReadChapter) {
+    const chapterNumber = Number(lastReadChapter);
+    chapterStore.setSelectedChapter(chapterNumber);
+    fetchChapterContent(chapterNumber);
+    fetchChaptersList();
+  } else {
+    fetchChaptersList();
+    fetchLastReadChapter();
+  }
+});
+</script>
+
+<style scoped>
+/* ========== BACKGROUND ========== */
+body {
+  will-change: filter;
+}
+
+.background-image-container {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  width: 66.6667%;
+  height: 100vh;
+  transform: translateX(-50%);
+  z-index: -1;
+  opacity: 0.2;
+  background-size: cover;
+  background-position: top center;
+  overflow: hidden;
+  transition: width 0.3s ease;
+}
+
+/* ========== MAIN WRAPPER ========== */
+.reading-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(
+    180deg,
+    rgba(250, 250, 250, 0.95) 0%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+  padding: 80px 20px 60px;
+}
+
+.container {
+  max-width: 66.67%;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.98);
+  padding: 50px 60px;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(12, 113, 61, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* ========== STORY HEADER ========== */
+.story-header {
+  margin-bottom: 40px;
+}
+
+.story-title {
+  display: inline-block;
+  font-size: 3.5rem;
+  font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+  color: transparent;
+  background: linear-gradient(
+    to right,
+    #ff0000,
+    #ffa500,
+    #ffff00,
+    #00ff00,
+    #90ee90,
+    #0000ff,
+    #4b0082,
+    #800080,
+    #ff00bf,
+    #ff0000
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-weight: 800;
+  margin: 0 0 20px 0;
+  line-height: 1.2;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.custom-hr {
+  height: 5px;
+  width: 60%;
+  margin: 20px auto;
+  background-image: url('../../assets/img/gachchan.jpg');
+  background-repeat: repeat-x;
+  background-size: contain;
+  background-position: center;
+  border: none;
+}
+
+.author-name {
+  font-size: 1.3rem;
+  color: #0c713d;
+  margin: 20px 0 0 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* ========== NAVIGATION - Style từ Index2 ========== */
+.navigation-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin: 30px 0;
+  flex-wrap: wrap;
+}
+
+.navigation-controls.bottom {
+  margin-top: 50px;
+}
+
+.nav-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 140px;
+  padding: 14px 24px !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%) !important;
+  border: none !important;
+  color: white !important;
+  cursor: pointer;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.2) !important;
+}
+
+.nav-button:hover:not(:disabled) {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(12, 113, 61, 0.3) !important;
+}
+
+.nav-button:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background: #ccc !important;
+}
+
+.nav-button i {
+  font-size: 0.9rem;
+}
+
+.nav-text {
+  display: inline;
+}
+
+.chapter-select-container {
+  flex: 1;
+  max-width: 250px;
+  min-width: 180px;
+}
+
+.chapter-select {
+  width: 100%;
+  border-radius: 12px !important;
+}
+
+/* ========== SNOWFLAKE DIVIDER ========== */
+.snowflake-divider {
+  margin: 40px 0;
+}
+
+.snowflake {
+  color: #0c713d;
+  font-size: 1.8rem;
+  margin: 0 15px;
+  opacity: 0.6;
+  display: inline-block;
+  animation: float 3s ease-in-out infinite;
+}
+
+.snowflake:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.snowflake:nth-child(3) {
+  animation-delay: 1s;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ========== CHAPTER SECTION ========== */
+.chapter-section {
+  margin: 50px 0;
+}
+
+.chapter-title {
+  text-align: center;
+  font-size: 2rem;
+  color: #cd0c10;
+  margin: 30px 0;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 2px rgba(205, 12, 16, 0.1);
+}
+
+.chapter-content {
+  text-align: left;
+  font-size: 1.25rem;
+  line-height: 2;
+  color: #333;
+  transition:
+    font-size 0.3s ease,
+    font-family 0.3s ease,
+    line-height 0.3s ease;
+}
+
+.paragraph {
+  text-indent: 2.5em;
+  margin-bottom: 1.5rem;
+  text-align: justify;
+  transition: color 0.3s ease;
+}
+
+.paragraph:hover {
+  color: #0c713d;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 20px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(12, 113, 61, 0.1);
+  border-top-color: #0c713d;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .reading-wrapper {
+    padding: 70px 20px 50px;
+  }
+
+  .container {
+    max-width: 80%;
+    padding: 40px 50px;
+  }
+
+  .story-title {
+    font-size: 3rem;
+  }
+
+  .author-name {
+    font-size: 1.2rem;
+  }
+
+  .chapter-title {
+    font-size: 1.8rem;
+  }
+
+  .chapter-content {
+    font-size: 1.2rem;
+    line-height: 1.9;
+  }
+
+  .nav-button {
+    min-width: 120px;
+    padding: 12px 20px !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .reading-wrapper {
+    padding: 60px 15px 40px;
+  }
+
+  .container {
+    max-width: 95%;
+    padding: 35px 25px;
+    border-radius: 16px;
+  }
+
+  .story-title {
+    font-size: 2.5rem;
+  }
+
+  .custom-hr {
+    width: 80%;
+    height: 4px;
+  }
+
+  .author-name {
+    font-size: 1.1rem;
+  }
+
+  .navigation-controls {
+    gap: 10px;
+  }
+
+  .nav-button {
+    min-width: auto;
+    padding: 12px 16px !important;
+  }
+
+  .nav-button i {
+    font-size: 1rem;
+  }
+
+  .nav-text {
+    display: none;
+  }
+
+  .chapter-select-container {
+    flex: 1;
+    max-width: 100%;
+    min-width: 150px;
+  }
+
+  .snowflake {
+    font-size: 1.5rem;
+    margin: 0 10px;
+  }
+
+  .chapter-title {
+    font-size: 1.6rem;
+  }
+
+  .chapter-content {
+    font-size: 1.15rem;
+    line-height: 1.85;
+  }
+
+  .paragraph {
+    text-indent: 2em;
+    margin-bottom: 1.3rem;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .reading-wrapper {
+    padding: 50px 10px 30px;
+  }
+
+  .container {
+    max-width: 100%;
+    padding: 25px 20px;
+    border-radius: 12px;
+  }
+
+  .story-title {
+    font-size: 2rem;
+  }
+
+  .custom-hr {
+    width: 90%;
+    height: 3px;
+  }
+
+  .author-name {
+    font-size: 1rem;
+  }
+
+  .navigation-controls {
+    gap: 8px;
+  }
+
+  .nav-button {
+    padding: 10px 14px !important;
+  }
+
+  .chapter-select-container {
+    min-width: 120px;
+  }
+
+  .snowflake-divider {
+    margin: 30px 0;
+  }
+
+  .snowflake {
+    font-size: 1.3rem;
+    margin: 0 8px;
+  }
+
+  .chapter-section {
+    margin: 40px 0;
+  }
+
+  .chapter-title {
+    font-size: 1.4rem;
+    margin: 25px 0;
+  }
+
+  .chapter-content {
+    font-size: 1.05rem;
+    line-height: 1.8;
+  }
+
+  .paragraph {
+    text-indent: 1.5em;
+    margin-bottom: 1.2rem;
+  }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 360px) {
+  .story-title {
+    font-size: 1.7rem;
+  }
+
+  .nav-button {
+    padding: 8px 12px !important;
+  }
+
+  .chapter-select-container {
+    min-width: 100px;
+  }
+
+  .chapter-content {
+    font-size: 0.95rem;
+  }
+}
+.custom-background-layer {
+  position: fixed;
+  top: 0; /* ĐỔI từ 80px về 0 để full viewport */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 66.67%;
+  max-width: 66.67%;
+  height: 100vh; /* FULL 100vh */
+  z-index: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  border-radius: 0; /* BỎ BO GÓC */
+
+  /* HỖ TRỢ BACKGROUND IMAGE - FULL HEIGHT, CANH GIỮA */
+  background-size: cover; /* Cover để full chiều cao */
+  background-position: center center; /* Canh giữa cả 2 chiều */
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+.custom-solid-layer {
+  position: fixed;
+  top: 0; /* ĐỔI từ 80px về 0 để full viewport */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 66.67%;
+  max-width: 66.67%;
+  height: 100vh; /* FULL 100vh */
+  z-index: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  border-radius: 0; /* BỎ BO GÓC */
+}
+
+.reading-wrapper {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(
+    180deg,
+    rgba(250, 250, 250, 0.95) 0%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+  padding: 80px 20px 60px;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 66.67%;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.98);
+  padding: 50px 60px;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(12, 113, 61, 0.1);
+  transition: all 0.3s ease;
+}
+/* Tablet */
+@media (max-width: 1024px) {
+  .custom-background-layer,
+  .custom-solid-layer {
+    width: 80%;
+    max-width: 80%;
+    top: 70px;
+    height: calc(100vh - 120px);
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .custom-background-layer,
+  .custom-solid-layer {
+    width: 95%;
+    max-width: 95%;
+    top: 60px;
+    height: calc(100vh - 100px);
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .custom-background-layer,
+  .custom-solid-layer {
+    width: 100%;
+    max-width: 100%;
+    top: 50px;
+    height: calc(100vh - 80px);
+  }
+}
+</style>

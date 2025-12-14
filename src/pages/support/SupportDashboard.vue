@@ -2,10 +2,13 @@
   <TheHeader />
   <div class="support-dashboard">
     <div class="dashboard-header">
-      <h1>Hỗ Trợ Khách Hàng</h1>
+      <div class="header-content">
+        <h1>Hỗ Trợ Khách Hàng</h1>
+        <p class="header-subtitle">Quản lý và phản hồi các yêu cầu hỗ trợ</p>
+      </div>
       <button @click="refreshAll" class="refresh-btn" :disabled="loading">
         <i class="fa-solid fa-rotate" :class="{ 'fa-spin': loading }"></i>
-        Làm mới
+        <span class="btn-text">Làm mới</span>
       </button>
     </div>
 
@@ -15,7 +18,7 @@
         :class="['tab', { active: activeTab === 'pending' }]"
         @click="activeTab = 'pending'"
       >
-        Đang chờ
+        <span class="tab-label">Đang chờ</span>
         <span v-if="pendingCount > 0" class="tab-badge">{{
           pendingCount
         }}</span>
@@ -24,7 +27,7 @@
         :class="['tab', { active: activeTab === 'my_active' }]"
         @click="activeTab = 'my_active'"
       >
-        Của tôi
+        <span class="tab-label">Của tôi</span>
         <span v-if="myActiveCount > 0" class="tab-badge">{{
           myActiveCount
         }}</span>
@@ -34,7 +37,7 @@
         :class="['tab', { active: activeTab === 'all_active' }]"
         @click="activeTab = 'all_active'"
       >
-        Tất cả
+        <span class="tab-label">Tất cả</span>
         <span v-if="allActiveCount > 0" class="tab-badge">{{
           allActiveCount
         }}</span>
@@ -44,13 +47,15 @@
     <!-- Conversations List -->
     <div class="conversations-container">
       <div v-if="loading" class="loading-state">
-        <i class="fa-solid fa-spinner fa-spin"></i>
-        <p>Đang tải...</p>
+        <div class="loading-spinner"></div>
+        <p>Đang tải dữ liệu...</p>
       </div>
 
       <div v-else-if="currentConversations.length === 0" class="empty-state">
-        <i class="fa-solid fa-inbox"></i>
-        <p>{{ emptyMessage }}</p>
+        <div class="empty-icon">
+          <i class="fa-solid fa-inbox"></i>
+        </div>
+        <p class="empty-message">{{ emptyMessage }}</p>
       </div>
 
       <div
@@ -200,7 +205,7 @@ const refreshAll = async () => {
 
 const claimConversation = async (conversationId) => {
   if (claimingIds.value.has(conversationId)) {
-    return; // Đang xử lý, không cho click lại
+    return;
   }
 
   claimingIds.value.add(conversationId);
@@ -255,7 +260,6 @@ onMounted(() => {
   loadConversations();
   supportStore.subscribeToManagerChannel();
 
-  // Auto refresh every 30s
   const interval = setInterval(() => {
     supportStore.refreshManagerConversations();
   }, 30000);
@@ -267,42 +271,89 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* ========== MODERN SUPPORT DASHBOARD ========== */
 .support-dashboard {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+  padding: 80px 20px 60px;
 }
 
 .dashboard-header {
+  max-width: 1200px;
+  margin: 0 auto 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  gap: 20px;
+  padding: 30px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(12, 113, 61, 0.1);
+  border-left: 5px solid #0c713d;
 }
 
-.dashboard-header h1 {
-  font-size: 28px;
-  font-weight: 700;
-  color: #333;
+.header-content h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #0c713d;
+  margin: 0 0 8px 0;
+  letter-spacing: 0.5px;
+}
+
+.header-subtitle {
+  font-size: 0.95rem;
+  color: #666;
   margin: 0;
 }
 
+/* ========== BUTTON STANDARD STYLE ========== */
 .refresh-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background: #667eea;
+  gap: 10px;
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 50px;
   font-weight: 600;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(12, 113, 61, 0.3);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+
+.refresh-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s,
+    height 0.6s;
+}
+
+.refresh-btn:hover:not(:disabled)::before {
+  width: 300px;
+  height: 300px;
 }
 
 .refresh-btn:hover:not(:disabled) {
-  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(12, 113, 61, 0.4);
+}
+
+.refresh-btn:active {
+  transform: translateY(0);
 }
 
 .refresh-btn:disabled {
@@ -310,52 +361,70 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
+/* ========== TABS ========== */
 .tabs {
+  max-width: 1200px;
+  margin: 0 auto 30px;
   display: flex;
-  gap: 8px;
-  border-bottom: 2px solid #e0e0e0;
-  margin-bottom: 20px;
+  gap: 12px;
+  background: white;
+  padding: 8px;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
 .tab {
   position: relative;
-  padding: 12px 24px;
-  background: none;
+  flex: 1;
+  padding: 14px 24px;
+  background: transparent;
   border: none;
-  font-size: 15px;
+  border-radius: 12px;
+  font-size: 0.95rem;
   font-weight: 600;
   color: #666;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .tab:hover {
-  color: #667eea;
+  background: rgba(12, 113, 61, 0.05);
+  color: #0c713d;
 }
 
 .tab.active {
-  color: #667eea;
-  border-bottom: 3px solid #667eea;
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.3);
 }
 
 .tab-badge {
-  position: absolute;
-  top: 6px;
-  right: 6px;
+  padding: 3px 8px;
   background: #ff3b30;
   color: white;
-  font-size: 11px;
+  font-size: 0.75rem;
   font-weight: bold;
-  padding: 2px 6px;
   border-radius: 10px;
-  min-width: 18px;
+  min-width: 22px;
   text-align: center;
 }
 
+.tab.active .tab-badge {
+  background: white;
+  color: #0c713d;
+}
+
+/* ========== CONVERSATIONS ========== */
 .conversations-container {
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .loading-state,
@@ -364,30 +433,56 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
-  color: #888;
-  gap: 16px;
+  padding: 80px 20px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
-.loading-state i,
-.empty-state i {
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(12, 113, 61, 0.1);
+  border-top-color: #0c713d;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.empty-icon {
   font-size: 64px;
+  color: #ddd;
+  margin-bottom: 20px;
+}
+
+.empty-message {
+  font-size: 1.1rem;
+  color: #888;
+  margin: 0;
 }
 
 .conversation-card {
   display: flex;
-  gap: 16px;
-  padding: 16px;
+  gap: 20px;
+  padding: 24px;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-left: 4px solid transparent;
 }
 
 .conversation-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(12, 113, 61, 0.15);
+  transform: translateY(-3px);
+  border-left-color: #0c713d;
 }
 
 .conv-avatar {
@@ -396,10 +491,11 @@ onMounted(() => {
 }
 
 .conv-avatar img {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   object-fit: cover;
+  border: 3px solid #f0f0f0;
 }
 
 .unread-badge {
@@ -408,12 +504,13 @@ onMounted(() => {
   right: -4px;
   background: #ff3b30;
   color: white;
-  font-size: 11px;
+  font-size: 0.7rem;
   font-weight: bold;
-  padding: 3px 7px;
+  padding: 4px 8px;
   border-radius: 12px;
-  min-width: 20px;
+  min-width: 22px;
   text-align: center;
+  box-shadow: 0 2px 6px rgba(255, 59, 48, 0.3);
 }
 
 .conv-info {
@@ -425,13 +522,14 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  gap: 12px;
 }
 
 .conv-header h3 {
   margin: 0;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 700;
   color: #333;
   white-space: nowrap;
   overflow: hidden;
@@ -439,46 +537,50 @@ onMounted(() => {
 }
 
 .conv-time {
-  font-size: 12px;
-  color: #888;
+  font-size: 0.85rem;
+  color: #999;
   flex-shrink: 0;
-  margin-left: 12px;
 }
 
 .conv-message {
-  margin: 0 0 8px 0;
-  font-size: 14px;
+  margin: 0 0 12px 0;
+  font-size: 0.95rem;
   color: #666;
-  white-space: nowrap;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .conv-meta {
   display: flex;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .status-badge {
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .status-badge.pending {
-  background: #fff3cd;
+  background: linear-gradient(135deg, #fff3cd 0%, #ffe7a0 100%);
   color: #856404;
 }
 
 .status-badge.active {
-  background: #d1ecf1;
+  background: linear-gradient(135deg, #d1ecf1 0%, #b8e6f0 100%);
   color: #0c5460;
 }
 
 .status-badge.resolved {
-  background: #d4edda;
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
   color: #155724;
 }
 
@@ -486,24 +588,57 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
-  color: #667eea;
+  font-size: 0.9rem;
+  color: #0c713d;
+  font-weight: 500;
 }
 
+/* ========== CLAIM BUTTON (STANDARD STYLE) ========== */
 .claim-btn {
   flex-shrink: 0;
-  padding: 10px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 50px;
   font-weight: 600;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(12, 113, 61, 0.3);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+
+.claim-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s,
+    height 0.6s;
+}
+
+.claim-btn:hover:not(:disabled)::before {
+  width: 300px;
+  height: 300px;
 }
 
 .claim-btn:hover:not(:disabled) {
-  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(12, 113, 61, 0.4);
+}
+
+.claim-btn:active {
+  transform: translateY(0);
 }
 
 .claim-btn:disabled {
@@ -511,24 +646,157 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
-/* Mobile responsive */
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .support-dashboard {
+    padding: 70px 20px 50px;
+  }
+
+  .dashboard-header {
+    padding: 25px;
+  }
+
+  .header-content h1 {
+    font-size: 1.8rem;
+  }
+
+  .conversation-card {
+    padding: 20px;
+  }
+
+  .conv-avatar img {
+    width: 55px;
+    height: 55px;
+  }
+}
+
+/* Mobile */
 @media (max-width: 768px) {
+  .support-dashboard {
+    padding: 60px 15px 40px;
+  }
+
   .dashboard-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    padding: 20px;
+    gap: 15px;
+  }
+
+  .header-content h1 {
+    font-size: 1.6rem;
+  }
+
+  .header-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .refresh-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btn-text {
+    display: inline;
   }
 
   .tabs {
-    overflow-x: auto;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .tab {
+    width: 100%;
   }
 
   .conversation-card {
     flex-direction: column;
+    padding: 18px;
+    gap: 15px;
+  }
+
+  .conv-avatar {
+    align-self: flex-start;
+  }
+
+  .conv-avatar img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .conv-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .conv-time {
+    font-size: 0.8rem;
+  }
+
+  .conv-message {
+    font-size: 0.9rem;
   }
 
   .claim-btn {
     width: 100%;
+    padding: 14px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .support-dashboard {
+    padding: 50px 10px 30px;
+  }
+
+  .dashboard-header {
+    padding: 18px;
+    margin-bottom: 30px;
+  }
+
+  .header-content h1 {
+    font-size: 1.4rem;
+  }
+
+  .header-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .tabs {
+    padding: 6px;
+  }
+
+  .tab {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+  }
+
+  .tab-label {
+    font-size: 0.9rem;
+  }
+
+  .conversation-card {
+    padding: 16px;
+  }
+
+  .conv-header h3 {
+    font-size: 1rem;
+  }
+
+  .conv-message {
+    font-size: 0.85rem;
+  }
+
+  .status-badge {
+    font-size: 0.75rem;
+    padding: 5px 12px;
+  }
+
+  .assigned-to {
+    font-size: 0.85rem;
   }
 }
 </style>

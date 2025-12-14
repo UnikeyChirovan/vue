@@ -71,16 +71,19 @@
         <p class="section-subtitle">Truy cập nhanh các chức năng thường dùng</p>
       </div>
 
-      <n-grid :x-gap="16" :y-gap="16" :cols="2 | 3 | 4 | 6" responsive="screen">
-        <n-grid-item v-for="action in quickActions" :key="action.key">
-          <div class="quick-action-card" @click="navigateTo(action.route)">
-            <div class="action-icon" :style="{ background: action.gradient }">
-              <i :class="action.icon"></i>
-            </div>
-            <span class="action-label">{{ action.label }}</span>
+      <div class="quick-actions-grid">
+        <div
+          v-for="action in quickActions"
+          :key="action.key"
+          class="quick-action-card"
+          @click="navigateTo(action.route)"
+        >
+          <div class="action-icon" :style="{ background: action.gradient }">
+            <i :class="action.icon"></i>
           </div>
-        </n-grid-item>
-      </n-grid>
+          <span class="action-label">{{ action.label }}</span>
+        </div>
+      </div>
 
       <!-- Management Modules -->
       <div class="section-header mt-5">
@@ -93,30 +96,28 @@
         </p>
       </div>
 
-      <n-grid :x-gap="20" :y-gap="20" :cols="1 | 2 | 2 | 3" responsive="screen">
-        <n-grid-item v-for="module in modules" :key="module.key">
-          <div class="module-card">
-            <div class="module-card-header">
-              <div class="module-icon" :style="{ background: module.gradient }">
-                <i :class="module.icon"></i>
-              </div>
-              <h4 class="module-title">{{ module.title }}</h4>
+      <div class="modules-grid">
+        <div v-for="module in modules" :key="module.key" class="module-card">
+          <div class="module-card-header">
+            <div class="module-icon" :style="{ background: module.gradient }">
+              <i :class="module.icon"></i>
             </div>
-            <div class="module-links">
-              <a
-                v-for="link in module.links"
-                :key="link.route"
-                @click.prevent="navigateTo(link.route)"
-                class="module-link"
-              >
-                <i :class="link.icon"></i>
-                <span>{{ link.label }}</span>
-                <i class="fas fa-chevron-right"></i>
-              </a>
-            </div>
+            <h4 class="module-title">{{ module.title }}</h4>
           </div>
-        </n-grid-item>
-      </n-grid>
+          <div class="module-links">
+            <a
+              v-for="link in module.links"
+              :key="link.route"
+              @click.prevent="navigateTo(link.route)"
+              class="module-link"
+            >
+              <i :class="link.icon"></i>
+              <span>{{ link.label }}</span>
+              <i class="fas fa-chevron-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
 
       <!-- System Info -->
       <div class="system-info mt-5">
@@ -174,7 +175,7 @@ const statistics = ref([
     label: 'Người Dùng',
     value: '0',
     icon: 'fas fa-users',
-    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    gradient: 'linear-gradient(135deg, #0c713d 0%, #0a5a31 100%)',
     route: 'admin-users',
     trend: 'up',
     trendIcon: 'fas fa-arrow-up',
@@ -185,7 +186,7 @@ const statistics = ref([
     label: 'Chương Truyện',
     value: '0',
     icon: 'fas fa-book',
-    gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     route: 'admin-stories',
     trend: 'up',
     trendIcon: 'fas fa-arrow-up',
@@ -220,14 +221,14 @@ const quickActions = ref([
     key: 'create-news',
     label: 'Thông Báo',
     icon: 'fas fa-bell',
-    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    gradient: 'linear-gradient(135deg, #0c713d 0%, #0a5a31 100%)',
     route: 'admin-news-create',
   },
   {
     key: 'create-story',
     label: 'Thêm Truyện',
     icon: 'fas fa-book-medical',
-    gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     route: 'admin-stories-create',
   },
   {
@@ -265,7 +266,7 @@ const modules = ref([
     key: 'content',
     title: 'Quản Lý Nội Dung',
     icon: 'fas fa-newspaper',
-    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    gradient: 'linear-gradient(135deg, #0c713d 0%, #0a5a31 100%)',
     links: [
       { label: 'Thông Báo', icon: 'fas fa-bell', route: 'admin-news' },
       { label: 'Chương Truyện', icon: 'fas fa-book', route: 'admin-stories' },
@@ -281,7 +282,7 @@ const modules = ref([
     key: 'media',
     title: 'Quản Lý Media',
     icon: 'fas fa-photo-video',
-    gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     links: [
       {
         label: 'Thư Viện Ảnh',
@@ -397,14 +398,12 @@ const loadStatistics = async () => {
     statistics.value[3].value = videosResponse.data.length || 0;
   } catch (error) {
     console.error('Error loading statistics:', error);
-    // Keep default values on error
   } finally {
     loading.value = false;
   }
 };
 
 onMounted(() => {
-  // Clear selected menu item khi vào dashboard
   useMenu().clearSelectedKey();
   loadStatistics();
 });
@@ -417,10 +416,10 @@ onMounted(() => {
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
-/* Welcome Banner */
+/* ========== WELCOME BANNER ========== */
 .welcome-banner {
   position: relative;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
   padding: 48px 32px;
   border-radius: 0 0 24px 24px;
   color: white;
@@ -495,7 +494,7 @@ onMounted(() => {
   right: 30%;
 }
 
-/* Loading State */
+/* ========== LOADING STATE ========== */
 .loading-state {
   display: flex;
   justify-content: center;
@@ -504,12 +503,12 @@ onMounted(() => {
 }
 
 .loading-text {
-  color: #667eea;
+  color: #0c713d;
   font-weight: 600;
   margin-top: 16px;
 }
 
-/* Dashboard Content */
+/* ========== DASHBOARD CONTENT ========== */
 .dashboard-content {
   padding: 0 32px 32px;
 }
@@ -531,10 +530,10 @@ onMounted(() => {
   margin: 0;
 }
 
-/* Statistics Cards */
+/* ========== STATISTICS CARDS ========== */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
 }
 
@@ -619,7 +618,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #0c713d 0%, #0a5a31 100%);
   transform: scaleX(0);
   transition: transform 0.3s;
 }
@@ -628,7 +627,13 @@ onMounted(() => {
   transform: scaleX(1);
 }
 
-/* Quick Actions */
+/* ========== QUICK ACTIONS ========== */
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
 .quick-action-card {
   background: white;
   border-radius: 16px;
@@ -666,7 +671,13 @@ onMounted(() => {
   text-align: center;
 }
 
-/* Module Cards */
+/* ========== MODULE CARDS ========== */
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
 .module-card {
   background: white;
   border-radius: 16px;
@@ -730,7 +741,7 @@ onMounted(() => {
 }
 
 .module-link:hover {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
   color: white;
   transform: translateX(4px);
 }
@@ -749,7 +760,7 @@ onMounted(() => {
   opacity: 0.6;
 }
 
-/* System Info */
+/* ========== SYSTEM INFO ========== */
 .system-info {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -771,7 +782,7 @@ onMounted(() => {
 
 .info-card i {
   font-size: 32px;
-  color: #667eea;
+  color: #0c713d;
 }
 
 .info-card div {
@@ -796,28 +807,284 @@ onMounted(() => {
   color: #22863a;
 }
 
-/* Responsive */
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .welcome-banner {
+    padding: 40px 24px;
+  }
+
+  .welcome-text h1 {
+    font-size: 28px;
+  }
+
+  .dashboard-content {
+    padding: 0 24px 24px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .stat-value {
+    font-size: 32px;
+  }
+
+  .quick-actions-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  .modules-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+/* Mobile */
 @media (max-width: 768px) {
   .welcome-banner {
     padding: 32px 20px;
+    border-radius: 0 0 16px 16px;
+  }
+
+  .welcome-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
   }
 
   .welcome-text h1 {
     font-size: 24px;
   }
 
+  .welcome-text p {
+    font-size: 14px;
+  }
+
+  .welcome-date {
+    padding: 10px 20px;
+    font-size: 14px;
+    width: 100%;
+    text-align: center;
+  }
+
   .dashboard-content {
     padding: 0 20px 20px;
   }
 
-  .stat-value {
-    font-size: 28px;
+  .section-header h3 {
+    font-size: 20px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .stat-card {
+    flex-direction: row;
+    align-items: center;
+    padding: 20px;
   }
 
   .stat-icon {
     width: 56px;
     height: 56px;
     font-size: 24px;
+  }
+
+  .stat-value {
+    font-size: 28px;
+  }
+
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .action-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .action-label {
+    font-size: 12px;
+  }
+
+  .modules-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .module-card {
+    padding: 20px;
+  }
+
+  .module-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .module-title {
+    font-size: 16px;
+  }
+
+  .system-info {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .info-card {
+    padding: 12px;
+  }
+
+  .info-card i {
+    font-size: 28px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .welcome-banner {
+    padding: 24px 15px;
+    margin-bottom: 24px;
+  }
+
+  .welcome-text h1 {
+    font-size: 20px;
+  }
+
+  .welcome-text h1 i {
+    font-size: 18px;
+  }
+
+  .welcome-text p {
+    font-size: 13px;
+  }
+
+  .welcome-date {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .dashboard-content {
+    padding: 0 15px 15px;
+  }
+
+  .section-header h3 {
+    font-size: 18px;
+  }
+
+  .section-subtitle {
+    font-size: 13px;
+  }
+
+  .stats-grid {
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .stat-trend {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .quick-action-card {
+    padding: 16px;
+    gap: 10px;
+  }
+
+  .action-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+
+  .action-label {
+    font-size: 11px;
+  }
+
+  .modules-grid {
+    gap: 12px;
+  }
+
+  .module-card {
+    padding: 16px;
+  }
+
+  .module-card-header {
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
+
+  .module-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+
+  .module-title {
+    font-size: 15px;
+  }
+
+  .module-link {
+    padding: 10px 12px;
+    font-size: 13px;
+    gap: 10px;
+  }
+
+  .module-link i:first-child {
+    width: 18px;
+  }
+
+  .system-info {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .info-card {
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .info-card i {
+    font-size: 24px;
+  }
+
+  .info-label {
+    font-size: 12px;
+  }
+
+  .info-value {
+    font-size: 14px;
   }
 }
 </style>

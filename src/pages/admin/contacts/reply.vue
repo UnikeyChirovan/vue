@@ -1,11 +1,16 @@
 <template>
   <div class="container mt-5">
-    <h1 class="text-center" style="color: red;">TRANG PHẢN HỒI EMAIL</h1>
+    <h1 class="text-center" style="color: red">TRANG PHẢN HỒI EMAIL</h1>
     <div class="form-group">
       <label>Nội dung liên hệ:</label>
-      <textarea class="form-control contact-message" rows="5" v-model="contactMessage" readonly></textarea>
+      <textarea
+        class="form-control contact-message"
+        rows="5"
+        v-model="contactMessage"
+        readonly
+      ></textarea>
     </div>
-    <form @submit.prevent="submitForm" class="mt-4" style="position: relative;">
+    <form @submit.prevent="submitForm" class="mt-4" style="position: relative">
       <div class="row mb-3">
         <div class="col-sm-2 text-start text-sm-end">
           <label for="email" class="form-label">
@@ -22,7 +27,7 @@
             placeholder="Email người nhận"
             required
             readonly
-          >
+          />
         </div>
       </div>
       <div class="ckeditor">
@@ -89,6 +94,6 @@ const submitForm = async () => {
 .button-submit {
   position: absolute;
   bottom: 10px;
-  right: 30px;   
+  right: 30px;
 }
 </style>

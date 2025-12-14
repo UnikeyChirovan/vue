@@ -2,7 +2,11 @@
   <a-card title="Danh sách Liên Hệ" style="width: 100%">
     <div class="row">
       <div class="col-12 m-0 p-0">
-        <a-table :dataSource="contacts" :columns="columns" :scroll="scrollOptions">
+        <a-table
+          :dataSource="contacts"
+          :columns="columns"
+          :scroll="scrollOptions"
+        >
           <template #bodyCell="{ column, index, record }">
             <template v-if="column.key === 'index'">
               <span>{{ index + 1 }}</span>
@@ -11,11 +15,17 @@
               <span>{{ record.contacted_at }}</span>
             </template>
             <template v-if="column.key === 'message'">
-              <n-ellipsis style="max-width: 240px">{{ record.message }}</n-ellipsis>
+              <n-ellipsis style="max-width: 240px">{{
+                record.message
+              }}</n-ellipsis>
             </template>
             <template v-if="column.key === 'action'">
               <router-link
-                :to="{ name: 'admin-contacts-reply', params: { id: record.id }, query: { email: record.email, message: record.message } }"
+                :to="{
+                  name: 'admin-contacts-reply',
+                  params: { id: record.id },
+                  query: { email: record.email, message: record.message },
+                }"
               >
                 <a-button type="primary" class="me-sm-2 me-2 mb-2">
                   Phản hồi
@@ -47,7 +57,7 @@ import { RouterLink } from 'vue-router';
 import { ref, computed, onMounted } from 'vue';
 import { message } from 'ant-design-vue';
 import api from '../../../services/axiosInterceptor';
-import { NEllipsis } from 'naive-ui'; 
+import { NEllipsis } from 'naive-ui';
 import { useMenu } from '../../../stores/use-menu';
 const contacts = ref([]);
 const isMobile = ref(window.innerWidth < 600);
@@ -113,7 +123,7 @@ const contactIdToDelete = ref(null);
 
 const deleteContact = (id) => {
   contactIdToDelete.value = id;
-  isModalVisible.value = true; 
+  isModalVisible.value = true;
 };
 
 const handleOk = () => {

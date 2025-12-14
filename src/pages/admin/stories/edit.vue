@@ -1,48 +1,163 @@
 <template>
-  <a-card title="Sửa Chương" style="width: 100%">
-    <form @submit.prevent="submitForm">
-      <div class="mb-3">
-        <label for="title">Tiêu đề</label>
-        <input v-model="form.title" type="text" id="title" required class="form-control" />
-      </div>
-      <div class="mb-3">
-        <label for="author">Tác giả</label>
-        <input v-model="form.author" type="text" id="author" required class="form-control" />
-      </div>
-      <div class="mb-3">
-        <label for="chapterNumber">Chương số</label>
-        <input v-model="form.chapter_number" type="number" id="chapterNumber" required class="form-control" />
-      </div>
-      <div class="mb-3">
-        <label for="file">Chọn tệp .txt để nhập nội dung</label>
-        <input @change="handleFileUpload" type="file" id="file" accept=".txt" class="form-control" />
-      </div>
-      <div v-for="(section, index) in form.content" :key="index" class="mb-3">
-        <label>Đoạn {{ index + 1 }}</label>
-        <textarea v-model="form.content[index]" rows="3" class="form-control"></textarea>
-        <a-button @click="removeSection(index)" danger class="mt-2">Xóa đoạn</a-button>
-      </div>
-      <a-button @click="addSection" class="mb-3">Thêm đoạn</a-button>
-      <a-button @click="showConfirmDelete" danger class="mb-3 ms-3">Xóa Toàn Bộ</a-button>
-      <a-button type="primary" html-type="submit">Lưu thay đổi</a-button>
-    </form>
-    <a-modal
-      v-model:visible="isConfirmVisible"
-      title="Xác Nhận Xóa Toàn Bộ"
-      @ok="removeAllSections"
-      @cancel="handleCancelDelete"
-    >
-      <p>Bạn có chắc chắn muốn xóa toàn bộ nội dung các đoạn không?</p>
-    </a-modal>
-    <ScrollButtons>
-      <template v-slot:top-button>
-        <a-button type="primary"><i class="fa-solid fa-arrow-down"></i></a-button>
-      </template>
-      <template v-slot:bottom-button>
-        <a-button type="primary"><i class="fa-solid fa-arrow-up"></i></a-button>
-      </template>
-    </ScrollButtons>
-  </a-card>
+  <div class="edit-chapter-wrapper">
+    <a-card class="modern-edit-card" title="Sửa Chương">
+      <form @submit.prevent="submitForm" class="edit-form">
+        <!-- Title Input -->
+        <div class="form-group">
+          <label for="title" class="form-label">
+            <i class="fa-solid fa-heading"></i> Tiêu đề
+          </label>
+          <input
+            v-model="form.title"
+            type="text"
+            id="title"
+            required
+            class="form-control modern-input"
+            placeholder="Nhập tiêu đề chương..."
+          />
+        </div>
+
+        <!-- Author Input -->
+        <div class="form-group">
+          <label for="author" class="form-label">
+            <i class="fa-solid fa-user-pen"></i> Tác giả
+          </label>
+          <input
+            v-model="form.author"
+            type="text"
+            id="author"
+            required
+            class="form-control modern-input"
+            placeholder="Nhập tên tác giả..."
+          />
+        </div>
+
+        <!-- Chapter Number -->
+        <div class="form-group">
+          <label for="chapterNumber" class="form-label">
+            <i class="fa-solid fa-list-ol"></i> Chương số
+          </label>
+          <input
+            v-model="form.chapter_number"
+            type="number"
+            id="chapterNumber"
+            required
+            class="form-control modern-input"
+            placeholder="Nhập số chương..."
+          />
+        </div>
+
+        <!-- File Upload -->
+        <div class="form-group">
+          <label for="file" class="form-label">
+            <i class="fa-solid fa-file-arrow-up"></i> Chọn tệp .txt để nhập nội
+            dung
+          </label>
+          <div class="file-upload-wrapper">
+            <input
+              @change="handleFileUpload"
+              type="file"
+              id="file"
+              accept=".txt"
+              class="form-control modern-file-input"
+            />
+          </div>
+        </div>
+
+        <!-- Content Sections -->
+        <div class="content-sections">
+          <div class="sections-header">
+            <h3 class="sections-title">
+              <i class="fa-solid fa-book"></i> Nội dung chương
+            </h3>
+            <div class="section-actions">
+              <a-button
+                @click="addSection"
+                type="primary"
+                class="add-section-btn"
+              >
+                <i class="fa-solid fa-plus"></i> Thêm đoạn
+              </a-button>
+              <a-button
+                @click="showConfirmDelete"
+                danger
+                class="delete-all-btn"
+              >
+                <i class="fa-solid fa-trash-can"></i> Xóa toàn bộ
+              </a-button>
+            </div>
+          </div>
+
+          <div
+            v-for="(section, index) in form.content"
+            :key="index"
+            class="section-item"
+          >
+            <div class="section-header">
+              <span class="section-number">Đoạn {{ index + 1 }}</span>
+              <a-button
+                @click="removeSection(index)"
+                danger
+                size="small"
+                class="remove-section-btn"
+              >
+                <i class="fa-solid fa-xmark"></i> Xóa
+              </a-button>
+            </div>
+            <textarea
+              v-model="form.content[index]"
+              rows="4"
+              class="form-control modern-textarea"
+              placeholder="Nhập nội dung đoạn văn..."
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+          <a-button
+            type="primary"
+            html-type="submit"
+            size="large"
+            class="submit-btn"
+          >
+            <i class="fa-solid fa-floppy-disk"></i> Lưu thay đổi
+          </a-button>
+        </div>
+      </form>
+
+      <!-- Confirm Delete Modal -->
+      <a-modal
+        v-model:visible="isConfirmVisible"
+        title="Xác Nhận Xóa Toàn Bộ"
+        @ok="removeAllSections"
+        @cancel="handleCancelDelete"
+        okText="Xóa"
+        cancelText="Hủy"
+        class="confirm-modal"
+      >
+        <p class="modal-warning">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          Bạn có chắc chắn muốn xóa toàn bộ nội dung các đoạn không? Hành động
+          này không thể hoàn tác.
+        </p>
+      </a-modal>
+
+      <!-- Scroll Buttons -->
+      <ScrollButtons>
+        <template v-slot:top-button>
+          <a-button type="primary"
+            ><i class="fa-solid fa-arrow-down"></i
+          ></a-button>
+        </template>
+        <template v-slot:bottom-button>
+          <a-button type="primary"
+            ><i class="fa-solid fa-arrow-up"></i
+          ></a-button>
+        </template>
+      </ScrollButtons>
+    </a-card>
+  </div>
 </template>
 
 <script setup>
@@ -52,15 +167,19 @@ import { message } from 'ant-design-vue';
 import api from '../../../services/axiosInterceptor';
 import { useRoute } from 'vue-router';
 import { useMenu } from '../../../stores/use-menu';
+
 const route = useRoute();
-const chapterId = route.params.id; 
+const chapterId = route.params.id;
+
 const form = ref({
   title: '',
   author: '',
   chapter_number: 1,
   content: [''],
 });
+
 const isConfirmVisible = ref(false);
+
 const fetchChapterData = async () => {
   try {
     const response = await api.get(`/story/chapters/${chapterId}`);
@@ -70,6 +189,7 @@ const fetchChapterData = async () => {
     message.error('Đã xảy ra lỗi khi tải chương');
   }
 };
+
 const resetForm = () => {
   form.value = {
     title: '',
@@ -78,24 +198,30 @@ const resetForm = () => {
     content: [''],
   };
 };
+
 onMounted(() => {
   fetchChapterData();
   useMenu().onSelectedKey(['admin-stories']);
 });
+
 const addSection = () => {
   form.value.content.push('');
 };
+
 const removeSection = (index) => {
   form.value.content.splice(index, 1);
 };
+
 const showConfirmDelete = () => {
   isConfirmVisible.value = true;
 };
+
 const removeAllSections = () => {
-  form.value.content = ['']; 
+  form.value.content = [''];
   message.success('Đã xóa toàn bộ nội dung các đoạn');
-  isConfirmVisible.value = false; 
+  isConfirmVisible.value = false;
 };
+
 const handleFileUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
@@ -108,6 +234,7 @@ const handleFileUpload = (event) => {
     reader.readAsText(file);
   }
 };
+
 const submitForm = async () => {
   try {
     await api.put(`/story/chapters/${chapterId}`, form.value);
@@ -118,12 +245,444 @@ const submitForm = async () => {
     message.error('Đã xảy ra lỗi khi cập nhật chương');
   }
 };
+
 const handleCancelDelete = () => {
   isConfirmVisible.value = false;
 };
 </script>
+
 <style scoped>
-.form-control {
+/* ========== WRAPPER STYLES ========== */
+.edit-chapter-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+  padding: 40px 20px;
+}
+
+/* ========== CARD STYLES ========== */
+.modern-edit-card {
+  max-width: 1000px;
+  margin: 0 auto;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(12, 113, 61, 0.1);
+  overflow: hidden;
+}
+
+.modern-edit-card :deep(.ant-card-head) {
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  border-bottom: none;
+  padding: 24px 32px;
+}
+
+.modern-edit-card :deep(.ant-card-head-title) {
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.modern-edit-card :deep(.ant-card-body) {
+  padding: 40px;
+}
+
+/* ========== FORM STYLES ========== */
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-label {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0c713d;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-label i {
+  font-size: 1rem;
+}
+
+.modern-input,
+.modern-textarea {
   width: 100%;
+  padding: 14px 18px;
+  font-size: 1rem;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.modern-input:focus,
+.modern-textarea:focus {
+  outline: none;
+  border-color: #0c713d;
+  box-shadow: 0 0 0 4px rgba(12, 113, 61, 0.1);
+}
+
+.modern-textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+/* ========== FILE UPLOAD ========== */
+.file-upload-wrapper {
+  position: relative;
+}
+
+.modern-file-input {
+  padding: 12px;
+  cursor: pointer;
+}
+
+.modern-file-input::file-selector-button {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-right: 12px;
+  transition: all 0.3s ease;
+}
+
+.modern-file-input::file-selector-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.3);
+}
+
+/* ========== CONTENT SECTIONS ========== */
+.content-sections {
+  background: #f8f9fa;
+  padding: 28px;
+  border-radius: 16px;
+  border: 2px solid #e9ecef;
+}
+
+.sections-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.sections-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0c713d;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.add-section-btn,
+.delete-all-btn {
+  height: 42px;
+  padding: 0 24px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.add-section-btn {
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  border: none;
+}
+
+.add-section-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.3);
+}
+
+.delete-all-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+/* ========== SECTION ITEMS ========== */
+.section-item {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.section-item:hover {
+  border-color: #0c713d;
+  box-shadow: 0 4px 16px rgba(12, 113, 61, 0.1);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.section-number {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0c713d;
+  background: rgba(12, 113, 61, 0.1);
+  padding: 6px 16px;
+  border-radius: 8px;
+}
+
+.remove-section-btn {
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ========== FORM ACTIONS ========== */
+.form-actions {
+  display: flex;
+  justify-content: center;
+  padding-top: 12px;
+}
+
+.submit-btn {
+  height: 52px;
+  padding: 0 48px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  border: none;
+  box-shadow: 0 4px 16px rgba(12, 113, 61, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.submit-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 24px rgba(12, 113, 61, 0.4);
+}
+
+/* ========== MODAL STYLES ========== */
+.confirm-modal :deep(.ant-modal-header) {
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+}
+
+.confirm-modal :deep(.ant-modal-title) {
+  color: white;
+  font-weight: 700;
+}
+
+.modal-warning {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.05rem;
+  color: #333;
+  line-height: 1.6;
+}
+
+.modal-warning i {
+  color: #dc2626;
+  font-size: 1.8rem;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+  .edit-chapter-wrapper {
+    padding: 30px 15px;
+  }
+
+  .modern-edit-card :deep(.ant-card-head-title) {
+    font-size: 1.5rem;
+  }
+
+  .modern-edit-card :deep(.ant-card-body) {
+    padding: 32px;
+  }
+
+  .sections-title {
+    font-size: 1.3rem;
+  }
+
+  .submit-btn {
+    height: 48px;
+    padding: 0 40px;
+    font-size: 1.05rem;
+  }
+}
+
+/* Mobile (max-width: 767px) */
+@media (max-width: 767px) {
+  .edit-chapter-wrapper {
+    padding: 20px 10px;
+  }
+
+  .modern-edit-card {
+    border-radius: 16px;
+  }
+
+  .modern-edit-card :deep(.ant-card-head) {
+    padding: 20px 16px;
+  }
+
+  .modern-edit-card :deep(.ant-card-head-title) {
+    font-size: 1.3rem;
+  }
+
+  .modern-edit-card :deep(.ant-card-body) {
+    padding: 24px 16px;
+  }
+
+  .edit-form {
+    gap: 24px;
+  }
+
+  .form-label {
+    font-size: 1rem;
+  }
+
+  .modern-input,
+  .modern-textarea {
+    padding: 12px 16px;
+    font-size: 0.95rem;
+  }
+
+  .content-sections {
+    padding: 20px 16px;
+  }
+
+  .sections-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sections-title {
+    font-size: 1.2rem;
+  }
+
+  .section-actions {
+    width: 100%;
+  }
+
+  .add-section-btn,
+  .delete-all-btn {
+    flex: 1;
+    justify-content: center;
+    height: 40px;
+    padding: 0 16px;
+    font-size: 0.9rem;
+  }
+
+  .section-item {
+    padding: 16px;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .remove-section-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .submit-btn {
+    width: 100%;
+    height: 46px;
+    font-size: 1rem;
+  }
+}
+
+/* Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+  .edit-chapter-wrapper {
+    padding: 15px 8px;
+  }
+
+  .modern-edit-card {
+    border-radius: 12px;
+  }
+
+  .modern-edit-card :deep(.ant-card-head) {
+    padding: 16px 12px;
+  }
+
+  .modern-edit-card :deep(.ant-card-head-title) {
+    font-size: 1.1rem;
+  }
+
+  .modern-edit-card :deep(.ant-card-body) {
+    padding: 20px 12px;
+  }
+
+  .form-label {
+    font-size: 0.95rem;
+  }
+
+  .modern-input,
+  .modern-textarea {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+
+  .content-sections {
+    padding: 16px 12px;
+  }
+
+  .sections-title {
+    font-size: 1.1rem;
+  }
+
+  .add-section-btn,
+  .delete-all-btn {
+    height: 38px;
+    font-size: 0.85rem;
+  }
+
+  .section-number {
+    font-size: 0.95rem;
+    padding: 4px 12px;
+  }
+
+  .submit-btn {
+    height: 44px;
+    font-size: 0.95rem;
+    padding: 0 32px;
+  }
 }
 </style>

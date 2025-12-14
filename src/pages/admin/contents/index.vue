@@ -1,50 +1,130 @@
 <template>
-  <a-card title="Quản Lý Phần" style="width: 100%">
-    <div class="row mb-3">
-      <div class="col-12 d-flex justify-content-end">
-        <a-button type="primary">
-          <router-link :to="{ name: 'admin-contents-create', params: { lastIndex: sections.length } }">
-            <i class="fa-solid fa-plus"></i> Thêm Phần
+  <div class="section-management-wrapper">
+    <a-card class="management-card">
+      <template #title>
+        <div class="card-header">
+          <h1 class="header-title">
+            <i class="fa-solid fa-book"></i>
+            Quản Lý Phần
+          </h1>
+        </div>
+      </template>
+
+      <div class="action-bar">
+        <button class="add-button">
+          <router-link
+            :to="{
+              name: 'admin-contents-create',
+              params: { lastIndex: sections.length },
+            }"
+          >
+            <span class="button-content">
+              <i class="fa-solid fa-plus"></i>
+              <span class="button-text">Thêm Phần</span>
+            </span>
           </router-link>
-        </a-button>
+        </button>
       </div>
-    </div>
-    <div class="row">
-      <div class="col-12">
-        <a-table :dataSource="sections" :columns="columns" :scroll="scrollOptions">
+
+      <!-- Desktop Table View -->
+      <div class="table-container desktop-view">
+        <a-table
+          :dataSource="sections"
+          :columns="columns"
+          :scroll="scrollOptions"
+          :pagination="{
+            pageSize: 10,
+            showSizeChanger: true,
+            showTotal: (total) => `Tổng ${total} phần`,
+          }"
+          class="modern-table"
+        >
           <template #bodyCell="{ column, index, record }">
             <template v-if="column.key === 'index'">
-              <span>{{ index + 1 }}</span>
+              <span class="index-cell">{{ index + 1 }}</span>
             </template>
             <template v-if="column.key === 'title'">
-              <span>{{ record.title }}</span>
+              <span class="title-cell">{{ record.title }}</span>
             </template>
             <template v-if="column.key === 'section_number'">
-              <span>{{ record.section_number }}</span>
+              <span class="number-cell">{{ record.section_number }}</span>
             </template>
             <template v-if="column.key === 'action'">
-              <router-link :to="{ name: 'admin-contents-edit', params: { id: record.id } }">
-                <a-button type="primary" class="me-sm-2 me-2 mb-2">
-                  <i class="fa-solid fa-pen-to-square"></i>
-                </a-button>
-              </router-link>
-              <a-button type="primary" danger @click="deleteSection(record.id)">
-                <i class="fa-solid fa-trash"></i>
-              </a-button>
+              <div class="action-buttons">
+                <router-link
+                  :to="{
+                    name: 'admin-contents-edit',
+                    params: { id: record.id },
+                  }"
+                >
+                  <button class="edit-btn">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span class="btn-text">Sửa</span>
+                  </button>
+                </router-link>
+                <button class="delete-btn" @click="deleteSection(record.id)">
+                  <i class="fa-solid fa-trash"></i>
+                  <span class="btn-text">Xóa</span>
+                </button>
+              </div>
             </template>
           </template>
         </a-table>
       </div>
-    </div>
+
+      <!-- Mobile Card View -->
+      <div class="cards-container mobile-view">
+        <div
+          v-for="(section, index) in sections"
+          :key="section.id"
+          class="section-card"
+        >
+          <div class="card-number">#{{ index + 1 }}</div>
+          <div class="card-content">
+            <div class="card-info">
+              <h3 class="card-title">{{ section.title }}</h3>
+              <p class="card-section-number">
+                Phần số: {{ section.section_number }}
+              </p>
+            </div>
+            <div class="card-actions">
+              <router-link
+                :to="{
+                  name: 'admin-contents-edit',
+                  params: { id: section.id },
+                }"
+              >
+                <button class="card-edit-btn">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                  <span>Sửa</span>
+                </button>
+              </router-link>
+              <button
+                class="card-delete-btn"
+                @click="deleteSection(section.id)"
+              >
+                <i class="fa-solid fa-trash"></i>
+                <span>Xóa</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a-card>
+
     <a-modal
       v-model:visible="isModalVisible"
       title="Xác nhận xóa phần"
       @ok="handleOk"
       @cancel="handleCancel"
+      class="delete-modal"
     >
-      <p>Bạn có chắc chắn muốn xóa phần này không?</p>
+      <div class="modal-content">
+        <i class="fa-solid fa-triangle-exclamation warning-icon"></i>
+        <p>Bạn có chắc chắn muốn xóa phần này không?</p>
+      </div>
     </a-modal>
-  </a-card>
+  </div>
 </template>
 
 <script setup>
@@ -53,11 +133,13 @@ import { useMenu } from '../../../stores/use-menu';
 import { onMounted, ref, computed } from 'vue';
 import { message } from 'ant-design-vue';
 import api from '../../../services/axiosInterceptor';
+
 const sections = ref([]);
 const isMobile = ref(window.innerWidth < 600);
 const scrollOptions = computed(() => {
   return isMobile.value ? { x: 1200 } : { x: 576 };
 });
+
 const columns = [
   {
     title: '#',
@@ -83,10 +165,11 @@ const columns = [
     align: 'center',
   },
 ];
+
 const getSections = async () => {
   try {
-    const response = await api.get('/sections'); 
-    sections.value = response.data; 
+    const response = await api.get('/sections');
+    sections.value = response.data;
   } catch (error) {
     console.error(error);
     if (error.response.status === 429) {
@@ -97,17 +180,19 @@ const getSections = async () => {
 
 const isModalVisible = ref(false);
 const sectionIdToDelete = ref(null);
+
 const deleteSection = (id) => {
   sectionIdToDelete.value = id;
-  isModalVisible.value = true; 
+  isModalVisible.value = true;
 };
+
 const handleOk = () => {
   api
-    .delete(`/sections/${sectionIdToDelete.value}`) 
+    .delete(`/sections/${sectionIdToDelete.value}`)
     .then((res) => {
       if (res.status === 204) {
         message.success('Xóa phần thành công');
-        getSections(); 
+        getSections();
       }
     })
     .catch((err) => {
@@ -117,9 +202,11 @@ const handleOk = () => {
       isModalVisible.value = false;
     });
 };
+
 const handleCancel = () => {
   isModalVisible.value = false;
 };
+
 onMounted(() => {
   getSections();
   window.addEventListener('resize', () => {
@@ -130,7 +217,613 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.container {
-  max-width: 800px;
+/* ========== WRAPPER ========== */
+.section-management-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 40px 20px;
+}
+
+/* ========== CARD STYLING ========== */
+.management-card {
+  max-width: 1400px;
+  margin: 0 auto;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: none;
+}
+
+.management-card :deep(.ant-card-head) {
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  border: none;
+  padding: 30px;
+}
+
+.management-card :deep(.ant-card-body) {
+  padding: 30px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-title {
+  color: white;
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  letter-spacing: 0.5px;
+}
+
+.header-title i {
+  font-size: 2.2rem;
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========== ACTION BAR ========== */
+.action-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 30px;
+}
+
+.add-button {
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  border: none;
+  border-radius: 50px;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(12, 113, 61, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.add-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s,
+    height 0.6s;
+}
+
+.add-button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.add-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(12, 113, 61, 0.4);
+}
+
+.add-button:active {
+  transform: translateY(0);
+}
+
+.add-button a {
+  color: white;
+  text-decoration: none;
+  display: block;
+}
+
+.button-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  position: relative;
+  z-index: 1;
+}
+
+.add-button i {
+  font-size: 1.2rem;
+}
+
+/* ========== DESKTOP TABLE VIEW ========== */
+.desktop-view {
+  display: block;
+}
+
+.mobile-view {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .mobile-view {
+    display: none !important;
+  }
+
+  .desktop-view {
+    display: block !important;
+  }
+}
+
+.table-container {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.modern-table :deep(.ant-table) {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.modern-table :deep(.ant-table-thead > tr > th) {
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  border: none;
+  padding: 18px 16px;
+}
+
+.modern-table :deep(.ant-table-tbody > tr) {
+  transition: all 0.3s ease;
+}
+
+.modern-table :deep(.ant-table-tbody > tr:hover) {
+  background: rgba(12, 113, 61, 0.05);
+  transform: scale(1.01);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.modern-table :deep(.ant-table-tbody > tr > td) {
+  padding: 20px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.index-cell {
+  font-weight: 700;
+  color: #0c713d;
+  font-size: 1.1rem;
+}
+
+.title-cell {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.number-cell {
+  font-weight: 600;
+  color: #0c713d;
+  font-size: 1rem;
+  background: rgba(12, 113, 61, 0.1);
+  padding: 6px 16px;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+/* ========== ACTION BUTTONS (Desktop) ========== */
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.edit-btn,
+.delete-btn {
+  border: none;
+  border-radius: 50px;
+  padding: 10px 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  font-size: 0.95rem;
+}
+
+.edit-btn::before,
+.delete-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s,
+    height 0.6s;
+}
+
+.edit-btn:hover::before,
+.delete-btn:hover::before {
+  width: 200px;
+  height: 200px;
+}
+
+.edit-btn {
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.3);
+}
+
+.edit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(12, 113, 61, 0.4);
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
+}
+
+.delete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 77, 79, 0.4);
+}
+
+.edit-btn:active,
+.delete-btn:active {
+  transform: translateY(0);
+}
+
+/* ========== MOBILE CARD VIEW ========== */
+.cards-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.section-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  padding: 20px;
+}
+
+.section-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(12, 113, 61, 0.2);
+}
+
+.card-number {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.card-info {
+  padding-right: 50px;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.card-section-number {
+  font-size: 0.95rem;
+  color: #0c713d;
+  margin: 0;
+  font-weight: 600;
+}
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.card-edit-btn,
+.card-delete-btn {
+  flex: 1;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  font-size: 0.95rem;
+}
+
+.card-edit-btn::before,
+.card-delete-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s,
+    height 0.6s;
+}
+
+.card-edit-btn:hover::before,
+.card-delete-btn:hover::before {
+  width: 200px;
+  height: 200px;
+}
+
+.card-edit-btn {
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.3);
+}
+
+.card-edit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(12, 113, 61, 0.4);
+}
+
+.card-delete-btn {
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
+}
+
+.card-delete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 77, 79, 0.4);
+}
+
+.card-edit-btn:active,
+.card-delete-btn:active {
+  transform: translateY(0);
+}
+
+/* ========== MODAL STYLING ========== */
+.delete-modal :deep(.ant-modal-header) {
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+  border: none;
+}
+
+.delete-modal :deep(.ant-modal-title) {
+  color: white;
+  font-weight: 700;
+}
+
+.modal-content {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.warning-icon {
+  font-size: 4rem;
+  color: #ff4d4f;
+  margin-bottom: 20px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.modal-content p {
+  font-size: 1.1rem;
+  color: #333;
+  margin: 0;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .section-management-wrapper {
+    padding: 30px 15px;
+  }
+
+  .header-title {
+    font-size: 1.7rem;
+  }
+
+  .header-title i {
+    font-size: 1.9rem;
+  }
+
+  .button-content {
+    padding: 12px 28px;
+    font-size: 0.95rem;
+  }
+
+  .management-card :deep(.ant-card-body) {
+    padding: 25px;
+  }
+
+  .table-container {
+    padding: 15px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .section-management-wrapper {
+    padding: 20px 10px;
+  }
+
+  .management-card :deep(.ant-card-head) {
+    padding: 20px;
+  }
+
+  .header-title {
+    font-size: 1.4rem;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .header-title i {
+    font-size: 1.6rem;
+  }
+
+  .action-bar {
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .add-button {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .button-content {
+    padding: 12px 24px;
+    font-size: 0.9rem;
+    justify-content: center;
+  }
+
+  .management-card :deep(.ant-card-body) {
+    padding: 20px 15px;
+  }
+
+  .desktop-view {
+    display: none;
+  }
+
+  .mobile-view {
+    display: block;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .section-management-wrapper {
+    padding: 15px 8px;
+  }
+
+  .management-card {
+    border-radius: 12px;
+  }
+
+  .management-card :deep(.ant-card-head) {
+    padding: 15px;
+  }
+
+  .header-title {
+    font-size: 1.2rem;
+  }
+
+  .header-title i {
+    font-size: 1.4rem;
+  }
+
+  .button-content {
+    padding: 10px 20px;
+    font-size: 0.85rem;
+  }
+
+  .add-button i {
+    font-size: 1rem;
+  }
+
+  .management-card :deep(.ant-card-body) {
+    padding: 15px 10px;
+  }
+
+  .section-card {
+    border-radius: 12px;
+    padding: 15px;
+  }
+
+  .card-number {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .card-section-number {
+    font-size: 0.9rem;
+  }
+
+  .card-actions {
+    gap: 8px;
+  }
+
+  .card-edit-btn,
+  .card-delete-btn {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+
+  .warning-icon {
+    font-size: 3rem;
+  }
+
+  .modal-content p {
+    font-size: 1rem;
+  }
 }
 </style>

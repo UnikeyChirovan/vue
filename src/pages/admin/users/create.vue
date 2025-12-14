@@ -144,7 +144,7 @@ const formFields = ref([
     options: departments,
     allowClear: true,
     required: true,
-    customRender: true, 
+    customRender: true,
     style: { display: 'flex' },
   },
   {
@@ -166,9 +166,7 @@ const formFields = ref([
 ]);
 const getUsersCreate = async () => {
   try {
-    const response = await api.get(
-      '/users/create'
-    );
+    const response = await api.get('/users/create');
     users_status.value = response.data.users_status;
     departments.value = response.data.departments;
   } catch (error) {

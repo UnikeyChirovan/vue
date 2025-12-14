@@ -4,19 +4,36 @@
       <!-- Name Input -->
       <div class="mb-3">
         <label for="name">Tên Dự Án</label>
-        <input v-model="form.name" type="text" id="name" required class="form-control" />
+        <input
+          v-model="form.name"
+          type="text"
+          id="name"
+          required
+          class="form-control"
+        />
       </div>
 
       <!-- Timeline Input -->
       <div class="mb-3">
         <label for="timeline">Thời Gian</label>
-        <input v-model="form.timeline" type="text" id="timeline" required class="form-control" />
+        <input
+          v-model="form.timeline"
+          type="text"
+          id="timeline"
+          required
+          class="form-control"
+        />
       </div>
 
       <!-- Description Input -->
       <div class="mb-3">
         <label for="description">Mô Tả</label>
-        <textarea v-model="form.description" id="description" required class="form-control"></textarea>
+        <textarea
+          v-model="form.description"
+          id="description"
+          required
+          class="form-control"
+        ></textarea>
       </div>
 
       <!-- Submit Button -->

@@ -4,25 +4,48 @@
       <!-- Title Input -->
       <div class="mb-3">
         <label for="title">Tiêu Đề</label>
-        <input v-model="form.title" type="text" id="title" required class="form-control" />
+        <input
+          v-model="form.title"
+          type="text"
+          id="title"
+          required
+          class="form-control"
+        />
       </div>
 
       <!-- Icon Input -->
       <div class="mb-3">
         <label for="icon">Icon</label>
-        <input v-model="form.icon" type="text" id="icon" required class="form-control" />
+        <input
+          v-model="form.icon"
+          type="text"
+          id="icon"
+          required
+          class="form-control"
+        />
       </div>
 
       <!-- Icon Class Input -->
       <div class="mb-3">
         <label for="icon_class">Icon Class</label>
-        <input v-model="form.icon_class" type="text" id="icon_class" required class="form-control" />
+        <input
+          v-model="form.icon_class"
+          type="text"
+          id="icon_class"
+          required
+          class="form-control"
+        />
       </div>
 
       <!-- Description Input -->
       <div class="mb-3">
         <label for="description">Mô Tả</label>
-        <textarea v-model="form.description" id="description" required class="form-control"></textarea>
+        <textarea
+          v-model="form.description"
+          id="description"
+          required
+          class="form-control"
+        ></textarea>
       </div>
 
       <!-- Submit Button -->

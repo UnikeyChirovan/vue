@@ -2,7 +2,11 @@
   <a-card title="Quản Lý Thiết Bị" style="width: 100%">
     <div class="row">
       <div class="col-12">
-        <a-table :dataSource="devices" :columns="columns" :scroll="scrollOptions">
+        <a-table
+          :dataSource="devices"
+          :columns="columns"
+          :scroll="scrollOptions"
+        >
           <template #bodyCell="{ column, index, record }">
             <template v-if="column.key === 'index'">
               <span>{{ index + 1 }}</span>
@@ -29,7 +33,12 @@
       @cancel="handleCancel"
     >
       <p>Bạn có chắc chắn muốn chuyển thiết bị này vào blacklist không?</p>
-      <textarea v-model="reason" placeholder="Lý do chuyển" :rows="4" style="width: 100%"></textarea>
+      <textarea
+        v-model="reason"
+        placeholder="Lý do chuyển"
+        :rows="4"
+        style="width: 100%"
+      ></textarea>
     </a-modal>
   </a-card>
 </template>
@@ -45,7 +54,7 @@ const scrollOptions = computed(() => {
 });
 
 const isModalVisible = ref(false);
-const reason = ref('');  
+const reason = ref('');
 const deviceIdToTransfer = ref(null);
 const columns = [
   {
@@ -93,11 +102,13 @@ const handleOk = () => {
     return;
   }
   api
-    .post(`/users/transfer-to-blacklist/${deviceIdToTransfer.value}`, { reason: reason.value })
+    .post(`/users/transfer-to-blacklist/${deviceIdToTransfer.value}`, {
+      reason: reason.value,
+    })
     .then((res) => {
       if (res.status === 200) {
         message.success('Chuyển vào blacklist thành công');
-        getDevices(); 
+        getDevices();
       }
     })
     .catch((err) => {
@@ -105,7 +116,7 @@ const handleOk = () => {
     })
     .finally(() => {
       isModalVisible.value = false;
-      reason.value = ''; 
+      reason.value = '';
     });
 };
 const handleCancel = () => {

@@ -304,7 +304,7 @@ onUnmounted(() => {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
-  z-index: 998;
+  z-index: 1001;
   overflow: hidden;
 }
 
@@ -377,6 +377,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   transition: background 0.2s;
+  flex-shrink: 0;
 }
 
 .close-btn:hover {
@@ -627,6 +628,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   transition: opacity 0.2s;
+  flex-shrink: 0;
 }
 
 .send-btn:hover:not(:disabled) {
@@ -653,6 +655,42 @@ onUnmounted(() => {
   transform: translateY(20px);
 }
 
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Tablet (769px - 1023px) */
+@media (max-width: 1023px) {
+  .support-chat-window {
+    width: 90%;
+    max-width: 400px;
+    height: 600px;
+    bottom: 15px;
+    right: 15px;
+  }
+
+  .chat-header {
+    padding: 14px;
+  }
+
+  .support-avatar img {
+    width: 44px;
+    height: 44px;
+  }
+
+  .header-text h3 {
+    font-size: 15px;
+  }
+
+  .header-text p {
+    font-size: 11px;
+  }
+
+  .close-btn {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+/* Mobile (481px - 768px) */
 @media (max-width: 768px) {
   .support-chat-window {
     width: 100%;
@@ -660,6 +698,347 @@ onUnmounted(() => {
     bottom: 0;
     right: 0;
     border-radius: 0;
+    max-width: none;
+    /* ✅ SỬA: Thêm padding-top để không bị navbar che */
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
+  /* ✅ SỬA: Header nhỏ gọn hơn + margin-top để tránh navbar */
+  .chat-header {
+    padding: 12px 16px;
+    margin-top: 60px; /* Tránh navbar */
+    position: relative;
+  }
+
+  .header-info {
+    gap: 10px;
+    flex: 1;
+    min-width: 0; /* Cho phép text truncate */
+  }
+
+  .support-avatar img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .online-dot {
+    width: 10px;
+    height: 10px;
+    border: 1.5px solid white;
+  }
+
+  .header-text {
+    flex: 1;
+    min-width: 0; /* Cho phép text truncate */
+  }
+
+  .header-text h3 {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-text p {
+    font-size: 11px;
+  }
+
+  /* ✅ SỬA: Nút close trong mobile */
+  .close-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+
+  .close-btn i {
+    font-size: 18px;
+  }
+
+  .chat-messages {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .message-avatar img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .message-content {
+    max-width: 75%;
+  }
+
+  .message-content p {
+    font-size: 13px;
+  }
+
+  .offline-notice {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .rating-section {
+    padding: 14px;
+  }
+
+  .rating-header h4 {
+    font-size: 15px;
+  }
+
+  .rating-stars i {
+    font-size: 26px;
+  }
+
+  .chat-input {
+    padding: 10px;
+  }
+
+  .chat-input input {
+    padding: 9px 12px;
+    font-size: 13px;
+  }
+
+  .send-btn {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* Small Mobile (361px - 480px) */
+@media (max-width: 480px) {
+  /* ✅ SỬA: Header compact hơn + margin-top */
+  .chat-header {
+    padding: 10px 12px;
+    margin-top: 55px; /* Tránh navbar trên màn nhỏ */
+  }
+
+  .header-info {
+    gap: 8px;
+  }
+
+  .support-avatar img {
+    width: 36px;
+    height: 36px;
+  }
+
+  .online-dot {
+    width: 9px;
+    height: 9px;
+  }
+
+  .header-text h3 {
+    font-size: 13px;
+  }
+
+  .header-text p {
+    font-size: 10px;
+  }
+
+  /* ✅ SỬA: Nút close nhỏ hơn nhưng vẫn dễ bấm */
+  .close-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
+  }
+
+  .close-btn i {
+    font-size: 16px;
+  }
+
+  .chat-messages {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .message-avatar img {
+    width: 26px;
+    height: 26px;
+  }
+
+  .message-content {
+    padding: 9px 12px;
+  }
+
+  .message-content p {
+    font-size: 12px;
+  }
+
+  .message-time {
+    font-size: 10px;
+  }
+
+  .offline-notice {
+    padding: 9px;
+    font-size: 11px;
+  }
+
+  .rating-section {
+    padding: 12px;
+  }
+
+  .rating-header i {
+    font-size: 22px;
+  }
+
+  .rating-header h4 {
+    font-size: 14px;
+  }
+
+  .rating-section p {
+    font-size: 13px;
+  }
+
+  .rating-stars {
+    gap: 6px;
+  }
+
+  .rating-stars i {
+    font-size: 24px;
+  }
+
+  .rating-section textarea {
+    padding: 7px;
+    font-size: 13px;
+  }
+
+  .skip-rating-btn,
+  .submit-rating-btn {
+    padding: 9px;
+    font-size: 13px;
+  }
+
+  .chat-input {
+    padding: 9px;
+  }
+
+  .chat-input input {
+    padding: 8px 11px;
+    font-size: 12px;
+  }
+
+  .send-btn {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* Extra Small Mobile (≤360px) */
+@media (max-width: 360px) {
+  /* ✅ SỬA: Header siêu compact + margin-top */
+  .chat-header {
+    padding: 9px 10px;
+    margin-top: 50px; /* Tránh navbar trên màn rất nhỏ */
+  }
+
+  .header-info {
+    gap: 7px;
+  }
+
+  .support-avatar img {
+    width: 34px;
+    height: 34px;
+  }
+
+  .online-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .header-text h3 {
+    font-size: 12px;
+  }
+
+  .header-text p {
+    font-size: 9px;
+  }
+
+  /* ✅ SỬA: Nút close nhỏ nhất */
+  .close-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
+  }
+
+  .close-btn i {
+    font-size: 15px;
+  }
+
+  .chat-messages {
+    padding: 8px;
+    gap: 7px;
+  }
+
+  .message-avatar img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .message-content {
+    padding: 8px 10px;
+  }
+
+  .message-content p {
+    font-size: 11px;
+  }
+
+  .message-time {
+    font-size: 9px;
+  }
+
+  .offline-notice {
+    padding: 8px;
+    font-size: 10px;
+  }
+
+  .rating-section {
+    padding: 10px;
+  }
+
+  .rating-header i {
+    font-size: 20px;
+  }
+
+  .rating-header h4 {
+    font-size: 13px;
+  }
+
+  .rating-section p {
+    font-size: 12px;
+  }
+
+  .rating-stars {
+    gap: 5px;
+  }
+
+  .rating-stars i {
+    font-size: 22px;
+  }
+
+  .rating-section textarea {
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  .skip-rating-btn,
+  .submit-rating-btn {
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  .chat-input {
+    padding: 8px;
+  }
+
+  .chat-input input {
+    padding: 7px 10px;
+    font-size: 11px;
+  }
+
+  .send-btn {
+    width: 34px;
+    height: 34px;
   }
 }
 </style>

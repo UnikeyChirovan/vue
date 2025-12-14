@@ -2,7 +2,11 @@
   <a-card title="Danh Sách Request Log" style="width: 100%">
     <div class="row">
       <div class="col-12">
-        <a-table :dataSource="requestLogs" :columns="columns" :scroll="scrollOptions">
+        <a-table
+          :dataSource="requestLogs"
+          :columns="columns"
+          :scroll="scrollOptions"
+        >
           <template #bodyCell="{ column, index, record }">
             <template v-if="column.key === 'index'">
               <span>{{ index + 1 }}</span>
@@ -20,7 +24,11 @@
               <span>{{ record.last_request_at }}</span>
             </template>
             <template v-if="column.key === 'action'">
-              <a-button type="primary" @click="confirmTransfer(record.id)" class="me-sm-2 me-2 mb-2">
+              <a-button
+                type="primary"
+                @click="confirmTransfer(record.id)"
+                class="me-sm-2 me-2 mb-2"
+              >
                 <i class="fa-solid fa-arrow-right me-2"></i> Chuyển
               </a-button>
               <a-button type="primary" danger @click="confirmDelete(record.id)">
@@ -45,7 +53,10 @@
       @ok="handleTransfer"
       @cancel="handleTransferCancel"
     >
-      <p>Bạn có chắc chắn muốn chuyển địa chỉ IP <strong>{{ ipToTransfer }}</strong> vào blacklist không?</p>
+      <p>
+        Bạn có chắc chắn muốn chuyển địa chỉ IP
+        <strong>{{ ipToTransfer }}</strong> vào blacklist không?
+      </p>
     </a-modal>
     <a-modal
       v-model:visible="isModalVisibleAll"
@@ -130,7 +141,7 @@ const getRequestLogs = async () => {
 };
 
 const confirmTransfer = (id) => {
-  const record = requestLogs.value.find(log => log.id === id);
+  const record = requestLogs.value.find((log) => log.id === id);
   if (record) {
     idToTransfer.value = id;
     ipToTransfer.value = record.ip_address;
@@ -140,13 +151,15 @@ const confirmTransfer = (id) => {
 
 const handleTransfer = async () => {
   try {
-    const response = await api.post(`users/transfer-from-request-log/${idToTransfer.value}`);
+    const response = await api.post(
+      `users/transfer-from-request-log/${idToTransfer.value}`
+    );
     message.success(response.data.message);
-    getRequestLogs(); 
+    getRequestLogs();
   } catch (error) {
     message.error('Lỗi khi chuyển vào blacklist');
   } finally {
-    isTransferModalVisible.value = false; 
+    isTransferModalVisible.value = false;
   }
 };
 const confirmDelete = (id) => {
@@ -159,7 +172,7 @@ const handleDelete = () => {
     .then((res) => {
       if (res.status === 200) {
         message.success('Xóa bản ghi thành công');
-        getRequestLogs(); 
+        getRequestLogs();
       }
     })
     .catch((err) => {
@@ -180,7 +193,7 @@ const handleDeleteAll = () => {
     .then((res) => {
       if (res.status === 200) {
         message.success('Đã xóa tất cả bản ghi');
-        getRequestLogs(); 
+        getRequestLogs();
       }
     })
     .catch((err) => {
@@ -194,10 +207,10 @@ const handleCancel = () => {
   isModalVisible.value = false;
 };
 const handleCancelAll = () => {
-  isModalVisibleAll.value = false; 
+  isModalVisibleAll.value = false;
 };
 const handleTransferCancel = () => {
-  isTransferModalVisible.value = false; 
+  isTransferModalVisible.value = false;
 };
 onMounted(() => {
   getRequestLogs();

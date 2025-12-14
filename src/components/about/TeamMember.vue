@@ -302,8 +302,8 @@ onMounted(async () => {
   box-shadow:
     inset 0 0 10px rgba(0, 0, 0, 0.1),
     0 4px 20px rgba(0, 0, 0, 0.15);
-  border-left: 6px solid #d9b382;
-  border-right: 6px solid #d9b382;
+  border-left: 10px solid #d9b382;
+  border-right: 10px solid #d9b382;
   max-width: 100%;
 }
 

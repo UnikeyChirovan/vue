@@ -1,26 +1,48 @@
 <template>
-  <div
-    v-if="
-      authStore.isLoggedIn &&
-      shouldShowButton &&
-      !supportStore.isOpen &&
-      isSupportButtonEnabled
-    "
-    class="support-button-container"
-    :style="buttonStyle"
-    @mousedown="startDrag"
-  >
-    <button class="support-button" @click.stop="handleClick">
-      <i class="fa-solid fa-headset"></i>
-      <span class="support-text">Hỗ Trợ</span>
-      <span v-if="unreadCount > 0" class="support-badge">
-        {{ unreadCount }}
-      </span>
+  <div>
+    <!-- Drop Zone - chỉ hiện khi đang kéo trên mobile/tablet -->
+    <div
+      v-if="isDragging && isMobileOrTablet"
+      class="drop-zone"
+      :class="{ 'drop-zone-active': isOverDropZone }"
+    >
+      <div class="drop-zone-content">
+        <i class="fa-solid fa-trash-can"></i>
+        <span class="drop-zone-text">Thả vào đây để tắt</span>
+      </div>
+    </div>
 
-      <span class="close-support-btn" @click.stop="closeSupportButton">
-        <i class="fa-solid fa-xmark"></i>
-      </span>
-    </button>
+    <!-- Support Button -->
+    <div
+      v-if="
+        authStore.isLoggedIn &&
+        shouldShowButton &&
+        !supportStore.isOpen &&
+        isSupportButtonEnabled
+      "
+      class="support-button-container"
+      :class="{ dragging: isDragging }"
+      :style="buttonStyle"
+      @mousedown="startDrag"
+      @touchstart="startDrag"
+    >
+      <button class="support-button">
+        <i class="fa-solid fa-headset"></i>
+        <span class="support-text">Hỗ Trợ</span>
+        <span v-if="unreadCount > 0" class="support-badge">
+          {{ unreadCount }}
+        </span>
+
+        <!-- Close button - chỉ hiện trên desktop khi hover -->
+        <span
+          v-if="!isMobileOrTablet"
+          class="close-support-btn"
+          @click.stop="closeSupportButton"
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </span>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -43,14 +65,79 @@ const position = ref({
 });
 
 const isDragging = ref(false);
-const hasDragged = ref(false); // Track if actually dragged
+const hasDragged = ref(false);
 const dragStart = ref({ x: 0, y: 0 });
-const dragThreshold = 5; // Minimum pixels to consider as drag
+const dragThreshold = 5;
+const isOverDropZone = ref(false);
 
 // Support button enabled state
 const isSupportButtonEnabled = ref(
   localStorage.getItem('supportButtonEnabled') !== 'false'
 );
+
+// Detect mobile/tablet
+const isMobileOrTablet = ref(window.innerWidth <= 1023);
+
+// Drop zone area (bottom center)
+const dropZone = {
+  x: window.innerWidth / 2 - 60, // center - half width of zone
+  y: window.innerHeight - 120,
+  width: 120,
+  height: 80,
+};
+
+// Update drop zone on resize
+const updateDropZone = () => {
+  dropZone.x = window.innerWidth / 2 - 60;
+  dropZone.y = window.innerHeight - 120;
+};
+
+// Check if position is over drop zone
+const checkDropZone = (x, y) => {
+  const buttonCenterX = x + 40; // approximate button center
+  const buttonCenterY = y + 30;
+
+  return (
+    buttonCenterX >= dropZone.x &&
+    buttonCenterX <= dropZone.x + dropZone.width &&
+    buttonCenterY >= dropZone.y &&
+    buttonCenterY <= dropZone.y + dropZone.height
+  );
+};
+
+// Constrain position
+const constrainPosition = () => {
+  const minVisiblePart = 30;
+  const buttonHeight = 60;
+
+  const minX = 0;
+  const maxX = window.innerWidth - minVisiblePart;
+  const minY = 70;
+  const maxY = window.innerHeight - buttonHeight;
+
+  if (position.value.x !== null) {
+    if (position.value.x < minX) {
+      position.value.x = minX;
+    } else if (position.value.x > maxX) {
+      position.value.x = maxX;
+    }
+  }
+
+  if (position.value.y < minY) {
+    position.value.y = minY;
+  } else if (position.value.y > maxY) {
+    position.value.y = maxY;
+  }
+
+  localStorage.setItem('supportButtonPosition', JSON.stringify(position.value));
+};
+
+// Handle resize
+const handleResize = () => {
+  isMobileOrTablet.value = window.innerWidth <= 1023;
+  updateDropZone();
+  constrainPosition();
+};
 
 // Unread count
 const unreadCount = computed(() => supportStore.unreadCount);
@@ -86,80 +173,111 @@ const buttonStyle = computed(() => {
   return {
     transform: `translate(${x}px, ${position.value.y}px)`,
     cursor: isDragging.value ? 'grabbing' : 'grab',
+    opacity: isOverDropZone.value ? 0.6 : 1,
   };
 });
 
-// Drag functions
+// Start drag
 const startDrag = (e) => {
-  // Ngăn drag nếu click vào nút close
   if (e.target.closest('.close-support-btn')) {
     return;
   }
 
   isDragging.value = true;
-  hasDragged.value = false; // Reset drag flag
+  hasDragged.value = false;
+
+  const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+  const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
 
   dragStart.value = {
-    x: e.clientX - (position.value.x ?? window.innerWidth - 90),
-    y: e.clientY - position.value.y,
-    startX: e.clientX,
-    startY: e.clientY,
+    x: clientX - (position.value.x ?? window.innerWidth - 90),
+    y: clientY - position.value.y,
+    startX: clientX,
+    startY: clientY,
   };
 
   document.addEventListener('mousemove', onDrag);
   document.addEventListener('mouseup', stopDrag);
+  document.addEventListener('touchmove', onDrag, { passive: false });
+  document.addEventListener('touchend', stopDrag);
 
-  // Prevent text selection during drag
   e.preventDefault();
 };
 
+// On drag
 const onDrag = (e) => {
   if (!isDragging.value) return;
 
-  // Calculate distance moved
-  const deltaX = Math.abs(e.clientX - dragStart.value.startX);
-  const deltaY = Math.abs(e.clientY - dragStart.value.startY);
+  const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+  const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
 
-  // If moved more than threshold, mark as dragged
+  const deltaX = Math.abs(clientX - dragStart.value.startX);
+  const deltaY = Math.abs(clientY - dragStart.value.startY);
+
   if (deltaX > dragThreshold || deltaY > dragThreshold) {
     hasDragged.value = true;
   }
 
-  // Only update position if actually dragging
   if (hasDragged.value) {
-    const newX = e.clientX - dragStart.value.x;
-    const newY = e.clientY - dragStart.value.y;
+    const newX = clientX - dragStart.value.x;
+    const newY = clientY - dragStart.value.y;
 
-    // Constrain to viewport
-    const maxX = window.innerWidth - 80;
-    const maxY = window.innerHeight - 60;
+    const minVisiblePart = 30;
+    const buttonHeight = 60;
 
-    position.value.x = Math.max(0, Math.min(newX, maxX));
-    position.value.y = Math.max(0, Math.min(newY, maxY));
+    const minX = 0;
+    const maxX = window.innerWidth - minVisiblePart;
+    const minY = 70;
+    const maxY = window.innerHeight - buttonHeight;
 
-    // Save to localStorage
+    position.value.x = Math.max(minX, Math.min(newX, maxX));
+    position.value.y = Math.max(minY, Math.min(newY, maxY));
+
+    // Check if over drop zone (only on mobile/tablet)
+    if (isMobileOrTablet.value) {
+      isOverDropZone.value = checkDropZone(position.value.x, position.value.y);
+    }
+
     localStorage.setItem(
       'supportButtonPosition',
       JSON.stringify(position.value)
     );
   }
+
+  e.preventDefault();
 };
 
+// Stop drag
 const stopDrag = () => {
-  isDragging.value = false;
-  document.removeEventListener('mousemove', onDrag);
-  document.removeEventListener('mouseup', stopDrag);
-};
+  // Check if dropped in drop zone on mobile/tablet
+  if (isMobileOrTablet.value && isOverDropZone.value && hasDragged.value) {
+    closeSupportButton();
+    isOverDropZone.value = false;
+    isDragging.value = false;
+    hasDragged.value = false;
 
-// Handle click - only open if not dragged
-const handleClick = () => {
-  // Only open chat if we didn't actually drag
+    document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', stopDrag);
+    document.removeEventListener('touchmove', onDrag);
+    document.removeEventListener('touchend', stopDrag);
+    return;
+  }
+
   if (!hasDragged.value) {
     openSupportChat();
   }
 
-  // Reset drag flag
-  hasDragged.value = false;
+  isDragging.value = false;
+  isOverDropZone.value = false;
+
+  setTimeout(() => {
+    hasDragged.value = false;
+  }, 50);
+
+  document.removeEventListener('mousemove', onDrag);
+  document.removeEventListener('mouseup', stopDrag);
+  document.removeEventListener('touchmove', onDrag);
+  document.removeEventListener('touchend', stopDrag);
 };
 
 // Open support chat
@@ -199,20 +317,19 @@ onMounted(() => {
     position.value.x = window.innerWidth - 90;
   }
 
-  // Listen for toggle from settings
+  constrainPosition();
+  updateDropZone();
+  window.addEventListener('resize', handleResize);
+
   const handleToggle = (event) => {
     isSupportButtonEnabled.value = event.detail;
   };
 
   window.addEventListener('supportButtonToggle', handleToggle);
 
-  // Load unread count
   supportStore.loadUnreadCount();
-
-  // Subscribe to WebSocket
   supportStore.subscribeToUserChannel();
 
-  // Poll unread count every 30s
   const interval = setInterval(() => {
     if (authStore.isLoggedIn) {
       supportStore.loadUnreadCount();
@@ -221,18 +338,91 @@ onMounted(() => {
 
   onUnmounted(() => {
     clearInterval(interval);
+    window.removeEventListener('resize', handleResize);
     window.removeEventListener('supportButtonToggle', handleToggle);
   });
 });
 </script>
 
 <style scoped>
+/* Drop Zone */
+.drop-zone {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 80px;
+  background: rgba(255, 59, 48, 0.1);
+  border: 2px dashed rgba(255, 59, 48, 0.4);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 998;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.drop-zone-active {
+  background: rgba(255, 59, 48, 0.2);
+  border-color: rgba(255, 59, 48, 0.8);
+  border-width: 3px;
+  transform: translateX(-50%) scale(1.1);
+  box-shadow: 0 8px 24px rgba(255, 59, 48, 0.3);
+}
+
+.drop-zone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #ff3b30;
+}
+
+.drop-zone-content i {
+  font-size: 24px;
+  transition: transform 0.3s ease;
+}
+
+.drop-zone-active .drop-zone-content i {
+  transform: scale(1.2);
+  animation: shake 0.5s ease-in-out;
+}
+
+.drop-zone-text {
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: scale(1.2) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.2) rotate(-10deg);
+  }
+  75% {
+    transform: scale(1.2) rotate(10deg);
+  }
+}
+
+/* Support Button Container */
 .support-button-container {
   position: fixed;
   top: 0;
   left: 0;
   z-index: 999;
   user-select: none;
+  will-change: transform;
+  touch-action: none;
+  transition: opacity 0.3s ease;
+}
+
+.support-button-container.dragging {
+  z-index: 1000;
 }
 
 .support-button {
@@ -335,7 +525,27 @@ onMounted(() => {
   }
 }
 
-/* Mobile responsive */
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Tablet (769px - 1023px) */
+@media (max-width: 1023px) {
+  .support-button {
+    padding: 11px 18px;
+    font-size: 13px;
+  }
+
+  .drop-zone {
+    width: 110px;
+    height: 75px;
+    bottom: 15px;
+  }
+
+  .drop-zone-text {
+    font-size: 10px;
+  }
+}
+
+/* Mobile (481px - 768px) */
 @media (max-width: 768px) {
   .support-button {
     padding: 10px 16px;
@@ -350,12 +560,86 @@ onMounted(() => {
     font-size: 20px;
   }
 
-  .close-support-btn {
-    width: 20px;
-    height: 20px;
+  .support-badge {
+    top: -6px;
+    right: -6px;
     font-size: 10px;
+    padding: 2px 6px;
+  }
+
+  .drop-zone {
+    width: 100px;
+    height: 70px;
+  }
+
+  .drop-zone-content i {
+    font-size: 22px;
+  }
+}
+
+/* Small Mobile (361px - 480px) */
+@media (max-width: 480px) {
+  .support-button {
+    padding: 9px 14px;
+    font-size: 12px;
+  }
+
+  .support-button i {
+    font-size: 18px;
+  }
+
+  .support-badge {
     top: -5px;
     right: -5px;
+    font-size: 9px;
+    padding: 2px 5px;
+    min-width: 18px;
+  }
+
+  .drop-zone {
+    width: 90px;
+    height: 65px;
+  }
+
+  .drop-zone-content i {
+    font-size: 20px;
+  }
+
+  .drop-zone-text {
+    font-size: 9px;
+  }
+}
+
+/* Extra Small Mobile (≤360px) */
+@media (max-width: 360px) {
+  .support-button {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .support-button i {
+    font-size: 17px;
+  }
+
+  .support-badge {
+    top: -4px;
+    right: -4px;
+    font-size: 8px;
+    padding: 1px 4px;
+    min-width: 16px;
+  }
+
+  .drop-zone {
+    width: 85px;
+    height: 60px;
+  }
+
+  .drop-zone-content i {
+    font-size: 18px;
+  }
+
+  .drop-zone-text {
+    font-size: 8px;
   }
 }
 </style>
