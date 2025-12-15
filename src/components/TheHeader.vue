@@ -39,7 +39,10 @@
 
         <!-- Auth Section (Desktop only >= 1024px) -->
         <div class="auth-section desktop-auth">
-          <TheAuth />
+          <TheAuth
+            @openRegister="showRegister = true"
+            @openLogin="showLogin = true"
+          />
         </div>
 
         <!-- Mobile/Tablet Auth Toggle (< 1024px, only when NOT logged in) -->
@@ -53,58 +56,108 @@
 
         <!-- Mobile/Tablet User Section (when logged in, < 1024px) -->
         <div v-if="authStore.isLoggedIn" class="mobile-user-section">
-          <TheAuth />
+          <TheAuth
+            @openRegister="showRegister = true"
+            @openLogin="showLogin = true"
+          />
         </div>
       </div>
     </nav>
   </div>
 
-  <!-- Drawer for Navigation Menu (Mobile/Tablet) -->
-  <a-drawer
-    v-model:visible="visible"
-    title="DANH MỤC"
-    placement="left"
-    :width="drawerWidth"
-  >
-    <ul class="mobile-nav-list">
-      <template v-for="item in listItem" :key="item.name">
-        <li
-          class="mobile-nav-item"
-          v-if="
-            (!item.requiresLogin && !item.isAdmin && !item.isManager) ||
-            (authStore.isLoggedIn &&
-              item.requiresLogin &&
-              !item.isAdmin &&
-              !item.isManager) ||
-            (authStore.isManager && !item.isAdmin) ||
-            authStore.isAdmin
-          "
+  <!-- Custom Drawer for Navigation Menu (Mobile/Tablet) -->
+  <Transition name="drawer-fade">
+    <div v-if="visible" class="drawer-overlay" @click="visible = false">
+      <Transition name="drawer-slide">
+        <div
+          v-if="visible"
+          class="custom-drawer drawer-left"
+          :style="{ width: drawerWidth }"
+          @click.stop
         >
-          <router-link
-            class="mobile-nav-link"
-            :to="{ name: item.link }"
-            @click="visible = false"
-          >
-            <i :class="item.icon" class="mobile-nav-icon"></i>
-            <span class="mobile-nav-text">{{ item.name }}</span>
-          </router-link>
-        </li>
-      </template>
-    </ul>
-  </a-drawer>
-
-  <!-- Drawer for Auth (only when NOT logged in) -->
-  <a-drawer
-    v-if="!authStore.isLoggedIn"
-    v-model:visible="visible_user"
-    title="ĐĂNG NHẬP / ĐĂNG KÝ"
-    placement="right"
-    :width="drawerWidth"
-  >
-    <div class="mobile-auth-container">
-      <TheAuth />
+          <div class="drawer-header">
+            <h3 class="drawer-title">
+              <i class="fa-solid fa-list-ul"></i>
+              DANH MỤC
+            </h3>
+            <button class="drawer-close" @click="visible = false">
+              <i class="fa-solid fa-times"></i>
+            </button>
+          </div>
+          <div class="drawer-body">
+            <ul class="mobile-nav-list">
+              <template v-for="item in listItem" :key="item.name">
+                <li
+                  class="mobile-nav-item"
+                  v-if="
+                    (!item.requiresLogin && !item.isAdmin && !item.isManager) ||
+                    (authStore.isLoggedIn &&
+                      item.requiresLogin &&
+                      !item.isAdmin &&
+                      !item.isManager) ||
+                    (authStore.isManager && !item.isAdmin) ||
+                    authStore.isAdmin
+                  "
+                >
+                  <router-link
+                    class="mobile-nav-link"
+                    :to="{ name: item.link }"
+                    @click="visible = false"
+                  >
+                    <i :class="item.icon" class="mobile-nav-icon"></i>
+                    <span class="mobile-nav-text">{{ item.name }}</span>
+                    <i class="fa-solid fa-chevron-right mobile-nav-arrow"></i>
+                  </router-link>
+                </li>
+              </template>
+            </ul>
+          </div>
+        </div>
+      </Transition>
     </div>
-  </a-drawer>
+  </Transition>
+
+  <!-- Custom Drawer for Auth (only when NOT logged in) -->
+  <Transition name="drawer-fade">
+    <div
+      v-if="!authStore.isLoggedIn && visible_user"
+      class="drawer-overlay"
+      @click="visible_user = false"
+    >
+      <Transition name="drawer-slide-right">
+        <div
+          v-if="visible_user"
+          class="custom-drawer drawer-right"
+          :style="{ width: drawerWidth }"
+          @click.stop
+        >
+          <div class="drawer-header">
+            <h3 class="drawer-title">
+              <i class="fa-solid fa-user-lock"></i>
+              ĐĂNG NHẬP / ĐĂNG KÝ
+            </h3>
+            <button class="drawer-close" @click="visible_user = false">
+              <i class="fa-solid fa-times"></i>
+            </button>
+          </div>
+          <div class="drawer-body">
+            <div class="mobile-auth-container">
+              <TheAuth
+                @openRegister="showRegister = true"
+                @openLogin="showLogin = true"
+              />
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </div>
+  </Transition>
+
+  <!-- Auth Modals (Using Teleport - renders at body level) -->
+  <AuthModals
+    v-model:showRegister="showRegister"
+    v-model:showLogin="showLogin"
+  />
 </template>
 
 <script setup>
@@ -113,11 +166,14 @@ import { useAuthStore } from '../stores/auth';
 import { useLoadingStore } from '../stores/loadingStore';
 import apiLinks from '../services/api-links';
 import TheAuth from './TheAuth.vue';
+import AuthModals from './AuthModals.vue';
 
 const authStore = useAuthStore();
 
 const visible = ref(false);
 const visible_user = ref(false);
+const showRegister = ref(false);
+const showLogin = ref(false);
 
 // Responsive drawer width
 const drawerWidth = computed(() => {
@@ -237,6 +293,14 @@ onMounted(() => {
   background: linear-gradient(135deg, #0c713d 0%, #0a5c32 100%);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background 0.3s ease;
+}
+
+/* Dark Mode for Navbar */
+html.dark-mode .navbar-container {
+  background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .navbar-content {
@@ -277,11 +341,15 @@ onMounted(() => {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
+html.dark-mode .logo-image {
+  filter: drop-shadow(0 2px 6px rgba(255, 255, 255, 0.3));
+}
+
 /* ===== DESKTOP NAVIGATION ===== */
 .nav-menu {
   display: flex;
   align-items: center;
-  gap: 0;
+  gap: 0.25rem;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -326,9 +394,18 @@ onMounted(() => {
   text-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 }
 
+html.dark-mode .nav-link:hover {
+  color: #4ade80;
+  text-shadow: 0 2px 8px rgba(74, 222, 128, 0.4);
+}
+
 .nav-link:hover .nav-icon {
   transform: scale(1.15) rotate(5deg);
   color: #ffd700;
+}
+
+html.dark-mode .nav-link:hover .nav-icon {
+  color: #4ade80;
 }
 
 .nav-link.router-link-active,
@@ -339,9 +416,20 @@ onMounted(() => {
   box-shadow: inset 0 -3px 0 #ffd700;
 }
 
+html.dark-mode .nav-link.router-link-active,
+html.dark-mode .nav-link.router-link-exact-active {
+  background: rgba(74, 222, 128, 0.15);
+  box-shadow: inset 0 -3px 0 #4ade80;
+}
+
 .nav-link.router-link-active .nav-icon,
 .nav-link.router-link-exact-active .nav-icon {
   color: #ffd700;
+}
+
+html.dark-mode .nav-link.router-link-active .nav-icon,
+html.dark-mode .nav-link.router-link-exact-active .nav-icon {
+  color: #4ade80;
 }
 
 .nav-icon {
@@ -379,9 +467,18 @@ onMounted(() => {
   z-index: 10;
 }
 
+html.dark-mode .mobile-toggle {
+  background: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+}
+
 .mobile-toggle:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: scale(1.05);
+}
+
+html.dark-mode .mobile-toggle:hover {
+  background: rgba(74, 222, 128, 0.2);
 }
 
 .mobile-toggle:active {
@@ -414,6 +511,141 @@ onMounted(() => {
   gap: 0;
 }
 
+/* ===== CUSTOM DRAWER STYLES ===== */
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+
+html.dark-mode .drawer-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.custom-drawer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  background: #ffffff;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+  z-index: 2001;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+html.dark-mode .custom-drawer {
+  background: #1a1a1a;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+}
+
+.drawer-left {
+  left: 0;
+}
+
+.drawer-right {
+  right: 0;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, #0c713d 0%, #0a5c32 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+html.dark-mode .drawer-header {
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.drawer-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.125rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+html.dark-mode .drawer-title {
+  color: #4ade80;
+}
+
+.drawer-close {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+html.dark-mode .drawer-close {
+  background: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+}
+
+.drawer-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+
+html.dark-mode .drawer-close:hover {
+  background: rgba(74, 222, 128, 0.2);
+}
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+/* Custom scrollbar for drawer */
+.drawer-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.drawer-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+html.dark-mode .drawer-body::-webkit-scrollbar-track {
+  background: #2a2a2a;
+}
+
+.drawer-body::-webkit-scrollbar-thumb {
+  background: #0c713d;
+  border-radius: 4px;
+}
+
+html.dark-mode .drawer-body::-webkit-scrollbar-thumb {
+  background: #4ade80;
+}
+
+.drawer-body::-webkit-scrollbar-thumb:hover {
+  background: #0a5c32;
+}
+
+html.dark-mode .drawer-body::-webkit-scrollbar-thumb:hover {
+  background: #22c55e;
+}
+
 /* ===== MOBILE DRAWER NAVIGATION ===== */
 .mobile-nav-list {
   list-style: none;
@@ -422,27 +654,61 @@ onMounted(() => {
 }
 
 .mobile-nav-item {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.625rem;
 }
 
 .mobile-nav-link {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1rem;
+  padding: 1rem 1.25rem;
   color: #333;
   text-decoration: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 1rem;
   font-weight: 500;
   transition: all 0.3s ease;
-  background: #f5f5f5;
+  background: #f8f9fa;
+  position: relative;
+  overflow: hidden;
+}
+
+html.dark-mode .mobile-nav-link {
+  background: #2a2a2a;
+  color: #e5e5e5;
+}
+
+.mobile-nav-link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #0c713d 0%, #0a5c32 100%);
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+html.dark-mode .mobile-nav-link::before {
+  background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%);
 }
 
 .mobile-nav-link:hover {
   background: linear-gradient(135deg, #0c713d 0%, #0a5c32 100%);
   color: #ffffff;
-  transform: translateX(5px);
+  transform: translateX(8px);
+  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.3);
+}
+
+html.dark-mode .mobile-nav-link:hover {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  color: #0d0d0d;
+  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+}
+
+.mobile-nav-link:hover::before {
+  transform: scaleY(1);
 }
 
 .mobile-nav-link.router-link-active,
@@ -450,25 +716,90 @@ onMounted(() => {
   background: linear-gradient(135deg, #0c713d 0%, #0a5c32 100%);
   color: #ffffff;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(12, 113, 61, 0.3);
+  box-shadow: 0 4px 16px rgba(12, 113, 61, 0.4);
+}
+
+html.dark-mode .mobile-nav-link.router-link-active,
+html.dark-mode .mobile-nav-link.router-link-exact-active {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  color: #0d0d0d;
+  box-shadow: 0 4px 16px rgba(74, 222, 128, 0.4);
+}
+
+.mobile-nav-link.router-link-active::before,
+.mobile-nav-link.router-link-exact-active::before {
+  transform: scaleY(1);
 }
 
 .mobile-nav-icon {
   font-size: 1.25rem;
   min-width: 24px;
   text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.mobile-nav-link:hover .mobile-nav-icon {
+  transform: scale(1.2) rotate(5deg);
 }
 
 .mobile-nav-text {
   flex: 1;
 }
 
+.mobile-nav-arrow {
+  font-size: 0.875rem;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.mobile-nav-link:hover .mobile-nav-arrow {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
 /* ===== MOBILE AUTH CONTAINER ===== */
 .mobile-auth-container {
-  padding: 0;
+  padding: 0.5rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+/* ===== DRAWER TRANSITIONS ===== */
+.drawer-fade-enter-active,
+.drawer-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.drawer-fade-enter-from,
+.drawer-fade-leave-to {
+  opacity: 0;
+}
+
+.drawer-slide-enter-active,
+.drawer-slide-leave-active {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.drawer-slide-enter-from {
+  transform: translateX(-100%);
+}
+
+.drawer-slide-leave-to {
+  transform: translateX(-100%);
+}
+
+.drawer-slide-right-enter-active,
+.drawer-slide-right-leave-active {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.drawer-slide-right-enter-from {
+  transform: translateX(100%);
+}
+
+.drawer-slide-right-leave-to {
+  transform: translateX(100%);
 }
 
 /* ===== RESPONSIVE BREAKPOINTS ===== */
@@ -501,12 +832,24 @@ onMounted(() => {
   }
 
   .mobile-nav-link {
-    padding: 0.875rem;
+    padding: 0.875rem 1rem;
     font-size: 0.9375rem;
   }
 
   .mobile-nav-icon {
     font-size: 1.125rem;
+  }
+
+  .drawer-header {
+    padding: 1rem 1.25rem;
+  }
+
+  .drawer-title {
+    font-size: 1rem;
+  }
+
+  .drawer-body {
+    padding: 0.75rem;
   }
 }
 
@@ -541,13 +884,11 @@ onMounted(() => {
     padding: 0.875rem 1.25rem;
   }
 
-  /* Hide desktop auth and menu */
   .desktop-auth,
   .desktop-menu {
     display: none !important;
   }
 
-  /* Show mobile toggles */
   .mobile-toggle {
     display: flex;
   }
@@ -585,7 +926,6 @@ onMounted(() => {
     display: flex !important;
   }
 
-  /* Reset brand-section for desktop */
   .brand-section {
     position: static !important;
     transform: none !important;
@@ -623,7 +963,6 @@ onMounted(() => {
     display: flex !important;
   }
 
-  /* Reset brand-section for desktop */
   .brand-section {
     position: static !important;
     transform: none !important;
@@ -640,7 +979,7 @@ onMounted(() => {
   }
 }
 
-/* Large Desktop (1440px+) */
+/* Large Desktop (1440px+) - Phần còn thiếu */
 @media (min-width: 1440px) {
   .navbar-content {
     padding: 1rem 2rem;

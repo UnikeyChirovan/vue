@@ -3,94 +3,108 @@
     v-model:openKeys="openKeys"
     v-model:selectedKeys="selectedKeys"
     mode="inline"
+    class="admin-menu"
   >
-    <a-menu-item key="admin-support-statistics">
-      <RouterLink :to="{ name: 'admin-support-statistics' }">
-        <span><i class="fa-solid fa-headset me-1"></i>QUẢN LÝ CSKH</span>
+    <a-menu-item key="admin-support-statistics" class="menu-item">
+      <RouterLink :to="{ name: 'admin-support-statistics' }" class="menu-link">
+        <i class="fa-solid fa-headset menu-icon"></i>
+        <span class="menu-text">QUẢN LÝ CSKH</span>
       </RouterLink>
     </a-menu-item>
-    <a-menu-item key="admin-users">
-      <RouterLink :to="{ name: 'admin-users' }">
-        <span><i class="fa-solid fa-user me-1"></i>Quản lý tài khoản</span>
+    <a-menu-item key="admin-users" class="menu-item">
+      <RouterLink :to="{ name: 'admin-users' }" class="menu-link">
+        <i class="fa-solid fa-user menu-icon"></i>
+        <span class="menu-text">Quản lý tài khoản</span>
       </RouterLink>
     </a-menu-item>
-    <a-menu-item key="admin-mails">
-      <RouterLink :to="{ name: 'admin-mails' }">
-        <span><i class="fa-solid fa-heart me-1"></i>Danh sách Mails</span>
+    <a-menu-item key="admin-mails" class="menu-item">
+      <RouterLink :to="{ name: 'admin-mails' }" class="menu-link">
+        <i class="fa-solid fa-heart menu-icon"></i>
+        <span class="menu-text">Danh sách Mails</span>
       </RouterLink>
     </a-menu-item>
-    <a-menu-item key="admin-news">
-      <RouterLink :to="{ name: 'admin-news' }">
-        <span><i class="fa-solid fa-bell me-1"></i> Quản lý thông báo</span>
+    <a-menu-item key="admin-news" class="menu-item">
+      <RouterLink :to="{ name: 'admin-news' }" class="menu-link">
+        <i class="fa-solid fa-bell menu-icon"></i>
+        <span class="menu-text">Quản lý thông báo</span>
       </RouterLink>
     </a-menu-item>
-    <a-menu-item key="admin-infos">
-      <RouterLink :to="{ name: 'admin-infos' }">
-        <span><i class="fa-solid fa-envelope me-1"></i>Thông báo qua mail</span>
+    <a-menu-item key="admin-infos" class="menu-item">
+      <RouterLink :to="{ name: 'admin-infos' }" class="menu-link">
+        <i class="fa-solid fa-envelope menu-icon"></i>
+        <span class="menu-text">Thông báo qua mail</span>
       </RouterLink>
     </a-menu-item>
-    <a-menu-item key="admin-contents">
-      <RouterLink :to="{ name: 'admin-contents' }">
-        <span><i class="fa-solid fa-indent me-1"></i>Nội dung dài - About</span>
+    <a-menu-item key="admin-contents" class="menu-item">
+      <RouterLink :to="{ name: 'admin-contents' }" class="menu-link">
+        <i class="fa-solid fa-indent menu-icon"></i>
+        <span class="menu-text">Nội dung dài - About</span>
       </RouterLink>
     </a-menu-item>
-    <a-menu-item key="admin-company">
-      <RouterLink :to="{ name: 'admin-company' }">
-        <span
-          ><i class="fa-solid fa-layer-group me-1"></i>Thông tin công ty</span
-        >
+    <a-menu-item key="admin-company" class="menu-item">
+      <RouterLink :to="{ name: 'admin-company' }" class="menu-link">
+        <i class="fa-solid fa-layer-group menu-icon"></i>
+        <span class="menu-text">Thông tin công ty</span>
       </RouterLink>
     </a-menu-item>
-    <a-menu-item key="admin-categories">
-      <RouterLink :to="{ name: 'admin-categories' }">
-        <span><i class="fa-solid fa-list me-1"></i>Danh mục tên</span>
+    <a-menu-item key="admin-categories" class="menu-item">
+      <RouterLink :to="{ name: 'admin-categories' }" class="menu-link">
+        <i class="fa-solid fa-list menu-icon"></i>
+        <span class="menu-text">Danh mục tên</span>
       </RouterLink>
     </a-menu-item>
-    <a-menu-item key="admin-stories">
-      <RouterLink :to="{ name: 'admin-stories' }">
-        <span><i class="fa-solid fa-tag me-1"></i>Quản lý chương truyện</span>
+    <a-menu-item key="admin-stories" class="menu-item">
+      <RouterLink :to="{ name: 'admin-stories' }" class="menu-link">
+        <i class="fa-solid fa-tag menu-icon"></i>
+        <span class="menu-text">Quản lý chương truyện</span>
       </RouterLink>
     </a-menu-item>
-    <a-menu-item key="admin-images-manager">
-      <RouterLink :to="{ name: 'admin-images-manager' }">
-        <span><i class="fa-solid fa-images me-1"></i>Danh mục hình ảnh</span>
+    <a-menu-item key="admin-images-manager" class="menu-item">
+      <RouterLink :to="{ name: 'admin-images-manager' }" class="menu-link">
+        <i class="fa-solid fa-images menu-icon"></i>
+        <span class="menu-text">Danh mục hình ảnh</span>
       </RouterLink>
     </a-menu-item>
-    <a-menu-item key="admin-images">
-      <RouterLink :to="{ name: 'admin-images' }">
-        <span><i class="fa-solid fa-image me-1"></i>Quản lý hình nền</span>
+    <a-menu-item key="admin-images" class="menu-item">
+      <RouterLink :to="{ name: 'admin-images' }" class="menu-link">
+        <i class="fa-solid fa-image menu-icon"></i>
+        <span class="menu-text">Quản lý hình nền</span>
       </RouterLink>
     </a-menu-item>
-    <a-menu-item key="admin-videos">
-      <RouterLink :to="{ name: 'admin-videos' }">
-        <span><i class="fa-solid fa-film me-1"></i>Quản lý Video</span>
+    <a-menu-item key="admin-videos" class="menu-item">
+      <RouterLink :to="{ name: 'admin-videos' }" class="menu-link">
+        <i class="fa-solid fa-film menu-icon"></i>
+        <span class="menu-text">Quản lý Video</span>
       </RouterLink>
     </a-menu-item>
-    <a-menu-item key="admin-contacts">
-      <RouterLink :to="{ name: 'admin-contacts' }">
-        <span
-          ><i class="fa-regular fa-paper-plane me-1"></i>Quản lý liên hệ</span
-        >
+    <a-menu-item key="admin-contacts" class="menu-item">
+      <RouterLink :to="{ name: 'admin-contacts' }" class="menu-link">
+        <i class="fa-regular fa-paper-plane menu-icon"></i>
+        <span class="menu-text">Quản lý liên hệ</span>
       </RouterLink>
     </a-menu-item>
-    <a-menu-item key="admin-blacklists">
-      <RouterLink :to="{ name: 'admin-blacklists' }">
-        <span><i class="fa-solid fa-ban me-1"></i>Danh sách bị cấm</span>
+    <a-menu-item key="admin-blacklists" class="menu-item">
+      <RouterLink :to="{ name: 'admin-blacklists' }" class="menu-link">
+        <i class="fa-solid fa-ban menu-icon"></i>
+        <span class="menu-text">Danh sách bị cấm</span>
       </RouterLink>
     </a-menu-item>
-    <a-menu-item key="admin-device-infos">
-      <RouterLink :to="{ name: 'admin-device-infos' }">
-        <span><i class="fa-solid fa-user-tag me-1"></i>Quản lý thiết bị</span>
+    <a-menu-item key="admin-device-infos" class="menu-item">
+      <RouterLink :to="{ name: 'admin-device-infos' }" class="menu-link">
+        <i class="fa-solid fa-user-tag menu-icon"></i>
+        <span class="menu-text">Quản lý thiết bị</span>
       </RouterLink>
     </a-menu-item>
-    <a-menu-item key="admin-requests">
-      <RouterLink :to="{ name: 'admin-requests' }">
-        <span><i class="fa-solid fa-list-ul me-1"></i>Nhật ký Requests</span>
+    <a-menu-item key="admin-requests" class="menu-item">
+      <RouterLink :to="{ name: 'admin-requests' }" class="menu-link">
+        <i class="fa-solid fa-list-ul menu-icon"></i>
+        <span class="menu-text">Nhật ký Requests</span>
       </RouterLink>
     </a-menu-item>
-    <a-menu-item key="admin-settings">
-      <RouterLink :to="{ name: 'admin-settings' }">
-        <span><i class="fa-solid fa-gear me-1"></i>Cài đặt</span>
+    <a-menu-item key="admin-settings" class="menu-item">
+      <RouterLink :to="{ name: 'admin-settings' }" class="menu-link">
+        <i class="fa-solid fa-gear menu-icon"></i>
+        <span class="menu-text">Cài đặt</span>
       </RouterLink>
     </a-menu-item>
   </a-menu>
@@ -102,3 +116,192 @@ import { useMenu } from '../stores/use-menu';
 const store = useMenu();
 const { selectedKeys, openKeys } = storeToRefs(store);
 </script>
+
+<style scoped>
+/* ========== ADMIN MENU STYLING ========== */
+.admin-menu {
+  background: transparent !important;
+  border-right: none !important;
+}
+
+/* Light Mode Menu */
+.admin-menu :deep(.ant-menu-item) {
+  margin: 8px 0;
+  border-radius: 12px;
+  padding: 12px 16px !important;
+  height: auto !important;
+  line-height: 1.5 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+html.dark-mode .admin-menu :deep(.ant-menu-item) {
+  background: #1e293b;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.admin-menu :deep(.ant-menu-item:hover) {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%) !important;
+  transform: translateX(8px);
+  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.15);
+}
+
+html.dark-mode .admin-menu :deep(.ant-menu-item:hover) {
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 100%) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.admin-menu :deep(.ant-menu-item-selected) {
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%) !important;
+  box-shadow: 0 4px 16px rgba(12, 113, 61, 0.3);
+}
+
+html.dark-mode .admin-menu :deep(.ant-menu-item-selected) {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+}
+
+.admin-menu :deep(.ant-menu-item-selected .menu-link) {
+  color: white !important;
+}
+
+.admin-menu :deep(.ant-menu-item-selected .menu-icon) {
+  color: white !important;
+}
+
+/* Menu Link Styling */
+.menu-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+html.dark-mode .menu-link {
+  color: #e2e8f0;
+}
+
+.menu-icon {
+  font-size: 18px;
+  min-width: 24px;
+  text-align: center;
+  color: #0c713d;
+  transition: all 0.3s ease;
+}
+
+html.dark-mode .menu-icon {
+  color: #10b981;
+}
+
+.menu-text {
+  flex: 1;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Hover State for Non-Selected Items */
+.admin-menu
+  :deep(.ant-menu-item:not(.ant-menu-item-selected):hover .menu-link) {
+  color: #0c713d;
+}
+
+html.dark-mode
+  .admin-menu
+  :deep(.ant-menu-item:not(.ant-menu-item-selected):hover .menu-link) {
+  color: #10b981;
+}
+
+.admin-menu
+  :deep(.ant-menu-item:not(.ant-menu-item-selected):hover .menu-icon) {
+  color: #0c713d;
+  transform: scale(1.1);
+}
+
+html.dark-mode
+  .admin-menu
+  :deep(.ant-menu-item:not(.ant-menu-item-selected):hover .menu-icon) {
+  color: #10b981;
+}
+
+/* Remove default Ant Design styles */
+.admin-menu :deep(.ant-menu-item::after) {
+  display: none !important;
+}
+
+.admin-menu :deep(.ant-menu-item-active) {
+  background: transparent !important;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .admin-menu :deep(.ant-menu-item) {
+    padding: 10px 14px !important;
+    margin: 6px 0;
+  }
+
+  .menu-icon {
+    font-size: 16px;
+    min-width: 22px;
+  }
+
+  .menu-text {
+    font-size: 0.9rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .admin-menu :deep(.ant-menu-item) {
+    padding: 10px 12px !important;
+    margin: 6px 0;
+    border-radius: 10px;
+  }
+
+  .menu-link {
+    gap: 10px;
+  }
+
+  .menu-icon {
+    font-size: 16px;
+    min-width: 20px;
+  }
+
+  .menu-text {
+    font-size: 0.875rem;
+  }
+
+  .admin-menu :deep(.ant-menu-item:hover) {
+    transform: translateX(4px);
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .admin-menu :deep(.ant-menu-item) {
+    padding: 8px 10px !important;
+    margin: 5px 0;
+    border-radius: 8px;
+  }
+
+  .menu-link {
+    gap: 8px;
+  }
+
+  .menu-icon {
+    font-size: 14px;
+    min-width: 18px;
+  }
+
+  .menu-text {
+    font-size: 0.825rem;
+  }
+}
+</style>

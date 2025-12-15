@@ -4,14 +4,14 @@
     <div class="settings-header">
       <div class="header-content">
         <h1>
-          <i class="fas fa-cog"></i>
+          <i class="fas fa-cog me-2"></i>
           Cài Đặt Hệ Thống
         </h1>
         <p>Quản lý cấu hình và tùy chỉnh hệ thống</p>
       </div>
       <button class="save-all-btn" @click="saveAllSettings">
-        <i class="fas fa-save"></i>
-        <span>Lưu Tất Cả</span>
+        <i class="fas fa-save me-2"></i>
+        Lưu Tất Cả
       </button>
     </div>
 
@@ -112,8 +112,8 @@
             </div>
             <n-upload action="/api/upload/logo" :max="1" list-type="image-card">
               <n-button size="large">
-                <i class="fas fa-upload"></i>
-                <span>Tải Logo</span>
+                <i class="fas fa-upload me-2"></i>
+                Tải Logo
               </n-button>
             </n-upload>
           </div>
@@ -129,8 +129,8 @@
               list-type="image-card"
             >
               <n-button size="large">
-                <i class="fas fa-upload"></i>
-                <span>Tải Favicon</span>
+                <i class="fas fa-upload me-2"></i>
+                Tải Favicon
               </n-button>
             </n-upload>
           </div>
@@ -259,10 +259,10 @@
         </div>
 
         <div class="test-email-section">
-          <button class="test-email-btn" @click="testEmail">
-            <i class="fas fa-paper-plane"></i>
-            <span>Gửi Email Thử Nghiệm</span>
-          </button>
+          <n-button type="info" size="large" @click="testEmail">
+            <i class="fas fa-paper-plane me-2"></i>
+            Gửi Email Thử Nghiệm
+          </n-button>
         </div>
       </div>
 
@@ -365,14 +365,16 @@
 
     <!-- Action Buttons -->
     <div class="settings-footer">
-      <button class="reset-button" @click="resetSettings">
-        <i class="fas fa-undo"></i>
-        <span>Khôi Phục Mặc Định</span>
-      </button>
-      <button class="save-button" @click="saveAllSettings">
-        <i class="fas fa-save"></i>
-        <span>Lưu Thay Đổi</span>
-      </button>
+      <n-space>
+        <n-button size="large" @click="resetSettings">
+          <i class="fas fa-undo me-2"></i>
+          Khôi Phục Mặc Định
+        </n-button>
+        <n-button type="primary" size="large" @click="saveAllSettings">
+          <i class="fas fa-save me-2"></i>
+          Lưu Thay Đổi
+        </n-button>
+      </n-space>
     </div>
   </div>
 </template>
@@ -394,24 +396,35 @@ import { useMenu } from '../../../stores/use-menu';
 const message = useMessage();
 
 const settings = ref({
+  // General
   siteName: 'Admin Dashboard',
   contactEmail: 'admin@example.com',
   phone: '0123-456-789',
   address: '',
+
+  // Appearance
   darkMode: false,
   language: 'vi',
+
+  // Security
   twoFactorAuth: false,
   sessionTimeout: 30,
   maxLoginAttempts: 5,
   ipWhitelist: '',
+
+  // Email
   smtpHost: 'smtp.gmail.com',
   smtpPort: 587,
   smtpEmail: '',
   smtpPassword: '',
+
+  // Performance
   cacheEnabled: true,
   cacheDuration: 3600,
   imageCompression: true,
   lazyLoading: true,
+
+  // Maintenance
   maintenanceMode: false,
   maintenanceMessage:
     'Website đang trong quá trình bảo trì. Vui lòng quay lại sau!',
@@ -425,15 +438,18 @@ const languageOptions = [
 ];
 
 const saveAllSettings = () => {
+  // TODO: Call API to save settings
   message.success('Đã lưu cài đặt thành công!');
 };
 
 const resetSettings = () => {
   message.warning('Đã khôi phục cài đặt mặc định');
+  // Reset to default values
 };
 
 const testEmail = () => {
   message.info('Đang gửi email thử nghiệm...');
+  // TODO: Call API to test email
   setTimeout(() => {
     message.success('Email đã được gửi thành công!');
   }, 2000);
@@ -441,113 +457,60 @@ const testEmail = () => {
 
 onMounted(() => {
   useMenu().onSelectedKey(['admin-settings']);
+  // TODO: Load settings from API
 });
 </script>
 
 <style scoped>
-/* ========== WRAPPER ========== */
 .settings-page {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 40px 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
 }
 
-/* ========== HEADER ========== */
+/* Header */
 .settings-header {
-  max-width: 1400px;
-  margin: 0 auto 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 30px 40px;
-  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
-  border-radius: 20px;
+  margin-bottom: 32px;
+  padding: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
   color: white;
-  box-shadow: 0 10px 40px rgba(12, 113, 61, 0.3);
 }
 
 .header-content h1 {
-  font-size: 2rem;
-  font-weight: 800;
+  font-size: 28px;
+  font-weight: 700;
   margin: 0 0 8px 0;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  letter-spacing: 0.5px;
-}
-
-.header-content h1 i {
-  font-size: 2.2rem;
-  animation: rotate 3s linear infinite;
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .header-content p {
   margin: 0;
   opacity: 0.9;
-  font-size: 1rem;
 }
 
 .save-all-btn {
+  padding: 12px 32px;
   background: white;
-  color: #0c713d;
+  color: #667eea;
   border: none;
-  padding: 14px 32px;
-  border-radius: 50px;
+  border-radius: 10px;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 15px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  letter-spacing: 0.5px;
-  position: relative;
-  overflow: hidden;
-}
-
-.save-all-btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(12, 113, 61, 0.1);
-  transform: translate(-50%, -50%);
-  transition:
-    width 0.6s,
-    height 0.6s;
-}
-
-.save-all-btn:hover::before {
-  width: 300px;
-  height: 300px;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .save-all-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-.save-all-btn:active {
-  transform: translateY(0);
-}
-
-/* ========== SETTINGS CONTENT ========== */
+/* Settings Content */
 .settings-content {
-  max-width: 1400px;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -555,43 +518,37 @@ onMounted(() => {
 
 .settings-section {
   background: white;
-  border-radius: 20px;
-  padding: 35px 40px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(12, 113, 61, 0.1);
-  transition: all 0.3s ease;
-}
-
-.settings-section:hover {
-  box-shadow: 0 12px 40px rgba(12, 113, 61, 0.12);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .section-title {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid rgba(12, 113, 61, 0.1);
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
 }
 
 .section-title i {
-  font-size: 1.5rem;
-  color: #0c713d;
+  font-size: 24px;
+  color: #667eea;
 }
 
 .section-title h3 {
-  font-size: 1.4rem;
+  font-size: 20px;
   font-weight: 700;
-  color: #333;
+  color: #2d3748;
   margin: 0;
 }
 
-/* ========== SETTINGS GRID ========== */
+/* Settings Grid */
 .settings-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
 }
 
 .setting-item {
@@ -601,97 +558,31 @@ onMounted(() => {
 }
 
 .setting-info label {
-  font-size: 1rem;
+  font-size: 15px;
   font-weight: 600;
-  color: #333;
+  color: #2d3748;
   display: block;
   margin-bottom: 4px;
 }
 
 .setting-info p {
-  font-size: 0.9rem;
+  font-size: 13px;
   color: #718096;
   margin: 0;
   line-height: 1.5;
 }
 
-/* ========== INPUT STYLING ========== */
-.setting-item :deep(.n-input),
-.setting-item :deep(.n-input-number),
-.setting-item :deep(.n-select) {
-  border-radius: 12px;
-}
-
-.setting-item :deep(.n-input__input-el),
-.setting-item :deep(.n-input__textarea-el) {
-  border: 2px solid #ddd;
-  transition: all 0.3s ease;
-}
-
-.setting-item :deep(.n-input--focus .n-input__input-el),
-.setting-item :deep(.n-input--focus .n-input__textarea-el) {
-  border-color: #0c713d;
-  box-shadow: 0 0 0 3px rgba(12, 113, 61, 0.1);
-}
-
-/* ========== TEST EMAIL SECTION ========== */
+/* Test Email Section */
 .test-email-section {
-  margin-top: 25px;
-  padding-top: 25px;
-  border-top: 1px solid rgba(12, 113, 61, 0.1);
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
 }
 
-.test-email-btn {
-  background: linear-gradient(135deg, #2196f3 0%, #1565c0 100%);
-  color: white;
-  border: none;
-  padding: 12px 28px;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 20px rgba(33, 150, 243, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  position: relative;
-  overflow: hidden;
-}
-
-.test-email-btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  transform: translate(-50%, -50%);
-  transition:
-    width 0.6s,
-    height 0.6s;
-}
-
-.test-email-btn:hover::before {
-  width: 300px;
-  height: 300px;
-}
-
-.test-email-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(33, 150, 243, 0.4);
-}
-
-.test-email-btn:active {
-  transform: translateY(0);
-}
-
-/* ========== DANGER ZONE ========== */
+/* Maintenance Mode */
 .danger-zone {
   border: 2px solid #fed7d7;
-  background: linear-gradient(135deg, #fff5f5 0%, #fffaf0 100%);
+  background: #fffaf0;
 }
 
 .danger-zone .section-title i {
@@ -703,22 +594,21 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   gap: 20px;
-  padding: 25px;
+  padding: 20px;
   background: white;
-  border-radius: 16px;
+  border-radius: 12px;
   border: 2px solid #fed7d7;
-  box-shadow: 0 4px 12px rgba(245, 101, 101, 0.1);
 }
 
 .maintenance-info h4 {
-  font-size: 1.1rem;
+  font-size: 16px;
   font-weight: 700;
-  color: #333;
+  color: #2d3748;
   margin: 0 0 8px 0;
 }
 
 .maintenance-info p {
-  font-size: 0.95rem;
+  font-size: 14px;
   color: #718096;
   margin: 0;
   line-height: 1.6;
@@ -726,271 +616,56 @@ onMounted(() => {
 
 .maintenance-message-box {
   margin-top: 20px;
-  padding: 20px;
-  background: white;
-  border-radius: 12px;
 }
 
 .maintenance-message-box label {
-  font-size: 1rem;
+  font-size: 15px;
   font-weight: 600;
-  color: #333;
+  color: #2d3748;
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
-/* ========== FOOTER ========== */
+/* Footer */
 .settings-footer {
-  max-width: 1400px;
-  margin: 24px auto 0;
+  position: sticky;
+  bottom: 0;
   background: white;
-  padding: 25px 40px;
-  border-radius: 20px;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+  padding: 20px 28px;
+  border-radius: 16px;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+  margin-top: 24px;
   display: flex;
   justify-content: flex-end;
-  gap: 16px;
 }
 
-.reset-button,
-.save-button {
-  border: none;
-  padding: 14px 32px;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  position: relative;
-  overflow: hidden;
-}
-
-.reset-button::before,
-.save-button::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  transform: translate(-50%, -50%);
-  transition:
-    width 0.6s,
-    height 0.6s;
-}
-
-.reset-button:hover::before,
-.save-button:hover::before {
-  width: 300px;
-  height: 300px;
-}
-
-.reset-button {
-  background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
-  color: white;
-  box-shadow: 0 4px 20px rgba(113, 128, 150, 0.3);
-}
-
-.reset-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(113, 128, 150, 0.4);
-}
-
-.save-button {
-  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
-  color: white;
-  box-shadow: 0 4px 20px rgba(12, 113, 61, 0.3);
-}
-
-.save-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(12, 113, 61, 0.4);
-}
-
-.reset-button:active,
-.save-button:active {
-  transform: translateY(0);
-}
-
-/* ========== RESPONSIVE DESIGN ========== */
-
-/* Tablet */
-@media (max-width: 1024px) {
-  .settings-page {
-    padding: 30px 15px;
-  }
-
-  .settings-header {
-    padding: 25px 30px;
-  }
-
-  .header-content h1 {
-    font-size: 1.7rem;
-  }
-
-  .header-content h1 i {
-    font-size: 1.9rem;
-  }
-
-  .settings-section {
-    padding: 30px 30px;
-  }
-
-  .settings-grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 25px;
-  }
-}
-
-/* Mobile */
+/* Responsive */
 @media (max-width: 768px) {
   .settings-page {
-    padding: 20px 10px;
+    padding: 16px;
   }
 
   .settings-header {
     flex-direction: column;
     gap: 16px;
     align-items: flex-start;
-    padding: 20px 20px;
-  }
-
-  .header-content h1 {
-    font-size: 1.4rem;
-  }
-
-  .header-content h1 i {
-    font-size: 1.6rem;
-  }
-
-  .header-content p {
-    font-size: 0.9rem;
   }
 
   .save-all-btn {
     width: 100%;
-    justify-content: center;
-    padding: 12px 24px;
-  }
-
-  .settings-section {
-    padding: 25px 20px;
-    border-radius: 16px;
-  }
-
-  .section-title {
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-  }
-
-  .section-title h3 {
-    font-size: 1.2rem;
   }
 
   .settings-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
   }
 
   .maintenance-controls {
     flex-direction: column;
     align-items: flex-start;
-    padding: 20px;
   }
 
   .settings-footer {
-    flex-direction: column;
-    padding: 20px;
-  }
-
-  .reset-button,
-  .save-button {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-/* Small Mobile */
-@media (max-width: 480px) {
-  .settings-page {
-    padding: 15px 8px;
-  }
-
-  .settings-header {
-    padding: 15px;
-    border-radius: 12px;
-  }
-
-  .header-content h1 {
-    font-size: 1.2rem;
-  }
-
-  .header-content h1 i {
-    font-size: 1.4rem;
-  }
-
-  .header-content p {
-    font-size: 0.85rem;
-  }
-
-  .save-all-btn {
-    padding: 10px 20px;
-    font-size: 0.9rem;
-  }
-
-  .settings-section {
-    padding: 20px 15px;
-    border-radius: 12px;
-  }
-
-  .section-title i {
-    font-size: 1.3rem;
-  }
-
-  .section-title h3 {
-    font-size: 1.1rem;
-  }
-
-  .setting-info label {
-    font-size: 0.95rem;
-  }
-
-  .setting-info p {
-    font-size: 0.85rem;
-  }
-
-  .test-email-btn {
-    width: 100%;
-    justify-content: center;
-    padding: 10px 20px;
-    font-size: 0.9rem;
-  }
-
-  .maintenance-controls {
-    padding: 15px;
-  }
-
-  .maintenance-info h4 {
-    font-size: 1rem;
-  }
-
-  .maintenance-info p {
-    font-size: 0.85rem;
-  }
-
-  .settings-footer {
-    padding: 15px;
-  }
-
-  .reset-button,
-  .save-button {
-    padding: 12px 24px;
-    font-size: 0.9rem;
+    padding: 16px;
   }
 }
 </style>

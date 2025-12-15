@@ -18,7 +18,7 @@
           :key="chat.id"
           :id="`chat-bubble-${chat.id}`"
           class="chat-bubble"
-          :style="{ bottom: `${index * 60}px` }"
+          :style="{ bottom: `${10 + index * 70}px` }"
           @click="reopenChat(chat)"
         >
           <div class="bubble-avatar">
@@ -74,10 +74,10 @@ const removeChat = (chatId) => {
   position: relative;
 }
 
-/* Transitions for chat windows */
+/* ========== TRANSITIONS FOR CHAT WINDOWS ========== */
 .chat-slide-enter-active,
 .chat-slide-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .chat-slide-enter-from {
@@ -90,14 +90,13 @@ const removeChat = (chatId) => {
   transform: translateY(20px);
 }
 
-/* Minimized chats */
+/* ========== MINIMIZED CHATS ========== */
 .minimized-chats {
   position: fixed;
   bottom: 0;
   right: 20px;
   display: flex;
   flex-direction: column-reverse;
-  gap: 10px;
   z-index: 998;
 }
 
@@ -108,25 +107,36 @@ const removeChat = (chatId) => {
 .chat-bubble {
   position: absolute;
   right: 0;
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
   background: white;
   border-radius: 50%;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+/* Dark Mode */
+html.dark-mode .chat-bubble {
+  background: #2a2a2a;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
 .chat-bubble:hover {
   transform: scale(1.1);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+}
+
+html.dark-mode .chat-bubble:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
 }
 
 .chat-bubble:hover .bubble-close {
   opacity: 1;
+  visibility: visible;
 }
 
 /* Shake animation */
@@ -149,8 +159,8 @@ const removeChat = (chatId) => {
 
 .bubble-avatar {
   position: relative;
-  width: 50px;
-  height: 50px;
+  width: 54px;
+  height: 54px;
 }
 
 .bubble-avatar img {
@@ -158,6 +168,11 @@ const removeChat = (chatId) => {
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
+  border: 3px solid #0084ff;
+}
+
+html.dark-mode .bubble-avatar img {
+  border-color: #4da3ff;
 }
 
 .online-dot {
@@ -171,6 +186,10 @@ const removeChat = (chatId) => {
   border-radius: 50%;
 }
 
+html.dark-mode .online-dot {
+  border-color: #2a2a2a;
+}
+
 .unread-badge {
   position: absolute;
   top: -5px;
@@ -179,19 +198,19 @@ const removeChat = (chatId) => {
   color: white;
   font-size: 11px;
   font-weight: bold;
-  padding: 2px 6px;
-  border-radius: 10px;
-  min-width: 18px;
+  padding: 3px 7px;
+  border-radius: 12px;
+  min-width: 20px;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px rgba(255, 59, 48, 0.4);
 }
 
 .bubble-close {
   position: absolute;
   top: -5px;
   right: -5px;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   background: #ff3b30;
   color: white;
   border: 2px solid white;
@@ -200,19 +219,25 @@ const removeChat = (chatId) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 11px;
   opacity: 0;
-  transition: opacity 0.2s;
+  visibility: hidden;
+  transition: all 0.2s ease;
+}
+
+html.dark-mode .bubble-close {
+  border-color: #2a2a2a;
 }
 
 .bubble-close:hover {
   background: #d32f2f;
+  transform: scale(1.1);
 }
 
-/* Bubble transitions */
+/* ========== BUBBLE TRANSITIONS ========== */
 .bubble-enter-active,
 .bubble-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .bubble-enter-from {
@@ -226,6 +251,68 @@ const removeChat = (chatId) => {
 }
 
 .bubble-move {
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Tablet */
+@media (max-width: 768px) {
+  .minimized-chats {
+    right: 15px;
+  }
+
+  .chat-bubble {
+    width: 58px;
+    height: 58px;
+  }
+
+  .bubble-avatar {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .minimized-chats {
+    right: 10px;
+  }
+
+  .chat-bubble {
+    width: 54px;
+    height: 54px;
+  }
+
+  .chat-bubble:hover .bubble-close {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .bubble-avatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .bubble-avatar img {
+    border-width: 2px;
+  }
+
+  .online-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .unread-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    min-width: 18px;
+  }
+
+  .bubble-close {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
 }
 </style>
