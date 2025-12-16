@@ -393,6 +393,62 @@ onMounted(async () => {
   margin-bottom: 15px;
 }
 
+/* ========== DARK MODE ========== */
+.dark-mode .team-member-wrapper {
+  background: linear-gradient(180deg, var(--dark-bg-primary) 0%, #0d0d0d 100%);
+}
+
+.dark-mode .info-left,
+.dark-mode .content-right {
+  background: var(--dark-bg-card);
+  border-color: var(--dark-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode .section-title,
+.dark-mode .author-name,
+.dark-mode .introduction-title {
+  color: var(--dark-accent-green-light);
+}
+
+.dark-mode .section-title::after,
+.dark-mode .introduction-title::after,
+.dark-mode .divider {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--dark-accent-green),
+    transparent
+  );
+}
+
+.dark-mode .position {
+  color: var(--dark-text-primary);
+}
+
+.dark-mode .slogan {
+  color: var(--dark-text-secondary);
+}
+
+.dark-mode .poem {
+  background: linear-gradient(135deg, #2a2416 0%, #1f1a10 100%);
+  color: var(--dark-text-secondary);
+  border-left-color: #8b7355;
+  border-right-color: #8b7355;
+}
+
+.dark-mode .poem-title {
+  color: var(--dark-accent-green-light);
+}
+
+.dark-mode .poem-content {
+  color: var(--dark-text-secondary);
+}
+
+.dark-mode .introduction {
+  color: var(--dark-text-primary);
+}
+
 /* ========== RESPONSIVE DESIGN ========== */
 
 /* Tablet */

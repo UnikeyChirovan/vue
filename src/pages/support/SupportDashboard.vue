@@ -1,5 +1,7 @@
 <template>
   <TheHeader />
+  <ToastNotification ref="toastNotification" />
+
   <div class="support-dashboard">
     <div class="dashboard-header">
       <div class="header-content">
@@ -125,11 +127,12 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useSupportChatStore } from '../../stores/supportChatStore';
 import { useAuthStore } from '../../stores/auth';
 import ConversationDetailModal from '../../components/ConversationDetailModal.vue';
-import { useMessage } from 'naive-ui';
+import ToastNotification from '../../components/ToastNotification.vue';
+import { useToast } from '../../stores/useToast';
 import TheHeader from '../../components/TheHeader.vue';
 import TheFooter from '../../components/TheFooter.vue';
 
-const message = useMessage();
+const toast = useToast();
 const supportStore = useSupportChatStore();
 const authStore = useAuthStore();
 
@@ -142,11 +145,9 @@ const backendUrl = 'http://127.0.0.1:8000';
 
 const getAvatarUrl = (userId, avatar) => {
   if (!avatar) return 'https://picsum.photos/50';
-
   if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
     return avatar;
   }
-
   return `${backendUrl}/storage/avatars/${userId}/${avatar}`;
 };
 
@@ -184,7 +185,7 @@ const loadConversations = async () => {
     await supportStore.loadManagerConversations(activeTab.value);
   } catch (error) {
     console.error('Error loading conversations:', error);
-    message.error('Lỗi khi tải danh sách hội thoại');
+    if (toast) toast.error('Lỗi khi tải danh sách hội thoại');
   } finally {
     loading.value = false;
   }
@@ -194,10 +195,10 @@ const refreshAll = async () => {
   loading.value = true;
   try {
     await supportStore.refreshManagerConversations();
-    message.success('Đã làm mới');
+    if (toast) toast.success('Đã làm mới');
   } catch (error) {
     console.error('Error refreshing:', error);
-    message.error('Lỗi khi làm mới');
+    if (toast) toast.error('Lỗi khi làm mới');
   } finally {
     loading.value = false;
   }
@@ -212,10 +213,10 @@ const claimConversation = async (conversationId) => {
 
   try {
     await supportStore.claimConversation(conversationId);
-    message.success('Đã nhận cuộc hội thoại');
+    if (toast) toast.success('Đã nhận cuộc hội thoại');
   } catch (error) {
     console.error('Error claiming conversation:', error);
-    message.error('Không thể nhận cuộc hội thoại');
+    if (toast) toast.error('Không thể nhận cuộc hội thoại');
   } finally {
     claimingIds.value.delete(conversationId);
   }
@@ -269,13 +270,16 @@ onMounted(() => {
   });
 });
 </script>
-
 <style scoped>
 /* ========== MODERN SUPPORT DASHBOARD ========== */
 .support-dashboard {
   min-height: 100vh;
   background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
   padding: 80px 20px 60px;
+}
+
+html.dark-mode .support-dashboard {
+  background: linear-gradient(180deg, #0a0a0a 0%, #121212 100%);
 }
 
 .dashboard-header {
@@ -292,6 +296,12 @@ onMounted(() => {
   border-left: 5px solid #0c713d;
 }
 
+html.dark-mode .dashboard-header {
+  background: #1e1e1e;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  border-left-color: #0f8a4a;
+}
+
 .header-content h1 {
   font-size: 2rem;
   font-weight: 800;
@@ -300,14 +310,23 @@ onMounted(() => {
   letter-spacing: 0.5px;
 }
 
+html.dark-mode .header-content h1 {
+  color: #0f8a4a;
+}
+
 .header-subtitle {
   font-size: 0.95rem;
   color: #666;
   margin: 0;
 }
 
+html.dark-mode .header-subtitle {
+  color: #b0b0b0;
+}
+
 /* ========== BUTTON STANDARD STYLE ========== */
-.refresh-btn {
+.refresh-btn,
+.claim-btn {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -327,7 +346,14 @@ onMounted(() => {
   overflow: hidden;
 }
 
-.refresh-btn::before {
+html.dark-mode .refresh-btn,
+html.dark-mode .claim-btn {
+  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+  box-shadow: 0 4px 20px rgba(15, 138, 74, 0.3);
+}
+
+.refresh-btn::before,
+.claim-btn::before {
   content: '';
   position: absolute;
   top: 50%;
@@ -342,23 +368,37 @@ onMounted(() => {
     height 0.6s;
 }
 
-.refresh-btn:hover:not(:disabled)::before {
+.refresh-btn:hover:not(:disabled)::before,
+.claim-btn:hover:not(:disabled)::before {
   width: 300px;
   height: 300px;
 }
 
-.refresh-btn:hover:not(:disabled) {
+.refresh-btn:hover:not(:disabled),
+.claim-btn:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 8px 30px rgba(12, 113, 61, 0.4);
 }
 
-.refresh-btn:active {
+html.dark-mode .refresh-btn:hover:not(:disabled),
+html.dark-mode .claim-btn:hover:not(:disabled) {
+  box-shadow: 0 8px 30px rgba(15, 138, 74, 0.4);
+}
+
+.refresh-btn:active,
+.claim-btn:active {
   transform: translateY(0);
 }
 
-.refresh-btn:disabled {
+.refresh-btn:disabled,
+.claim-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.claim-btn {
+  flex-shrink: 0;
+  padding: 12px 28px;
 }
 
 /* ========== TABS ========== */
@@ -371,6 +411,11 @@ onMounted(() => {
   padding: 8px;
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+html.dark-mode .tabs {
+  background: #1e1e1e;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 
 .tab {
@@ -391,15 +436,29 @@ onMounted(() => {
   gap: 8px;
 }
 
+html.dark-mode .tab {
+  color: #b0b0b0;
+}
+
 .tab:hover {
   background: rgba(12, 113, 61, 0.05);
   color: #0c713d;
+}
+
+html.dark-mode .tab:hover {
+  background: rgba(15, 138, 74, 0.1);
+  color: #0f8a4a;
 }
 
 .tab.active {
   background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
   color: white;
   box-shadow: 0 4px 12px rgba(12, 113, 61, 0.3);
+}
+
+html.dark-mode .tab.active {
+  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+  box-shadow: 0 4px 12px rgba(15, 138, 74, 0.3);
 }
 
 .tab-badge {
@@ -416,6 +475,10 @@ onMounted(() => {
 .tab.active .tab-badge {
   background: white;
   color: #0c713d;
+}
+
+html.dark-mode .tab.active .tab-badge {
+  color: #0f8a4a;
 }
 
 /* ========== CONVERSATIONS ========== */
@@ -439,6 +502,12 @@ onMounted(() => {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
+html.dark-mode .loading-state,
+html.dark-mode .empty-state {
+  background: #1e1e1e;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
 .loading-spinner {
   width: 60px;
   height: 60px;
@@ -447,6 +516,11 @@ onMounted(() => {
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin-bottom: 20px;
+}
+
+html.dark-mode .loading-spinner {
+  border-color: rgba(15, 138, 74, 0.2);
+  border-top-color: #0f8a4a;
 }
 
 @keyframes spin {
@@ -461,10 +535,18 @@ onMounted(() => {
   margin-bottom: 20px;
 }
 
+html.dark-mode .empty-icon {
+  color: #444;
+}
+
 .empty-message {
   font-size: 1.1rem;
   color: #888;
   margin: 0;
+}
+
+html.dark-mode .empty-message {
+  color: #666;
 }
 
 .conversation-card {
@@ -479,10 +561,20 @@ onMounted(() => {
   border-left: 4px solid transparent;
 }
 
+html.dark-mode .conversation-card {
+  background: #1e1e1e;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
 .conversation-card:hover {
   box-shadow: 0 8px 24px rgba(12, 113, 61, 0.15);
   transform: translateY(-3px);
   border-left-color: #0c713d;
+}
+
+html.dark-mode .conversation-card:hover {
+  box-shadow: 0 8px 24px rgba(15, 138, 74, 0.2);
+  border-left-color: #0f8a4a;
 }
 
 .conv-avatar {
@@ -496,6 +588,10 @@ onMounted(() => {
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid #f0f0f0;
+}
+
+html.dark-mode .conv-avatar img {
+  border-color: #2a2a2a;
 }
 
 .unread-badge {
@@ -536,10 +632,18 @@ onMounted(() => {
   text-overflow: ellipsis;
 }
 
+html.dark-mode .conv-header h3 {
+  color: #e0e0e0;
+}
+
 .conv-time {
   font-size: 0.85rem;
   color: #999;
   flex-shrink: 0;
+}
+
+html.dark-mode .conv-time {
+  color: #666;
 }
 
 .conv-message {
@@ -551,6 +655,10 @@ onMounted(() => {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+html.dark-mode .conv-message {
+  color: #b0b0b0;
 }
 
 .conv-meta {
@@ -574,14 +682,29 @@ onMounted(() => {
   color: #856404;
 }
 
+html.dark-mode .status-badge.pending {
+  background: linear-gradient(135deg, #332800 0%, #443300 100%);
+  color: #ffa726;
+}
+
 .status-badge.active {
   background: linear-gradient(135deg, #d1ecf1 0%, #b8e6f0 100%);
   color: #0c5460;
 }
 
+html.dark-mode .status-badge.active {
+  background: linear-gradient(135deg, #1a2332 0%, #253545 100%);
+  color: #7cb3ff;
+}
+
 .status-badge.resolved {
   background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
   color: #155724;
+}
+
+html.dark-mode .status-badge.resolved {
+  background: linear-gradient(135deg, #1a2e1a 0%, #254025 100%);
+  color: #81c784;
 }
 
 .assigned-to {
@@ -593,57 +716,8 @@ onMounted(() => {
   font-weight: 500;
 }
 
-/* ========== CLAIM BUTTON (STANDARD STYLE) ========== */
-.claim-btn {
-  flex-shrink: 0;
-  padding: 12px 28px;
-  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
-  color: white;
-  border: none;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 20px rgba(12, 113, 61, 0.3);
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  position: relative;
-  overflow: hidden;
-}
-
-.claim-btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  transform: translate(-50%, -50%);
-  transition:
-    width 0.6s,
-    height 0.6s;
-}
-
-.claim-btn:hover:not(:disabled)::before {
-  width: 300px;
-  height: 300px;
-}
-
-.claim-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(12, 113, 61, 0.4);
-}
-
-.claim-btn:active {
-  transform: translateY(0);
-}
-
-.claim-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+html.dark-mode .assigned-to {
+  color: #0f8a4a;
 }
 
 /* ========== RESPONSIVE DESIGN ========== */

@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore } from 'pinia';
 
 export const useSettingsStore = defineStore('settings', {
   state: () => ({
@@ -22,17 +22,17 @@ export const useSettingsStore = defineStore('settings', {
   }),
   actions: {
     loadSettings() {
-      const savedSettings = sessionStorage.getItem('user-settings')
+      const savedSettings = sessionStorage.getItem('user-settings');
       if (savedSettings) {
-        Object.assign(this.$state, JSON.parse(savedSettings))
+        Object.assign(this.$state, JSON.parse(savedSettings));
       }
     },
     saveSettings() {
-      sessionStorage.setItem('user-settings', JSON.stringify(this.$state))
+      sessionStorage.setItem('user-settings', JSON.stringify(this.$state));
     },
     updateSetting(key, value) {
-      this.$state[key] = value
-      this.saveSettings()
-    }
-  }
-})
+      this.$state[key] = value;
+      this.saveSettings();
+    },
+  },
+});

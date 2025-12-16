@@ -2,9 +2,7 @@
   <div class="timeline-wrapper">
     <div class="timeline-container">
       <h2 class="timeline-title text-uppercase">{{ historyTitle }}</h2>
-      <p class="timeline-subtitle">
-        {{ personalJourneyTitle }}
-      </p>
+      <p class="timeline-subtitle">{{ personalJourneyTitle }}</p>
       <div class="timeline-embed">
         <iframe
           src="https://cdn.knightlab.com/libs/timeline3/latest/embed/index.html?source=1oXF6tI1oK1dRaVqalfZVQZf4ILPvPO5-mr4b-ZilT50&font=Default&lang=en&initial_zoom=2&height=650"
@@ -37,6 +35,11 @@ const props = defineProps({
 .timeline-wrapper {
   padding: 80px 20px;
   background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  min-height: 100vh;
+}
+
+html.dark-mode .timeline-wrapper {
+  background: linear-gradient(135deg, #0a0a0a 0%, #121212 100%);
 }
 
 .timeline-container {
@@ -55,6 +58,10 @@ const props = defineProps({
   padding-bottom: 20px;
 }
 
+html.dark-mode .timeline-title {
+  color: #0f8a4a;
+}
+
 .timeline-title::after {
   content: '';
   position: absolute;
@@ -65,6 +72,10 @@ const props = defineProps({
   height: 4px;
   background: linear-gradient(90deg, transparent, #0c713d, transparent);
   border-radius: 2px;
+}
+
+html.dark-mode .timeline-title::after {
+  background: linear-gradient(90deg, transparent, #0f8a4a, transparent);
 }
 
 .timeline-subtitle {
@@ -79,6 +90,10 @@ const props = defineProps({
   padding: 0 20px;
 }
 
+html.dark-mode .timeline-subtitle {
+  color: #b0b0b0;
+}
+
 .timeline-embed {
   background: white;
   padding: 30px;
@@ -86,6 +101,27 @@ const props = defineProps({
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(12, 113, 61, 0.1);
   overflow: hidden;
+  position: relative;
+}
+
+html.dark-mode .timeline-embed {
+  background: #1e1e1e;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border-color: rgba(15, 138, 74, 0.2);
+}
+
+/* Dark mode iframe overlay để cải thiện khả năng đọc */
+html.dark-mode .timeline-embed::before {
+  content: '';
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  right: 30px;
+  bottom: 30px;
+  background: rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 12px;
 }
 
 .timeline-frame {
@@ -94,6 +130,12 @@ const props = defineProps({
   border: none;
   border-radius: 12px;
   display: block;
+  position: relative;
+  z-index: 2;
+}
+
+html.dark-mode .timeline-frame {
+  filter: brightness(0.9) contrast(1.1);
 }
 
 /* ========== RESPONSIVE DESIGN ========== */
@@ -114,6 +156,17 @@ const props = defineProps({
     margin-bottom: 40px;
   }
 
+  .timeline-embed {
+    padding: 25px;
+  }
+
+  html.dark-mode .timeline-embed::before {
+    top: 25px;
+    left: 25px;
+    right: 25px;
+    bottom: 25px;
+  }
+
   .timeline-frame {
     height: 600px;
   }
@@ -128,19 +181,35 @@ const props = defineProps({
   .timeline-title {
     font-size: 1.9rem;
     margin-bottom: 18px;
+    padding-bottom: 18px;
+  }
+
+  .timeline-title::after {
+    width: 80px;
+    height: 3px;
   }
 
   .timeline-subtitle {
     font-size: 1.05rem;
     margin-bottom: 35px;
+    padding: 0 15px;
   }
 
   .timeline-embed {
     padding: 20px;
+    border-radius: 20px;
+  }
+
+  html.dark-mode .timeline-embed::before {
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
   }
 
   .timeline-frame {
     height: 550px;
+    border-radius: 10px;
   }
 }
 
@@ -153,6 +222,7 @@ const props = defineProps({
   .timeline-title {
     font-size: 1.6rem;
     margin-bottom: 15px;
+    padding-bottom: 15px;
   }
 
   .timeline-title::after {
@@ -171,9 +241,35 @@ const props = defineProps({
     border-radius: 16px;
   }
 
+  html.dark-mode .timeline-embed::before {
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+  }
+
   .timeline-frame {
     height: 500px;
     border-radius: 8px;
+  }
+}
+
+/* Extra Small Mobile (< 375px) */
+@media (max-width: 374px) {
+  .timeline-wrapper {
+    padding: 40px 8px;
+  }
+
+  .timeline-title {
+    font-size: 1.4rem;
+  }
+
+  .timeline-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .timeline-frame {
+    height: 450px;
   }
 }
 </style>

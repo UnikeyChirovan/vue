@@ -1104,318 +1104,6 @@ onUnmounted(() => {
   box-shadow: 0 6px 16px rgba(12, 113, 61, 0.4);
 }
 
-/* ========== DARK MODE STYLES ========== */
-
-/* Settings Button Dark Mode */
-.dark-mode .settings-button {
-  background: linear-gradient(
-    135deg,
-    var(--dark-accent-green) 0%,
-    var(--dark-accent-green-light) 100%
-  ) !important;
-  color: var(--dark-text-primary) !important;
-  border: 1px solid var(--dark-border) !important;
-  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.4) !important;
-}
-
-.dark-mode .settings-button:hover {
-  box-shadow: 0 6px 16px rgba(12, 113, 61, 0.5) !important;
-}
-
-/* Modal Dark Mode */
-.dark-mode .settings-modal :deep(.n-card) {
-  background-color: var(--dark-bg-card) !important;
-  border: 1px solid var(--dark-border) !important;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6) !important;
-}
-
-.dark-mode .settings-modal :deep(.n-card-header) {
-  background-color: var(--dark-bg-elevated) !important;
-  color: var(--dark-text-primary) !important;
-  border-bottom: 2px solid var(--dark-border) !important;
-}
-
-.dark-mode .settings-modal :deep(.n-card__content) {
-  background-color: var(--dark-bg-card) !important;
-  color: var(--dark-text-primary) !important;
-}
-
-/* Form Items Dark Mode */
-.dark-mode .icon-left {
-  color: var(--dark-accent-green-light) !important;
-}
-
-.dark-mode :deep(.n-form-item-label) {
-  color: var(--dark-text-primary) !important;
-}
-
-/* Mode Switch Dark Mode */
-.dark-mode .mode-switch i {
-  color: var(--dark-accent-green-light) !important;
-}
-
-/* Background Col Dark Mode */
-.dark-mode .background-col {
-  background: var(--dark-bg-elevated) !important;
-  border: 1px solid var(--dark-border) !important;
-}
-
-/* Switch Toggle Dark Mode */
-.dark-mode .switch-toggle {
-  background: var(--dark-bg-elevated) !important;
-  border: 1px solid var(--dark-border) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
-}
-
-.dark-mode .switch-toggle input + label {
-  color: var(--dark-text-secondary) !important;
-}
-
-.dark-mode .switch-toggle input:checked + label {
-  background: var(--dark-accent-green) !important;
-  color: var(--dark-text-primary) !important;
-}
-
-.dark-mode .switch-toggle input + label:hover {
-  background: rgba(15, 138, 74, 0.7) !important;
-}
-
-.dark-mode .switch-toggle input:checked + label:hover {
-  background: var(--dark-accent-green-light) !important;
-}
-
-/* Autoscroll Section Dark Mode */
-.dark-mode .autoscroll-section {
-  background: linear-gradient(
-    135deg,
-    rgba(12, 113, 61, 0.15) 0%,
-    rgba(12, 113, 61, 0.08) 100%
-  ) !important;
-  border: 2px solid rgba(12, 113, 61, 0.3) !important;
-}
-
-.dark-mode .autoscroll-section :deep(.n-divider) {
-  color: var(--dark-accent-green-light) !important;
-}
-
-.dark-mode .autoscroll-section :deep(.n-divider__line) {
-  background-color: var(--dark-border) !important;
-}
-
-/* Apply Button Dark Mode */
-.dark-mode .apply-button {
-  background: linear-gradient(
-    135deg,
-    var(--dark-accent-green) 0%,
-    var(--dark-accent-green-light) 100%
-  ) !important;
-  color: var(--dark-text-primary) !important;
-  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.5) !important;
-}
-
-.dark-mode .apply-button:hover {
-  box-shadow: 0 6px 16px rgba(12, 113, 61, 0.6) !important;
-}
-
-/* Naive UI Components Dark Mode */
-.dark-mode :deep(.n-slider-rail) {
-  background-color: var(--dark-bg-elevated) !important;
-}
-
-.dark-mode :deep(.n-slider-rail__fill) {
-  background-color: var(--dark-accent-green) !important;
-}
-
-.dark-mode :deep(.n-slider-handle) {
-  border-color: var(--dark-accent-green) !important;
-  background-color: var(--dark-text-primary) !important;
-}
-
-.dark-mode :deep(.n-slider-handle):hover {
-  box-shadow: 0 0 0 3px rgba(12, 113, 61, 0.3) !important;
-}
-
-.dark-mode :deep(.n-slider-mark-text) {
-  color: var(--dark-text-secondary) !important;
-}
-
-.dark-mode :deep(.n-switch) {
-  background-color: var(--dark-bg-elevated) !important;
-}
-
-.dark-mode :deep(.n-switch--active) {
-  background-color: var(--dark-accent-green) !important;
-}
-
-.dark-mode :deep(.n-switch__rail) {
-  background-color: var(--dark-bg-elevated) !important;
-}
-
-.dark-mode :deep(.n-switch--active .n-switch__rail) {
-  background-color: var(--dark-accent-green) !important;
-}
-
-.dark-mode :deep(.n-switch__button) {
-  background-color: var(--dark-text-primary) !important;
-}
-
-.dark-mode :deep(.n-select) {
-  background-color: var(--dark-bg-elevated) !important;
-  border-color: var(--dark-border) !important;
-  color: var(--dark-text-primary) !important;
-}
-
-.dark-mode :deep(.n-base-selection) {
-  background-color: var(--dark-bg-elevated) !important;
-  border-color: var(--dark-border) !important;
-}
-
-.dark-mode :deep(.n-base-selection:hover) {
-  border-color: var(--dark-accent-green) !important;
-}
-
-.dark-mode :deep(.n-base-selection--active) {
-  border-color: var(--dark-accent-green) !important;
-  box-shadow: 0 0 0 2px rgba(12, 113, 61, 0.2) !important;
-}
-
-.dark-mode :deep(.n-base-selection-label) {
-  color: var(--dark-text-primary) !important;
-}
-
-.dark-mode :deep(.n-base-selection-placeholder) {
-  color: var(--dark-text-muted) !important;
-}
-
-.dark-mode :deep(.n-base-select-menu) {
-  background-color: var(--dark-bg-elevated) !important;
-  border: 1px solid var(--dark-border) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
-}
-
-.dark-mode :deep(.n-base-select-option) {
-  color: var(--dark-text-primary) !important;
-}
-
-.dark-mode :deep(.n-base-select-option:hover) {
-  background-color: var(--dark-bg-card) !important;
-}
-
-.dark-mode :deep(.n-base-select-option--selected) {
-  background-color: rgba(12, 113, 61, 0.2) !important;
-  color: var(--dark-accent-green-light) !important;
-}
-
-.dark-mode :deep(.n-base-select-option--pending) {
-  background-color: var(--dark-bg-card) !important;
-}
-
-.dark-mode :deep(.n-color-picker-trigger) {
-  background-color: var(--dark-bg-elevated) !important;
-  border-color: var(--dark-border) !important;
-}
-
-.dark-mode :deep(.n-color-picker-trigger:hover) {
-  border-color: var(--dark-accent-green) !important;
-}
-
-.dark-mode :deep(.n-color-picker-panel) {
-  background-color: var(--dark-bg-card) !important;
-  border: 1px solid var(--dark-border) !important;
-}
-
-.dark-mode :deep(.n-radio) {
-  color: var(--dark-text-primary) !important;
-}
-
-.dark-mode :deep(.n-radio__dot) {
-  border-color: var(--dark-border) !important;
-  background-color: var(--dark-bg-elevated) !important;
-}
-
-.dark-mode :deep(.n-radio:hover .n-radio__dot) {
-  border-color: var(--dark-accent-green) !important;
-}
-
-.dark-mode :deep(.n-radio--checked .n-radio__dot) {
-  border-color: var(--dark-accent-green) !important;
-  background-color: var(--dark-accent-green) !important;
-}
-
-.dark-mode :deep(.n-radio--checked .n-radio__dot-inner) {
-  background-color: var(--dark-text-primary) !important;
-}
-
-.dark-mode :deep(.n-radio__label) {
-  color: var(--dark-text-primary) !important;
-}
-
-.dark-mode :deep(.n-radio-group) {
-  color: var(--dark-text-primary) !important;
-}
-
-.dark-mode :deep(.n-alert) {
-  background-color: var(--dark-bg-elevated) !important;
-  border: 1px solid var(--dark-border) !important;
-  color: var(--dark-text-primary) !important;
-}
-
-.dark-mode :deep(.n-alert--info) {
-  background-color: rgba(33, 150, 243, 0.1) !important;
-  border-color: rgba(33, 150, 243, 0.3) !important;
-}
-
-.dark-mode :deep(.n-alert__icon) {
-  color: var(--dark-accent-green-light) !important;
-}
-
-.dark-mode :deep(.n-alert__content) {
-  color: var(--dark-text-primary) !important;
-}
-
-.dark-mode :deep(.n-divider) {
-  background-color: var(--dark-border) !important;
-}
-
-.dark-mode :deep(.n-divider__title) {
-  color: var(--dark-text-primary) !important;
-}
-
-.dark-mode :deep(.n-space) {
-  color: var(--dark-text-primary) !important;
-}
-
-.dark-mode :deep(.n-modal-mask) {
-  background-color: rgba(0, 0, 0, 0.8) !important;
-}
-
-.dark-mode :deep(.n-scrollbar-rail) {
-  background-color: var(--dark-bg-primary) !important;
-}
-
-.dark-mode :deep(.n-scrollbar-rail__scrollbar) {
-  background-color: var(--dark-bg-elevated) !important;
-}
-
-.dark-mode :deep(.n-scrollbar-rail__scrollbar:hover) {
-  background-color: var(--dark-border) !important;
-}
-
-/* Disabled States Dark Mode */
-.dark-mode :deep(.n-select.n-select--disabled),
-.dark-mode :deep(.n-slider.n-slider--disabled),
-.dark-mode :deep(.n-color-picker.n-color-picker--disabled),
-.dark-mode :deep(.n-switch.n-switch--disabled),
-.dark-mode :deep(.n-radio.n-radio--disabled) {
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
-}
-
-.dark-mode :deep(.n-base-selection--disabled) {
-  cursor: not-allowed !important;
-  opacity: 0.5 !important;
-}
-
 /* ========== RESPONSIVE DESIGN ========== */
 
 /* Large Desktop (1440px+) */
@@ -1456,7 +1144,7 @@ onUnmounted(() => {
   }
 }
 
-/* Small Laptop (1024px - 1279px) */
+/* Small Laptop (1024px - 1279px) - VẪN DESKTOP MODE */
 @media (min-width: 1024px) and (max-width: 1279px) {
   .settings-button {
     top: 80px;
@@ -1465,6 +1153,7 @@ onUnmounted(() => {
     padding: 9px 18px;
   }
 
+  /* VẪN GIỮ NGUYÊN TEXT, ẨN ICON */
   .button-text {
     display: inline;
   }
@@ -1509,7 +1198,7 @@ onUnmounted(() => {
   }
 }
 
-/* Tablet (768px - 1023px) */
+/* Tablet (768px - 1023px) - CHUYỂN SANG MOBILE MODE */
 @media (max-width: 1023px) {
   .settings-button {
     top: auto;
@@ -1525,6 +1214,7 @@ onUnmounted(() => {
     border-radius: 50%;
   }
 
+  /* ẨN TEXT, HIỆN ICON */
   .button-text {
     display: none !important;
   }
@@ -1603,6 +1293,7 @@ onUnmounted(() => {
     height: 48px;
   }
 
+  /* ĐẢM BẢO ICON VẪN HIỆN */
   .button-text {
     display: none !important;
   }
@@ -1622,6 +1313,7 @@ onUnmounted(() => {
     height: 48px;
   }
 
+  /* ĐẢM BẢO ICON VẪN HIỆN */
   .button-text {
     display: none !important;
   }
@@ -1696,6 +1388,7 @@ onUnmounted(() => {
     height: 45px;
   }
 
+  /* ĐẢM BẢO ICON VẪN HIỆN */
   .button-text {
     display: none !important;
   }

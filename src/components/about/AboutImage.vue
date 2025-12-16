@@ -60,6 +60,19 @@ const dataStore = useDataStore();
   opacity: 0.7;
 }
 
+/* ========== DARK MODE ========== */
+.dark-mode .image-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(12, 113, 61, 0.5) 100%
+  );
+}
+
+.dark-mode .about-image-container:hover .image-overlay {
+  opacity: 0.85;
+}
+
 /* ========== RESPONSIVE DESIGN ========== */
 
 /* Tablet */

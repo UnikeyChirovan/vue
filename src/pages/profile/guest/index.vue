@@ -14,7 +14,7 @@
 
     <!-- Avatar Section -->
     <div class="avatar-section">
-      <n-image
+      <img
         class="avatar-img"
         alt="User Profile"
         :src="avatarUrl || 'https://picsum.photos/150'"
@@ -225,12 +225,12 @@ import { useRoute, useRouter } from 'vue-router';
 import { useGuestStore } from '../../../stores/guest.js';
 import { useAuthStore } from '../../../stores/auth.js';
 import { useChatStore } from '../../../stores/chatStore.js';
+import { useToast } from '../../../stores/useToast';
 import api from '../../../services/axiosInterceptor.js';
 import apiLinks from '../../../services/api-links.js';
 import dayjs from 'dayjs';
-import { useMessage } from 'naive-ui';
 
-const message = useMessage();
+const toast = useToast();
 const isFollowing = ref(false);
 const auth = useAuthStore();
 const chatStore = useChatStore();
@@ -258,15 +258,15 @@ const followUser = async () => {
     if (isFollowing.value) {
       await apiLinks.social.unfollow(id);
       isFollowing.value = false;
-      message.success('Đã bỏ theo dõi');
+      toast.success('Đã bỏ theo dõi');
     } else {
       await apiLinks.social.follow(id);
       isFollowing.value = true;
-      message.success('Đã theo dõi');
+      toast.success('Đã theo dõi');
     }
     await checkMutualFollow();
   } catch (error) {
-    message.error(error.response?.data?.message || 'Lỗi thao tác');
+    toast.error(error.response?.data?.message || 'Lỗi thao tác');
   }
 };
 
@@ -274,10 +274,10 @@ const blockUser = async () => {
   try {
     await apiLinks.social.block(id);
     isFollowing.value = false;
-    message.success('Đã chặn người dùng');
+    toast.success('Đã chặn người dùng');
     router.push({ name: 'profile-info' });
   } catch (error) {
-    message.error(error.response?.data?.message || 'Lỗi thao tác');
+    toast.error(error.response?.data?.message || 'Lỗi thao tác');
   }
 };
 
@@ -292,7 +292,7 @@ const openChatWithUser = async () => {
     });
   } catch (error) {
     console.error('Error opening chat:', error);
-    message.error('Không thể mở chat. Vui lòng thử lại.');
+    toast.error('Không thể mở chat. Vui lòng thử lại.');
   } finally {
     chatLoading.value = false;
   }
@@ -386,69 +386,81 @@ onMounted(async () => {
 });
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 /* ========== BASE LAYOUT ========== */
 .profile-page {
   font-family: 'Arial', sans-serif;
   background: linear-gradient(135deg, #e8ecf1 0%, #f5f7fa 100%);
   min-height: 100vh;
   padding-bottom: 40px;
+}
 
-  .cover-section {
-    position: relative;
-    height: 300px;
-    background-color: #282c34;
-    overflow: hidden;
+html.dark-mode .profile-page {
+  background: linear-gradient(135deg, #0a0a0a 0%, #121212 100%);
+}
 
-    .cover-img {
-      width: 100%;
-      border-radius: 12px;
-      object-fit: cover;
-    }
+.cover-section {
+  position: relative;
+  height: 300px;
+  background-color: #282c34;
+  overflow: hidden;
+}
+
+.cover-img {
+  width: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.avatar-section {
+  position: relative;
+  margin-top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+  z-index: 9;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
+}
+
+html.dark-mode .avatar-img {
+  border-color: #1e1e1e;
+}
+
+.profile-online-dot {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 24px;
+  height: 24px;
+  background: #44b700;
+  border: 4px solid white;
+  border-radius: 50%;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  animation: pulse 2s infinite;
+}
+
+html.dark-mode .profile-online-dot {
+  border-color: #1e1e1e;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(68, 183, 0, 0.7);
   }
-
-  .avatar-section {
-    position: relative;
-    margin-top: -100px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
-    z-index: 9;
-
-    .avatar-img {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid white;
-    }
-  }
-
-  .profile-online-dot {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    width: 24px;
-    height: 24px;
-    background: #44b700;
-    border: 4px solid white;
-    border-radius: 50%;
-    z-index: 10;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%,
-    100% {
-      box-shadow: 0 0 0 0 rgba(68, 183, 0, 0.7);
-    }
-    50% {
-      box-shadow: 0 0 0 8px rgba(68, 183, 0, 0);
-    }
+  50% {
+    box-shadow: 0 0 0 8px rgba(68, 183, 0, 0);
   }
 }
 
@@ -468,16 +480,24 @@ onMounted(async () => {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+html.dark-mode .username-title {
+  color: #e0e0e0;
+}
+
 .rating-stars {
   display: flex;
   justify-content: center;
   gap: 6px;
   margin-bottom: 25px;
+}
 
-  i {
-    color: #16a34a;
-    font-size: 22px;
-  }
+.rating-stars i {
+  color: #16a34a;
+  font-size: 22px;
+}
+
+html.dark-mode .rating-stars i {
+  color: #0f8a4a;
 }
 
 /* ========== ACTION BUTTONS ========== */
@@ -504,76 +524,76 @@ onMounted(async () => {
   gap: 8px;
   position: relative;
   overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    transform: translate(-50%, -50%);
-    transition:
-      width 0.6s,
-      height 0.6s;
-  }
-
-  &:hover::before {
-    width: 300px;
-    height: 300px;
-  }
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
 }
 
-.follow-btn {
-  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
-  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.3);
+html.dark-mode .action-btn {
+  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+  box-shadow: 0 4px 12px rgba(15, 138, 74, 0.3);
+}
 
-  &:hover {
-    box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
-  }
+.action-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s,
+    height 0.6s;
+}
+
+.action-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
+}
+
+html.dark-mode .action-btn:hover {
+  box-shadow: 0 6px 20px rgba(15, 138, 74, 0.4);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .unfollow-btn {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
 
-  &:hover {
-    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
-  }
+.unfollow-btn:hover {
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4) !important;
 }
 
 .block-btn {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
 
-  &:hover {
-    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
-  }
+.block-btn:hover {
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4) !important;
 }
 
 .chat-btn {
-  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%) !important;
   box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+}
 
-  &:hover {
-    box-shadow: 0 6px 20px rgba(8, 145, 178, 0.4);
-  }
+.chat-btn:hover {
+  box-shadow: 0 6px 20px rgba(8, 145, 178, 0.4) !important;
 }
 
 /* ========== PROFILE CARDS ========== */
@@ -594,6 +614,11 @@ onMounted(async () => {
   width: 100%;
 }
 
+html.dark-mode .profile-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
 .card-header-green {
   background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
   color: white;
@@ -604,15 +629,23 @@ onMounted(async () => {
   font-size: 18px;
   font-weight: 700;
   text-transform: uppercase;
+}
 
-  i {
-    font-size: 22px;
-  }
+html.dark-mode .card-header-green {
+  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+}
+
+.card-header-green i {
+  font-size: 22px;
 }
 
 .card-body-white {
   background: white;
   padding: 28px;
+}
+
+html.dark-mode .card-body-white {
+  background: #1e1e1e;
 }
 
 /* Info Rows */
@@ -622,34 +655,50 @@ onMounted(async () => {
   gap: 16px;
   padding: 14px 0;
   border-bottom: 1px solid #e5e7eb;
+}
 
-  &:last-child {
-    border-bottom: none;
-  }
+html.dark-mode .info-row {
+  border-bottom-color: #333;
+}
 
-  .icon-label {
-    font-size: 20px;
-    color: #16a34a;
-    width: 24px;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
+.info-row:last-child {
+  border-bottom: none;
+}
 
-  .info-content {
-    flex: 1;
+.icon-label {
+  font-size: 20px;
+  color: #16a34a;
+  width: 24px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
 
-    strong {
-      display: inline;
-      color: #1f2937;
-      font-size: 15px;
-      margin-right: 6px;
-    }
+html.dark-mode .icon-label {
+  color: #0f8a4a;
+}
 
-    span {
-      color: #6b7280;
-      font-size: 15px;
-    }
-  }
+.info-content {
+  flex: 1;
+}
+
+.info-content strong {
+  display: inline;
+  color: #1f2937;
+  font-size: 15px;
+  margin-right: 6px;
+}
+
+html.dark-mode .info-content strong {
+  color: #e0e0e0;
+}
+
+.info-content span {
+  color: #6b7280;
+  font-size: 15px;
+}
+
+html.dark-mode .info-content span {
+  color: #b0b0b0;
 }
 
 /* Stats Grid */
@@ -698,10 +747,18 @@ onMounted(async () => {
   margin: 0 0 6px 0;
 }
 
+html.dark-mode .stat-number {
+  color: #e0e0e0;
+}
+
 .stat-label {
   font-size: 14px;
   color: #6b7280;
   margin: 0;
+}
+
+html.dark-mode .stat-label {
+  color: #b0b0b0;
 }
 
 /* History Items */
@@ -714,31 +771,48 @@ onMounted(async () => {
   background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
   border-radius: 12px;
   border-left: 4px solid #16a34a;
+}
 
-  &:last-child {
-    margin-bottom: 0;
-  }
+html.dark-mode .history-item-box {
+  background: linear-gradient(135deg, #1a2e1a 0%, #0f1f0f 100%);
+  border-left-color: #0f8a4a;
+}
 
-  .history-icon {
-    font-size: 24px;
-    color: #16a34a;
-  }
+.history-item-box:last-child {
+  margin-bottom: 0;
+}
 
-  .history-text {
-    flex: 1;
+.history-icon {
+  font-size: 24px;
+  color: #16a34a;
+}
 
-    span {
-      color: #374151;
-      font-size: 15px;
-      margin-right: 8px;
-    }
+html.dark-mode .history-icon {
+  color: #0f8a4a;
+}
 
-    .history-number {
-      color: #dc2626;
-      font-size: 18px;
-      font-weight: 700;
-    }
-  }
+.history-text {
+  flex: 1;
+}
+
+.history-text span {
+  color: #374151;
+  font-size: 15px;
+  margin-right: 8px;
+}
+
+html.dark-mode .history-text span {
+  color: #b0b0b0;
+}
+
+.history-number {
+  color: #dc2626;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+html.dark-mode .history-number {
+  color: #ef4444;
 }
 
 /* Social Icons */
@@ -761,11 +835,11 @@ onMounted(async () => {
   text-decoration: none;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
 
-  &:hover {
-    transform: translateY(-4px) scale(1.1);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-  }
+.social-circle:hover {
+  transform: translateY(-4px) scale(1.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
 .facebook-color {
@@ -807,10 +881,10 @@ onMounted(async () => {
 
   .rating-stars {
     margin-bottom: 20px;
+  }
 
-    i {
-      font-size: 20px;
-    }
+  .rating-stars i {
+    font-size: 20px;
   }
 
   .action-buttons-group {
@@ -833,10 +907,10 @@ onMounted(async () => {
   .card-header-green {
     padding: 16px 20px;
     font-size: 16px;
+  }
 
-    i {
-      font-size: 20px;
-    }
+  .card-header-green i {
+    font-size: 20px;
   }
 
   .card-body-white {
@@ -856,6 +930,10 @@ onMounted(async () => {
     background: #f9fafb;
     border-radius: 12px;
     gap: 20px;
+  }
+
+  html.dark-mode .stat-circle-item {
+    background: #252525;
   }
 
   .stat-circle {
@@ -893,10 +971,10 @@ onMounted(async () => {
 
   .rating-stars {
     margin-bottom: 18px;
+  }
 
-    i {
-      font-size: 18px;
-    }
+  .rating-stars i {
+    font-size: 18px;
   }
 
   .action-btn {
@@ -913,10 +991,10 @@ onMounted(async () => {
   .card-header-green {
     padding: 14px 18px;
     font-size: 15px;
+  }
 
-    i {
-      font-size: 18px;
-    }
+  .card-header-green i {
+    font-size: 18px;
   }
 
   .card-body-white {
@@ -926,20 +1004,19 @@ onMounted(async () => {
   .info-row {
     padding: 12px 0;
     gap: 12px;
+  }
 
-    .icon-label {
-      font-size: 18px;
-      width: 20px;
-    }
+  .icon-label {
+    font-size: 18px;
+    width: 20px;
+  }
 
-    .info-content {
-      strong {
-        font-size: 14px;
-      }
-      span {
-        font-size: 14px;
-      }
-    }
+  .info-content strong {
+    font-size: 14px;
+  }
+
+  .info-content span {
+    font-size: 14px;
   }
 
   .stat-circle-item {
@@ -963,19 +1040,18 @@ onMounted(async () => {
   .history-item-box {
     padding: 14px;
     gap: 12px;
+  }
 
-    .history-icon {
-      font-size: 20px;
-    }
+  .history-icon {
+    font-size: 20px;
+  }
 
-    .history-text {
-      span {
-        font-size: 14px;
-      }
-      .history-number {
-        font-size: 16px;
-      }
-    }
+  .history-text span {
+    font-size: 14px;
+  }
+
+  .history-number {
+    font-size: 16px;
   }
 
   .social-circle {

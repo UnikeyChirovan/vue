@@ -9,9 +9,9 @@
 
         <!-- Logo & Brand -->
         <div class="brand-section">
-          <div class="logo-container">
+          <router-link class="logo-container" :to="{ name: 'home' }">
             <img :src="introImage" alt="logo" class="logo-image" />
-          </div>
+          </router-link>
 
           <!-- Desktop Navigation -->
           <ul class="nav-menu desktop-menu">

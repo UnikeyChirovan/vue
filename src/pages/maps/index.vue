@@ -243,6 +243,42 @@ onMounted(() => {
   transform: scale(1.05);
 }
 
+/* ========== DARK MODE ========== */
+.dark-mode .maps-wrapper {
+  background: linear-gradient(180deg, var(--dark-bg-primary) 0%, #0d0d0d 100%);
+}
+
+.dark-mode .map-section {
+  background: var(--dark-bg-card);
+  border-color: var(--dark-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode .map-section:hover {
+  box-shadow: 0 12px 40px rgba(12, 113, 61, 0.3);
+}
+
+.dark-mode .map-title {
+  color: var(--dark-accent-green-light);
+}
+
+.dark-mode .map-title::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--dark-accent-green),
+    transparent
+  );
+}
+
+.dark-mode .content-paragraph {
+  color: var(--dark-text-primary);
+}
+
+.dark-mode .content-paragraph:hover {
+  color: var(--dark-accent-green-light);
+}
+
 /* ========== RESPONSIVE DESIGN ========== */
 
 /* Tablet */

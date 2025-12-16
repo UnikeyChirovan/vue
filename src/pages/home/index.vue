@@ -129,9 +129,42 @@
         :data-aos-delay="index * 100"
       >
         <div class="feature-icon-wrapper">
-          <n-icon size="64" :class="feature.iconClass">
-            <component :is="feature.icon" />
-          </n-icon>
+          <svg
+            v-if="index === 0"
+            class="feature-icon green-star"
+            width="64"
+            height="64"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+            />
+          </svg>
+          <svg
+            v-else-if="index === 1"
+            class="feature-icon black-rocket"
+            width="64"
+            height="64"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M13.13 22.19L11.5 18.36C13.07 17.78 14.54 17 15.9 16.09L13.13 22.19M5.64 12.5L1.81 10.87L7.91 8.1C7 9.46 6.22 10.93 5.64 12.5M19.22 4C19.5 4 19.75 4 19.96 4.05C20.13 5.44 19.94 8.3 16.66 11.58C14.96 13.29 12.93 14.6 10.65 15.47L8.5 13.37C9.42 11.06 10.73 9.03 12.42 7.34C15.18 4.58 17.64 4 19.22 4M19.22 2C17.24 2 14.24 2.69 11 5.93C8.81 8.12 7.5 10.53 6.65 12.64C6.37 13.39 6.56 14.21 7.11 14.77L9.24 16.89C9.79 17.45 10.61 17.63 11.36 17.35C13.5 16.53 15.88 15.19 18.07 13C23.73 7.34 21.61 2.39 21.61 2.39S20.7 2 19.22 2M14.54 9.46C13.76 8.68 13.76 7.41 14.54 6.63S16.59 5.85 17.37 6.63C18.14 7.41 18.15 8.68 17.37 9.46C16.59 10.24 15.32 10.24 14.54 9.46M8.88 16.53L7.47 15.12L8.88 16.53M6.24 22L9.88 18.36C9.54 18.27 9.21 18.12 8.91 17.91L4.83 22H6.24M2 22H3.41L8.18 17.24L6.76 15.83L2 20.59V22M2 19.17L6.09 15.09C5.88 14.79 5.73 14.47 5.64 14.12L2 17.76V19.17Z"
+            />
+          </svg>
+          <svg
+            v-else
+            class="feature-icon handshake"
+            width="64"
+            height="64"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              d="M11.364 3.176a1 1 0 0 0-1.414 0L6.732 6.393a3.25 3.25 0 0 0-.952 2.298v.073a2.5 2.5 0 0 0-.894 1.056l-.53 1.155a1 1 0 0 0 .088.95l1.639 2.344a1.25 1.25 0 0 0 1.025.535h3.348a1 1 0 0 0 .857-.485l1.753-2.92c.331-.551.508-1.184.508-1.829v-2.17a3.25 3.25 0 0 0-.952-2.298l-1.258-1.257-.001-.001Zm-2.12 6.177 1.46-1.46a.5.5 0 0 1 .707 0l.796.796a.5.5 0 0 1-.707.707l-.443-.442-.756.755a1 1 0 0 1-1.414-1.414l.357-.357Z"
+            />
+          </svg>
         </div>
         <h3 class="feature-title">{{ feature.title }}</h3>
         <p class="feature-description">{{ feature.description }}</p>
@@ -157,7 +190,7 @@
 </template>
 
 <script setup>
-import { ref, markRaw, computed, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -165,11 +198,6 @@ import TheHeader from '../../components/TheHeader.vue';
 import TheFooter from '../../components/TheFooter.vue';
 import api from '../../services/axiosInterceptor';
 import eventBus from '../../stores/eventBus';
-import apiLinks from '../../services/api-links';
-import Handshake20Filled from '@vicons/fluent/Handshake20Filled';
-import StarEmphasis24Filled from '@vicons/fluent/StarEmphasis24Filled';
-import { Rocket } from '@vicons/ionicons5';
-import { useMessage } from 'naive-ui';
 import { useAuthStore } from '../../stores/auth';
 import { useVoteStore } from '../../stores/vote';
 import Notification from '../../components/Notification.vue';
@@ -184,7 +212,6 @@ const loadingStore = useLoadingStore();
 const voteStore = useVoteStore();
 const authStore = useAuthStore();
 const categoryStore = useCategoryStore();
-const message = useMessage();
 const router = useRouter();
 
 const futureProjectTitle = computed(() =>
@@ -249,11 +276,6 @@ const currentButtonText = computed(() =>
 );
 
 const features = ref([]);
-const iconMap = {
-  StarEmphasis24Filled: markRaw(StarEmphasis24Filled),
-  Rocket: markRaw(Rocket),
-  Handshake20Filled: markRaw(Handshake20Filled),
-};
 
 const handleButtonClick = () => {
   if (currentButtonText.value === 'Get Started') {
@@ -284,7 +306,7 @@ const goToMaps = () => {
 };
 const goToStories = () => {
   if (!authStore.isLoggedIn) {
-    message.warning('Vui lòng đăng nhập để đọc truyện bạn nhé!');
+    showToast('Vui lòng đăng nhập để đọc truyện bạn nhé!', 'warning');
   } else {
     router.push({ name: 'stories' });
   }
@@ -293,22 +315,41 @@ const goToStories = () => {
 const hoveredFeature = ref(null);
 const voteUpdated = ref(false);
 
+const showToast = (message, type = 'info') => {
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('show');
+  }, 10);
+
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => {
+      document.body.removeChild(toast);
+    }, 300);
+  }, 3000);
+};
+
 const vote = async (choice) => {
   if (!authStore.isLoggedIn) {
-    message.warning('Vui lòng đăng nhập để vote!');
+    showToast('Vui lòng đăng nhập để vote!', 'warning');
     return;
   }
 
   try {
     const response = await api.post('/vote/createOrUpdate', { choice });
-    message.success(response.data.message);
+    showToast(response.data.message, 'success');
 
     voteStore.userVoteChoice = choice;
     voteUpdated.value = true;
     await updateVoteResults();
   } catch (error) {
-    message.error(
-      error.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại!'
+    showToast(
+      error.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại!',
+      'error'
     );
   }
 };
@@ -350,11 +391,7 @@ const observeLocalStorageChange = () => {
         futureProjects.value = JSON.parse(value);
         break;
       case 'features':
-        features.value = JSON.parse(value).map((item) => ({
-          ...item,
-          icon: item.icon ? iconMap[item.icon] : null,
-          iconClass: item.icon_class,
-        }));
+        features.value = JSON.parse(value);
         break;
     }
   };
@@ -378,11 +415,7 @@ const loadFutureProjectsFromStorage = () => {
 const loadFeaturesFromStorage = () => {
   const featuresData = localStorage.getItem('features');
   if (featuresData) {
-    features.value = JSON.parse(featuresData).map((item) => ({
-      ...item,
-      icon: item.icon ? iconMap[item.icon] : null,
-      iconClass: item.icon_class,
-    }));
+    features.value = JSON.parse(featuresData);
   }
 };
 
@@ -421,6 +454,46 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* ========== TOAST NOTIFICATION ========== */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 16px 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  font-size: 1rem;
+  font-weight: 500;
+  transform: translateX(400px);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-left: 4px solid #0c713d;
+  max-width: 350px;
+}
+
+.dark-mode .toast {
+  background: var(--dark-bg-elevated);
+  color: var(--dark-text-primary);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.toast.show {
+  transform: translateX(0);
+}
+
+.toast-success {
+  border-left-color: #4caf50;
+}
+
+.toast-warning {
+  border-left-color: #ff9800;
+}
+
+.toast-error {
+  border-left-color: #f44336;
+}
+
 /* ========== MODERN HOME PAGE DESIGN 2025 ========== */
 
 * {
@@ -646,51 +719,6 @@ body {
   transform: translateX(3px);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .prev-btn,
-  .next-btn {
-    width: 50px;
-    height: 50px;
-  }
-
-  .prev-btn {
-    left: 20px;
-  }
-
-  .next-btn {
-    right: 20px;
-  }
-
-  .prev-btn svg,
-  .next-btn svg {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .prev-btn,
-  .next-btn {
-    width: 45px;
-    height: 45px;
-  }
-
-  .prev-btn {
-    left: 15px;
-  }
-
-  .next-btn {
-    right: 15px;
-  }
-
-  .prev-btn svg,
-  .next-btn svg {
-    width: 18px;
-    height: 18px;
-  }
-}
-
 .slide-indicators {
   position: absolute;
   bottom: 40px;
@@ -730,6 +758,14 @@ body {
   position: relative;
 }
 
+.dark-mode .future-projects-section {
+  background: linear-gradient(
+    180deg,
+    var(--dark-bg-primary) 0%,
+    var(--dark-bg-secondary) 100%
+  );
+}
+
 .future-projects-section::before {
   content: '';
   position: absolute;
@@ -745,6 +781,15 @@ body {
   );
 }
 
+.dark-mode .future-projects-section::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--dark-border) 50%,
+    transparent 100%
+  );
+}
+
 .future-projects-title {
   font-size: 2.5rem;
   margin-bottom: 60px;
@@ -754,6 +799,10 @@ body {
   letter-spacing: 1px;
   position: relative;
   padding-bottom: 20px;
+}
+
+.dark-mode .future-projects-title {
+  color: var(--dark-accent-green-light);
 }
 
 .future-projects-title::after {
@@ -766,6 +815,15 @@ body {
   height: 4px;
   background: linear-gradient(90deg, transparent, #0c713d, transparent);
   border-radius: 2px;
+}
+
+.dark-mode .future-projects-title::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--dark-accent-green),
+    transparent
+  );
 }
 
 .future-projects-carousel {
@@ -787,6 +845,12 @@ body {
   overflow: hidden;
 }
 
+.dark-mode .future-project-item {
+  background: var(--dark-bg-card);
+  border-color: var(--dark-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
 .future-project-item::before {
   content: '';
   position: absolute;
@@ -799,6 +863,14 @@ body {
   transition: transform 0.4s ease;
 }
 
+.dark-mode .future-project-item::before {
+  background: linear-gradient(
+    90deg,
+    var(--dark-accent-green),
+    var(--dark-accent-green-light)
+  );
+}
+
 .future-project-item:hover::before {
   transform: scaleX(1);
 }
@@ -807,6 +879,11 @@ body {
   transform: translateY(-10px);
   box-shadow: 0 12px 40px rgba(12, 113, 61, 0.15);
   border-color: #0c713d;
+}
+
+.dark-mode .future-project-item:hover {
+  box-shadow: 0 12px 40px rgba(12, 113, 61, 0.3);
+  border-color: var(--dark-accent-green);
 }
 
 .project-icon {
@@ -821,6 +898,14 @@ body {
   box-shadow: 0 4px 15px rgba(12, 113, 61, 0.3);
 }
 
+.dark-mode .project-icon {
+  background: linear-gradient(
+    135deg,
+    var(--dark-accent-green),
+    var(--dark-accent-green-light)
+  );
+}
+
 .project-icon span {
   color: white;
   font-size: 1.5rem;
@@ -833,6 +918,10 @@ body {
   color: #1a1a1a;
   font-weight: 700;
   text-align: center;
+}
+
+.dark-mode .future-project-name {
+  color: var(--dark-text-primary);
 }
 
 .future-project-timeline {
@@ -851,6 +940,11 @@ body {
   margin-right: auto;
 }
 
+.dark-mode .future-project-timeline {
+  background: var(--dark-bg-elevated);
+  color: var(--dark-text-secondary);
+}
+
 .timeline-icon {
   font-size: 1.1rem;
 }
@@ -862,10 +956,22 @@ body {
   text-align: center;
 }
 
+.dark-mode .future-project-description {
+  color: var(--dark-text-secondary);
+}
+
 /* ========== VIDEO SECTION ========== */
 .video-section {
   padding: 100px 50px;
   background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+}
+
+.dark-mode .video-section {
+  background: linear-gradient(
+    135deg,
+    var(--dark-bg-secondary) 0%,
+    var(--dark-bg-primary) 100%
+  );
 }
 
 .section-title {
@@ -877,6 +983,10 @@ body {
   letter-spacing: 1px;
   position: relative;
   padding-bottom: 20px;
+}
+
+.dark-mode .section-title {
+  color: var(--dark-accent-green-light);
 }
 
 .section-title::after {
@@ -891,6 +1001,15 @@ body {
   border-radius: 2px;
 }
 
+.dark-mode .section-title::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--dark-accent-green),
+    transparent
+  );
+}
+
 .video-container {
   max-width: 1000px;
   margin: 0 auto;
@@ -898,6 +1017,11 @@ body {
   padding: 40px;
   border-radius: 24px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .video-container {
+  background: var(--dark-bg-card);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
 .video-wrapper {
@@ -924,6 +1048,10 @@ video {
   line-height: 1.6;
 }
 
+.dark-mode .video-title {
+  color: var(--dark-accent-green-light);
+}
+
 .no-video-message {
   text-align: center;
   color: #666;
@@ -931,10 +1059,22 @@ video {
   padding: 60px 20px;
 }
 
+.dark-mode .no-video-message {
+  color: var(--dark-text-secondary);
+}
+
 /* ========== FEATURE/VOTE SECTION ========== */
 .feature-section {
   padding: 100px 50px;
   background: linear-gradient(180deg, #ffffff 0%, #f9f9f9 100%);
+}
+
+.dark-mode .feature-section {
+  background: linear-gradient(
+    180deg,
+    var(--dark-bg-primary) 0%,
+    var(--dark-bg-secondary) 100%
+  );
 }
 
 .feature-section-title {
@@ -948,6 +1088,10 @@ video {
   padding-bottom: 20px;
 }
 
+.dark-mode .feature-section-title {
+  color: var(--dark-accent-green-light);
+}
+
 .feature-section-title::after {
   content: '';
   position: absolute;
@@ -958,6 +1102,15 @@ video {
   height: 4px;
   background: linear-gradient(90deg, transparent, #0c713d, transparent);
   border-radius: 2px;
+}
+
+.dark-mode .feature-section-title::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--dark-accent-green),
+    transparent
+  );
 }
 
 .feature-grid {
@@ -980,6 +1133,12 @@ video {
   overflow: hidden;
 }
 
+.dark-mode .feature-item {
+  background: var(--dark-bg-card);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  border-color: var(--dark-border);
+}
+
 .feature-item::before {
   content: '';
   position: absolute;
@@ -992,11 +1151,17 @@ video {
   transition: transform 0.4s ease;
 }
 
+.dark-mode .feature-item::before {
+  background: linear-gradient(
+    90deg,
+    var(--dark-accent-green),
+    var(--dark-accent-green-light)
+  );
+}
+
 .feature-item:hover::before {
   transform: scaleX(1);
 }
-
-/* Phần CSS bị dang dở - tiếp tục từ .feature-item:hover */
 
 .feature-item:hover {
   transform: translateY(-12px) scale(1.02);
@@ -1004,10 +1169,25 @@ video {
   border-color: rgba(12, 113, 61, 0.3);
 }
 
+.dark-mode .feature-item:hover {
+  box-shadow: 0 16px 48px rgba(12, 113, 61, 0.3);
+  border-color: var(--dark-accent-green);
+}
+
 .feature-item.voted {
   background: linear-gradient(135deg, #f0f8f4 0%, #e8f5ed 100%);
   border-color: #0c713d;
   box-shadow: 0 8px 32px rgba(12, 113, 61, 0.2);
+}
+
+.dark-mode .feature-item.voted {
+  background: linear-gradient(
+    135deg,
+    rgba(12, 113, 61, 0.2) 0%,
+    rgba(12, 113, 61, 0.1) 100%
+  );
+  border-color: var(--dark-accent-green);
+  box-shadow: 0 8px 32px rgba(12, 113, 61, 0.4);
 }
 
 .feature-item.voted::before {
@@ -1020,16 +1200,36 @@ video {
   justify-content: center;
 }
 
+.feature-icon {
+  transition: transform 0.3s ease;
+}
+
+.feature-item:hover .feature-icon {
+  transform: scale(1.1);
+}
+
 .green-star {
   color: #0c713d;
+}
+
+.dark-mode .green-star {
+  color: var(--dark-accent-green-light);
 }
 
 .black-rocket {
   color: #2c3e50;
 }
 
-.Handshake {
+.dark-mode .black-rocket {
+  color: var(--dark-text-primary);
+}
+
+.handshake {
   color: #3498db;
+}
+
+.dark-mode .handshake {
+  color: #5dade2;
 }
 
 .feature-title {
@@ -1040,12 +1240,20 @@ video {
   text-align: center;
 }
 
+.dark-mode .feature-title {
+  color: var(--dark-text-primary);
+}
+
 .feature-description {
   font-size: 1.05rem;
   margin-bottom: 40px;
   color: #555;
   line-height: 1.8;
   text-align: center;
+}
+
+.dark-mode .feature-description {
+  color: var(--dark-text-secondary);
 }
 
 .feature-percentage {
@@ -1063,6 +1271,17 @@ video {
   left: 50%;
   transform: translateX(-50%);
   border: 2px solid rgba(12, 113, 61, 0.2);
+}
+
+.dark-mode .feature-percentage {
+  color: var(--dark-accent-green-light);
+  background: linear-gradient(
+    135deg,
+    rgba(12, 113, 61, 0.3) 0%,
+    rgba(12, 113, 61, 0.2) 100%
+  );
+  border-color: var(--dark-accent-green);
+  box-shadow: 0 4px 16px rgba(12, 113, 61, 0.4);
 }
 
 /* ========== RESPONSIVE DESIGN ========== */
@@ -1110,17 +1329,16 @@ video {
 
   .prev-btn,
   .next-btn {
-    width: 45px;
-    height: 45px;
-    font-size: 1.5rem;
+    width: 50px;
+    height: 50px;
   }
 
   .prev-btn {
-    left: 15px;
+    left: 20px;
   }
 
   .next-btn {
-    right: 15px;
+    right: 20px;
   }
 
   .slide-indicators {
@@ -1168,6 +1386,12 @@ video {
     font-size: 1.1rem;
     padding: 10px 22px;
   }
+
+  .toast {
+    right: 15px;
+    max-width: 300px;
+    font-size: 0.95rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1192,9 +1416,23 @@ video {
 
   .prev-btn,
   .next-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 1.3rem;
+    width: 45px;
+    height: 45px;
+  }
+
+  .prev-btn {
+    left: 15px;
+  }
+
+  .next-btn {
+    right: 15px;
+  }
+
+  .toast {
+    right: 10px;
+    max-width: 280px;
+    font-size: 0.9rem;
+    padding: 14px 20px;
   }
 }
 </style>

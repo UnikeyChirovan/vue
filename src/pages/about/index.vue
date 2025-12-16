@@ -66,4 +66,9 @@ const personalJourneyTitle = computed(() =>
   background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
   min-height: 100vh;
 }
+
+/* ========== DARK MODE ========== */
+.dark-mode .about-wrapper {
+  background: linear-gradient(180deg, var(--dark-bg-primary) 0%, #0d0d0d 100%);
+}
 </style>

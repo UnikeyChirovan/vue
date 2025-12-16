@@ -1,7 +1,6 @@
 <template>
   <div>
-    <ToastNotification ref="toastNotification" />
-    <n-config-provider :theme="naiveTheme">
+    <n-config-provider>
       <n-message-provider>
         <router-view></router-view>
         <ChatContainer />
@@ -15,20 +14,14 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, computed } from 'vue';
+import { onMounted, onUnmounted } from 'vue';
 import { useChatStore } from './stores/chatStore';
 import ChatContainer from './components/ChatContainer.vue';
 import { useAuthStore } from './stores/auth';
 import { useSupportChatStore } from './stores/supportChatStore';
 import SupportChatButton from './components/SupportChatButton.vue';
 import SupportChatWindow from './components/SupportChatWindow.vue';
-import ToastNotification from './components/ToastNotification.vue';
-import { darkTheme } from 'naive-ui';
-const naiveTheme = computed(() => {
-  return document.documentElement.classList.contains('dark-mode')
-    ? darkTheme
-    : null;
-});
+
 const authStore = useAuthStore();
 const supportStore = useSupportChatStore();
 const chatStore = useChatStore();
@@ -91,6 +84,22 @@ onUnmounted(() => {
 /* Import Dark Mode CSS */
 @import './assets/styles/dark-mode.css';
 
+/* Existing styles */
+html.light-mode .n-card-header {
+  background-color: rgb(240, 236, 221) !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.n-base-icon {
+  position: relative;
+}
+
+.n-form-item-f.n-form-item.n-form-item-feedback-wrapper {
+  min-height: 8px;
+}
+
 .error {
   color: red;
   margin-top: -4px !important;
@@ -103,5 +112,11 @@ onUnmounted(() => {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 </style>

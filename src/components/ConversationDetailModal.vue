@@ -1,5 +1,7 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
+    <ToastNotification ref="toastNotification" />
+
     <div class="conversation-modal">
       <div class="modal-header">
         <div class="user-info">
@@ -142,7 +144,8 @@ import { ref, computed, onMounted, nextTick, watch, onUnmounted } from 'vue';
 import { useSupportChatStore } from '../stores/supportChatStore';
 import { useAuthStore } from '../stores/auth';
 import supportApi from '../services/support-api';
-import { useMessage } from 'naive-ui';
+import ToastNotification from './ToastNotification.vue';
+import { useToast } from '../stores/useToast';
 
 const props = defineProps({
   conversation: {
@@ -153,7 +156,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'refresh']);
 
-const message = useMessage();
+const toast = useToast();
 const supportStore = useSupportChatStore();
 const authStore = useAuthStore();
 
@@ -174,11 +177,9 @@ const backendUrl = 'http://127.0.0.1:8000';
 
 const getAvatarUrl = (userId, avatar) => {
   if (!avatar) return 'https://picsum.photos/50';
-
   if (avatar.startsWith('http://') || avatar.startsWith('https://')) {
     return avatar;
   }
-
   return `${backendUrl}/storage/avatars/${userId}/${avatar}`;
 };
 
@@ -211,11 +212,9 @@ const loadMessages = async () => {
     const response = await supportApi.getConversationMessages(
       props.conversation.id
     );
-
     if (response.data.messages) {
       messages.value = response.data.messages;
     }
-
     scrollToBottom();
   } catch (error) {
     console.error('Error loading messages:', error);
@@ -236,19 +235,15 @@ const sendMessage = async () => {
       props.conversation.id,
       text
     );
-
     const exists = messages.value.find((m) => m.id === response.id);
-
     if (!exists) {
       messages.value.push(response);
     }
-
     scrollToBottom();
-
     await supportApi.markAsReadByManager(props.conversation.id);
   } catch (error) {
     console.error('Error sending message:', error);
-    message.error('Không thể gửi tin nhắn');
+    if (toast) toast.error('Không thể gửi tin nhắn');
     messageText.value = text;
   } finally {
     sending.value = false;
@@ -257,16 +252,15 @@ const sendMessage = async () => {
 
 const resolveConversation = async () => {
   if (resolving.value) return;
-
   resolving.value = true;
   try {
     await supportStore.resolveConversation(props.conversation.id);
-    message.success('Đã đánh dấu đã giải quyết');
+    if (toast) toast.success('Đã đánh dấu đã giải quyết');
     emit('refresh');
     emit('close');
   } catch (error) {
     console.error('Error resolving conversation:', error);
-    message.error('Không thể đánh dấu đã giải quyết');
+    if (toast) toast.error('Không thể đánh dấu đã giải quyết');
   } finally {
     resolving.value = false;
   }
@@ -285,20 +279,19 @@ const loadManagers = async () => {
 
 const confirmTransfer = async () => {
   if (!selectedManagerId.value || transferring.value) return;
-
   transferring.value = true;
   try {
     await supportStore.transferConversation(
       props.conversation.id,
       selectedManagerId.value
     );
-    message.success('Đã chuyển tiếp cuộc hội thoại');
+    if (toast) toast.success('Đã chuyển tiếp cuộc hội thoại');
     showTransferModal.value = false;
     emit('refresh');
     emit('close');
   } catch (error) {
     console.error('Error transferring conversation:', error);
-    message.error('Không thể chuyển tiếp');
+    if (toast) toast.error('Không thể chuyển tiếp');
   } finally {
     transferring.value = false;
   }
@@ -354,7 +347,6 @@ onMounted(() => {
   loadMessages();
   loadManagers();
   startMessagePolling();
-
   if (props.conversation.unread_count > 0) {
     supportApi.markAsReadByManager(props.conversation.id);
   }
@@ -424,6 +416,7 @@ html.dark-mode .conversation-modal {
   border-radius: 50%;
   border: 3px solid white;
   flex-shrink: 0;
+  object-fit: cover;
 }
 
 .user-header-details {
@@ -587,6 +580,7 @@ html.dark-mode .loading-messages p {
   height: 40px;
   border-radius: 50%;
   flex-shrink: 0;
+  object-fit: cover;
 }
 
 .message-content {
@@ -660,6 +654,10 @@ html.dark-mode .message-input {
   border-color: #667eea;
 }
 
+html.dark-mode .message-input:focus {
+  border-color: #8b9eff;
+}
+
 .send-btn {
   width: 50px;
   height: 50px;
@@ -697,6 +695,7 @@ html.dark-mode .message-input {
   align-items: center;
   justify-content: center;
   z-index: 10000;
+  padding: 20px;
 }
 
 .transfer-modal {
@@ -793,6 +792,7 @@ html.dark-mode .manager-item.selected {
   height: 44px;
   border-radius: 50%;
   flex-shrink: 0;
+  object-fit: cover;
 }
 
 .manager-item span {

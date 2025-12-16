@@ -6,9 +6,18 @@
         <!-- Vision -->
         <div v-if="dataStore.sections[3]" class="vmv-card vision-card">
           <div class="card-icon vision-icon">
-            <n-icon size="64">
-              <LightbulbFilament20Regular />
-            </n-icon>
+            <svg
+              class="icon-svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+              />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
           </div>
           <h3 class="card-title">{{ dataStore.sections[3].title }}</h3>
           <div
@@ -25,9 +34,10 @@
         <!-- Mission -->
         <div v-if="dataStore.sections[4]" class="vmv-card mission-card">
           <div class="card-icon mission-icon">
-            <n-icon size="64">
-              <TargetArrow24Filled />
-            </n-icon>
+            <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z" />
+              <circle cx="12" cy="12" r="2" />
+            </svg>
           </div>
           <h3 class="card-title">{{ dataStore.sections[4].title }}</h3>
           <div
@@ -44,9 +54,11 @@
         <!-- Core Values -->
         <div v-if="dataStore.sections[5]" class="vmv-card values-card">
           <div class="card-icon values-icon">
-            <n-icon size="64">
-              <Heart48Filled />
-            </n-icon>
+            <svg class="icon-svg" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+              />
+            </svg>
           </div>
           <h3 class="card-title">{{ dataStore.sections[5].title }}</h3>
           <div
@@ -66,10 +78,6 @@
 
 <script setup>
 import { useDataStore } from '../../stores/dataStore';
-import { NIcon } from 'naive-ui';
-import Heart48Filled from '@vicons/fluent/Heart48Filled';
-import TargetArrow24Filled from '@vicons/fluent/TargetArrow24Filled';
-import LightbulbFilament20Regular from '@vicons/fluent/LightbulbFilament20Regular';
 
 const props = defineProps({
   visionMissionCoreValuesTitle: {
@@ -203,6 +211,11 @@ function formatContent(content, sectionNumber) {
   transform: scale(1.1);
 }
 
+.icon-svg {
+  width: 64px;
+  height: 64px;
+}
+
 .vision-icon {
   color: #f39c12;
 }
@@ -233,6 +246,41 @@ function formatContent(content, sectionNumber) {
 
 .card-content p {
   margin-bottom: 10px;
+}
+
+/* ========== DARK MODE ========== */
+.dark-mode .vmv-wrapper {
+  background: linear-gradient(180deg, var(--dark-bg-primary) 0%, #0d0d0d 100%);
+}
+
+.dark-mode .vmv-title {
+  color: var(--dark-accent-green-light);
+}
+
+.dark-mode .vmv-title::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--dark-accent-green),
+    transparent
+  );
+}
+
+.dark-mode .vmv-card {
+  background: var(--dark-bg-card);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode .vmv-card:hover {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+}
+
+.dark-mode .card-title {
+  color: var(--dark-text-primary);
+}
+
+.dark-mode .card-content {
+  color: var(--dark-text-secondary);
 }
 
 /* ========== RESPONSIVE DESIGN ========== */
@@ -272,6 +320,11 @@ function formatContent(content, sectionNumber) {
   .card-content {
     font-size: 1.03rem;
   }
+
+  .icon-svg {
+    width: 56px;
+    height: 56px;
+  }
 }
 
 /* Mobile */
@@ -299,7 +352,7 @@ function formatContent(content, sectionNumber) {
     padding: 35px 25px;
   }
 
-  .card-icon :deep(svg) {
+  .icon-svg {
     width: 56px;
     height: 56px;
   }
@@ -339,7 +392,7 @@ function formatContent(content, sectionNumber) {
     border-radius: 16px;
   }
 
-  .card-icon :deep(svg) {
+  .icon-svg {
     width: 48px;
     height: 48px;
   }

@@ -222,7 +222,6 @@ onMounted(() => {
   });
 });
 </script>
-
 <style scoped>
 /* ========== MODERN NOTIFICATION REDESIGN ========== */
 .notification-container {
@@ -230,6 +229,14 @@ onMounted(() => {
   background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
   padding: 80px 20px;
   position: relative;
+}
+
+.dark-mode .notification-container {
+  background: linear-gradient(
+    180deg,
+    var(--dark-bg-primary) 0%,
+    var(--dark-bg-secondary) 100%
+  );
 }
 
 .notification-container::before {
@@ -243,6 +250,15 @@ onMounted(() => {
     90deg,
     transparent 0%,
     rgba(12, 113, 61, 0.2) 50%,
+    transparent 100%
+  );
+}
+
+.dark-mode .notification-container::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--dark-border) 50%,
     transparent 100%
   );
 }
@@ -263,6 +279,10 @@ onMounted(() => {
   padding-bottom: 20px;
 }
 
+.dark-mode .notification-title {
+  color: var(--dark-accent-green-light);
+}
+
 .notification-title::after {
   content: '';
   position: absolute;
@@ -273,6 +293,15 @@ onMounted(() => {
   height: 4px;
   background: linear-gradient(90deg, transparent, #0c713d, transparent);
   border-radius: 2px;
+}
+
+.dark-mode .notification-title::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--dark-accent-green),
+    transparent
+  );
 }
 
 /* Carousel */
@@ -296,6 +325,12 @@ onMounted(() => {
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.dark-mode .notification-card {
+  background: var(--dark-bg-card);
+  border-color: var(--dark-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
 .notification-card.active {
   opacity: 1;
   transform: scale(1);
@@ -306,6 +341,14 @@ onMounted(() => {
   padding: 30px 40px;
   position: relative;
   overflow: hidden;
+}
+
+.dark-mode .card-header {
+  background: linear-gradient(
+    135deg,
+    var(--dark-accent-green) 0%,
+    var(--dark-accent-green-light) 100%
+  );
 }
 
 .card-header::before {
@@ -350,6 +393,14 @@ onMounted(() => {
   background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
 }
 
+.dark-mode .card-image {
+  background: linear-gradient(
+    135deg,
+    var(--dark-bg-elevated) 0%,
+    var(--dark-bg-secondary) 100%
+  );
+}
+
 .card-image img {
   width: 100%;
   height: 100%;
@@ -371,6 +422,10 @@ onMounted(() => {
   pointer-events: none;
 }
 
+.dark-mode .image-overlay {
+  background: linear-gradient(to top, var(--dark-bg-card), transparent);
+}
+
 .card-body {
   padding: 40px;
 }
@@ -381,6 +436,10 @@ onMounted(() => {
   line-height: 1.8;
   margin: 0;
   text-align: center;
+}
+
+.dark-mode .card-content {
+  color: var(--dark-text-secondary);
 }
 
 /* Navigation Controls */
@@ -408,15 +467,31 @@ onMounted(() => {
   padding: 0;
 }
 
+.dark-mode .dot {
+  background: rgba(12, 113, 61, 0.4);
+}
+
 .dot:hover {
   background: rgba(12, 113, 61, 0.4);
   transform: scale(1.2);
+}
+
+.dark-mode .dot:hover {
+  background: rgba(12, 113, 61, 0.6);
 }
 
 .dot.active {
   width: 40px;
   border-radius: 6px;
   background: linear-gradient(90deg, #0c713d, #0a5a31);
+}
+
+.dark-mode .dot.active {
+  background: linear-gradient(
+    90deg,
+    var(--dark-accent-green),
+    var(--dark-accent-green-light)
+  );
 }
 
 .arrow-controls {
@@ -440,10 +515,28 @@ onMounted(() => {
   box-shadow: 0 4px 16px rgba(12, 113, 61, 0.3);
 }
 
+.dark-mode .arrow-btn {
+  background: linear-gradient(
+    135deg,
+    var(--dark-accent-green) 0%,
+    var(--dark-accent-green-light) 100%
+  );
+  box-shadow: 0 4px 16px rgba(12, 113, 61, 0.5);
+}
+
 .arrow-btn:hover {
   background: linear-gradient(135deg, #0a5a31 0%, #084524 100%);
   transform: scale(1.1);
   box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
+}
+
+.dark-mode .arrow-btn:hover {
+  background: linear-gradient(
+    135deg,
+    var(--dark-accent-green-light) 0%,
+    var(--dark-accent-hover) 100%
+  );
+  box-shadow: 0 6px 20px rgba(12, 113, 61, 0.6);
 }
 
 .arrow-btn:active {
@@ -468,6 +561,10 @@ onMounted(() => {
   color: #0c713d;
   min-width: 60px;
   text-align: center;
+}
+
+.dark-mode .slide-counter {
+  color: var(--dark-accent-green-light);
 }
 
 /* ========== RESPONSIVE DESIGN ========== */

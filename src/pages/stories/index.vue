@@ -14,40 +14,45 @@
           </h2>
         </div>
 
-        <!-- Navigation Controls - Giống Index2 -->
+        <!-- Navigation Controls -->
         <div class="navigation-controls">
-          <n-button
+          <button
             @click="prevChapter"
             :disabled="
               chapterStore.selectedChapter ===
               chapterStore.chapterOptions[0]?.value
             "
-            type="primary"
             class="nav-button"
           >
             <span class="nav-text">Chương trước</span>
             <i class="fas fa-chevron-left mobile-icon"></i>
-          </n-button>
+          </button>
           <div class="chapter-select-container">
-            <n-select
-              v-model:value="chapterStore.selectedChapter"
-              :options="chapterStore.chapterOptions"
-              @update:value="updateChapterAndFetchContent"
+            <select
+              v-model="chapterStore.selectedChapter"
+              @change="updateChapterAndFetchContent"
               class="chapter-select"
-            />
+            >
+              <option
+                v-for="option in chapterStore.chapterOptions"
+                :key="option.value"
+                :value="option.value"
+              >
+                {{ option.label }}: {{ option.title }}
+              </option>
+            </select>
           </div>
-          <n-button
+          <button
             @click="nextChapter"
             :disabled="
               chapterStore.selectedChapter ===
               chapterStore.chapterOptions.length
             "
-            type="primary"
             class="nav-button"
           >
             <span class="nav-text">Chương tiếp</span>
             <i class="fas fa-chevron-right mobile-icon"></i>
-          </n-button>
+          </button>
         </div>
 
         <div class="text-center snowflake-divider">
@@ -80,38 +85,43 @@
         </div>
 
         <div class="navigation-controls bottom">
-          <n-button
+          <button
             @click="prevChapter"
             :disabled="
               chapterStore.selectedChapter ===
               chapterStore.chapterOptions[0]?.value
             "
-            type="primary"
             class="nav-button"
           >
             <span class="nav-text">Chương trước</span>
             <i class="fas fa-chevron-left mobile-icon"></i>
-          </n-button>
+          </button>
           <div class="chapter-select-container">
-            <n-select
-              v-model:value="chapterStore.selectedChapter"
-              :options="chapterStore.chapterOptions"
-              @update:value="updateChapterAndFetchContent"
+            <select
+              v-model="chapterStore.selectedChapter"
+              @change="updateChapterAndFetchContent"
               class="chapter-select"
-            />
+            >
+              <option
+                v-for="option in chapterStore.chapterOptions"
+                :key="option.value"
+                :value="option.value"
+              >
+                {{ option.label }}: {{ option.title }}
+              </option>
+            </select>
           </div>
-          <n-button
+          <button
             @click="nextChapter"
             :disabled="
               chapterStore.selectedChapter ===
               chapterStore.chapterOptions.length
             "
-            type="primary"
             class="nav-button"
           >
             <span class="nav-text">Chương tiếp</span>
             <i class="fas fa-chevron-right mobile-icon"></i>
-          </n-button>
+          </button>
         </div>
       </div>
     </div>
@@ -124,7 +134,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import { useChapterStore } from '../../stores/chapterStore';
-import { NButton, NSelect } from 'naive-ui';
 import TheHeader from '../../components/TheHeader.vue';
 import api from '../../services/axiosInterceptor';
 import SettingsModal from '../../components/SettingsModal.vue';
@@ -227,7 +236,8 @@ const nextChapter = () => {
   }
 };
 
-const updateChapterAndFetchContent = (newChapter) => {
+const updateChapterAndFetchContent = (event) => {
+  const newChapter = parseInt(event.target.value);
   if (chapterStore.selectedChapter !== newChapter) {
     chapterStore.setSelectedChapter(newChapter);
   }
@@ -296,9 +306,8 @@ onMounted(() => {
   }
 });
 </script>
-<style>
-/* Wrap all styles in .reading-page-wrapper to avoid conflicts */
 
+<style scoped>
 /* ========== BACKGROUND ========== */
 .reading-page-wrapper body {
   will-change: filter;
@@ -411,29 +420,35 @@ onMounted(() => {
 .reading-page-wrapper .nav-button {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   min-width: 140px;
-  padding: 14px 24px !important;
-  font-size: 1rem !important;
-  font-weight: 600 !important;
-  border-radius: 12px !important;
-  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%) !important;
-  border: none !important;
-  color: white !important;
+  padding: 14px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  border: none;
+  color: white;
   cursor: pointer;
-  transition: all 0.3s ease !important;
-  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.2) !important;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.2);
 }
 
 .reading-page-wrapper .nav-button:hover:not(:disabled) {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 16px rgba(12, 113, 61, 0.3) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(12, 113, 61, 0.3);
+  background: linear-gradient(135deg, #0a5a31 0%, #084428 100%);
+}
+
+.reading-page-wrapper .nav-button:active {
+  transform: translateY(0);
 }
 
 .reading-page-wrapper .nav-button:disabled {
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
-  background: #ccc !important;
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #ccc;
 }
 
 .reading-page-wrapper .nav-button i {
@@ -456,7 +471,27 @@ onMounted(() => {
 
 .reading-page-wrapper .chapter-select {
   width: 100%;
-  border-radius: 12px !important;
+  padding: 12px 16px;
+  border: 2px solid #0c713d;
+  border-radius: 12px;
+  background: white;
+  font-size: 0.95rem;
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(12, 113, 61, 0.1);
+}
+
+.reading-page-wrapper .chapter-select:hover {
+  border-color: #0a5a31;
+  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.2);
+}
+
+.reading-page-wrapper .chapter-select:focus {
+  outline: none;
+  border-color: #0c713d;
+  box-shadow: 0 0 0 4px rgba(12, 113, 61, 0.15);
 }
 
 /* ========== SNOWFLAKE DIVIDER ========== */
@@ -616,16 +651,12 @@ body[style*='color:#ffffff'] .reading-page-wrapper .chapter-title {
 }
 
 body[style*='color: rgb(255, 255, 255)'] .reading-page-wrapper .chapter-content,
-body[style*='color:#ffffff'] .reading-page-wrapper .chapter-content {
-  color: #e5e5e5 !important;
-}
-
+body[style*='color:#ffffff'] .reading-page-wrapper .chapter-content,
 body[style*='color: rgb(255, 255, 255)'] .reading-page-wrapper .paragraph,
 body[style*='color:#ffffff'] .reading-page-wrapper .paragraph {
   color: #e5e5e5 !important;
 }
 
-/* BỎ hiệu ứng hover ở night mode */
 body[style*='color: rgb(255, 255, 255)'] .reading-page-wrapper .paragraph:hover,
 body[style*='color:#ffffff'] .reading-page-wrapper .paragraph:hover {
   color: #e5e5e5 !important;
@@ -640,6 +671,13 @@ body[style*='color: rgb(255, 255, 255)'] .reading-page-wrapper .spinner,
 body[style*='color:#ffffff'] .reading-page-wrapper .spinner {
   border: 4px solid rgba(74, 222, 128, 0.2) !important;
   border-top-color: #4ade80 !important;
+}
+
+body[style*='color: rgb(255, 255, 255)'] .reading-page-wrapper .chapter-select,
+body[style*='color:#ffffff'] .reading-page-wrapper .chapter-select {
+  background: var(--dark-bg-elevated) !important;
+  border-color: var(--dark-accent-green) !important;
+  color: var(--dark-text-primary) !important;
 }
 
 /* ========== DARK MODE - APP-WIDE ========== */
@@ -665,10 +703,7 @@ html.dark-mode .reading-page-wrapper .chapter-title {
   text-shadow: 1px 1px 2px rgba(248, 113, 113, 0.2) !important;
 }
 
-html.dark-mode .reading-page-wrapper .chapter-content {
-  color: #e5e5e5 !important;
-}
-
+html.dark-mode .reading-page-wrapper .chapter-content,
 html.dark-mode .reading-page-wrapper .paragraph {
   color: #e5e5e5 !important;
 }
@@ -686,10 +721,36 @@ html.dark-mode .reading-page-wrapper .spinner {
   border-top-color: #4ade80 !important;
 }
 
+html.dark-mode .reading-page-wrapper .chapter-select {
+  background: var(--dark-bg-elevated) !important;
+  border-color: var(--dark-accent-green) !important;
+  color: var(--dark-text-primary) !important;
+}
+
+html.dark-mode .reading-page-wrapper .loading-content p {
+  color: var(--dark-text-secondary) !important;
+}
+
 /* ========== RESPONSIVE DESIGN ========== */
 
-/* Tablet */
-@media (max-width: 1024px) {
+/* Tablet (1024px - 1440px) */
+@media (max-width: 1440px) and (min-width: 1024px) {
+  .reading-page-wrapper .container {
+    max-width: 75%;
+    padding: 45px 55px;
+  }
+
+  .reading-page-wrapper .story-title {
+    font-size: 3.2rem;
+  }
+
+  .reading-page-wrapper .chapter-title {
+    font-size: 1.9rem;
+  }
+}
+
+/* Tablet (768px - 1023px) */
+@media (max-width: 1023px) {
   .reading-page-wrapper .reading-wrapper {
     padding: 70px 20px 50px;
   }
@@ -718,7 +779,7 @@ html.dark-mode .reading-page-wrapper .spinner {
 
   .reading-page-wrapper .nav-button {
     min-width: 120px;
-    padding: 12px 20px !important;
+    padding: 12px 20px;
   }
 
   .reading-page-wrapper .custom-background-layer,
@@ -730,8 +791,8 @@ html.dark-mode .reading-page-wrapper .spinner {
   }
 }
 
-/* Mobile */
-@media (max-width: 768px) {
+/* Mobile (481px - 767px) */
+@media (max-width: 767px) {
   .reading-page-wrapper .reading-wrapper {
     padding: 50px 10px 30px;
   }
@@ -769,8 +830,8 @@ html.dark-mode .reading-page-wrapper .spinner {
 
   .reading-page-wrapper .nav-button {
     min-width: auto;
-    padding: 10px 12px !important;
-    font-size: 0.9rem !important;
+    padding: 10px 12px;
+    font-size: 0.9rem;
   }
 
   .reading-page-wrapper .nav-button i {
@@ -790,6 +851,11 @@ html.dark-mode .reading-page-wrapper .spinner {
     flex: 1;
     max-width: 180px;
     min-width: 120px;
+  }
+
+  .reading-page-wrapper .chapter-select {
+    padding: 10px 12px;
+    font-size: 0.85rem;
   }
 
   .reading-page-wrapper .snowflake-divider {
@@ -829,7 +895,7 @@ html.dark-mode .reading-page-wrapper .spinner {
   }
 }
 
-/* Small Mobile */
+/* Small Mobile (361px - 480px) */
 @media (max-width: 480px) {
   .reading-page-wrapper .reading-wrapper {
     padding: 45px 5px 20px;
@@ -867,14 +933,19 @@ html.dark-mode .reading-page-wrapper .spinner {
   }
 
   .reading-page-wrapper .nav-button {
-    padding: 8px 10px !important;
-    font-size: 0.85rem !important;
+    padding: 8px 10px;
+    font-size: 0.85rem;
   }
 
   .reading-page-wrapper .chapter-select-container {
     flex: 1;
     min-width: 90px;
     max-width: 120px;
+  }
+
+  .reading-page-wrapper .chapter-select {
+    padding: 8px 10px;
+    font-size: 0.8rem;
   }
 
   .reading-page-wrapper .snowflake-divider {
@@ -914,7 +985,7 @@ html.dark-mode .reading-page-wrapper .spinner {
   }
 }
 
-/* Extra Small Mobile */
+/* Extra Small Mobile (≤360px) */
 @media (max-width: 360px) {
   .reading-page-wrapper .reading-wrapper {
     padding: 40px 3px 15px;
@@ -950,8 +1021,8 @@ html.dark-mode .reading-page-wrapper .spinner {
   }
 
   .reading-page-wrapper .nav-button {
-    padding: 6px 8px !important;
-    font-size: 0.8rem !important;
+    padding: 6px 8px;
+    font-size: 0.8rem;
   }
 
   .reading-page-wrapper .mobile-icon {
@@ -961,6 +1032,11 @@ html.dark-mode .reading-page-wrapper .spinner {
   .reading-page-wrapper .chapter-select-container {
     min-width: 80px;
     max-width: 100px;
+  }
+
+  .reading-page-wrapper .chapter-select {
+    padding: 7px 8px;
+    font-size: 0.75rem;
   }
 
   .reading-page-wrapper .snowflake-divider {
@@ -989,6 +1065,16 @@ html.dark-mode .reading-page-wrapper .spinner {
   .reading-page-wrapper .paragraph {
     text-indent: 1.2em;
     margin-bottom: 0.75rem;
+  }
+
+  .reading-page-wrapper .loading-content {
+    padding: 40px 15px;
+  }
+
+  .reading-page-wrapper .spinner {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
   }
 }
 </style>

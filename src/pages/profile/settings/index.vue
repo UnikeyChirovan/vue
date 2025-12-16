@@ -8,7 +8,7 @@
     <div class="settings-container">
       <!-- 1. Thông tin cá nhân -->
       <div class="settings-card">
-        <div class="card-header">
+        <div class="card-header" @click="toggleSection('personal')">
           <div class="header-left">
             <i class="fas fa-user-circle"></i>
             <div>
@@ -16,13 +16,13 @@
               <p>Kiểm soát ai có thể xem thông tin của bạn</p>
             </div>
           </div>
-          <n-button text @click="toggleSection('personal')" class="toggle-btn">
+          <button class="toggle-btn">
             <i
               :class="
                 expanded.personal ? 'fas fa-chevron-up' : 'fas fa-chevron-down'
               "
             ></i>
-          </n-button>
+          </button>
         </div>
 
         <transition name="expand">
@@ -41,20 +41,22 @@
                   </span>
                 </div>
               </div>
-              <n-switch v-model:value="visibility[key]" />
+              <label class="switch">
+                <input type="checkbox" v-model="visibility[key]" />
+                <span class="slider"></span>
+              </label>
             </div>
 
             <div class="quick-actions">
-              <n-button @click="toggleAllPersonal(true)" size="small" secondary>
+              <button @click="toggleAllPersonal(true)" class="quick-action-btn">
                 <i class="fas fa-eye"></i> Hiện tất cả
-              </n-button>
-              <n-button
+              </button>
+              <button
                 @click="toggleAllPersonal(false)"
-                size="small"
-                secondary
+                class="quick-action-btn secondary"
               >
                 <i class="fas fa-eye-slash"></i> Ẩn tất cả
-              </n-button>
+              </button>
             </div>
           </div>
         </transition>
@@ -62,7 +64,7 @@
 
       <!-- 2. Tin nhắn & Giao tiếp -->
       <div class="settings-card">
-        <div class="card-header">
+        <div class="card-header" @click="toggleSection('messaging')">
           <div class="header-left">
             <i class="fas fa-comment-dots"></i>
             <div>
@@ -70,13 +72,13 @@
               <p>Cài đặt cách bạn nhận và gửi tin nhắn</p>
             </div>
           </div>
-          <n-button text @click="toggleSection('messaging')" class="toggle-btn">
+          <button class="toggle-btn">
             <i
               :class="
                 expanded.messaging ? 'fas fa-chevron-up' : 'fas fa-chevron-down'
               "
             ></i>
-          </n-button>
+          </button>
         </div>
 
         <transition name="expand">
@@ -95,7 +97,13 @@
                   </span>
                 </div>
               </div>
-              <n-switch v-model:value="messagingSettings.allow_messages" />
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  v-model="messagingSettings.allow_messages"
+                />
+                <span class="slider"></span>
+              </label>
             </div>
 
             <div class="setting-item">
@@ -108,7 +116,13 @@
                   >
                 </div>
               </div>
-              <n-switch v-model:value="messagingSettings.notifications" />
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  v-model="messagingSettings.notifications"
+                />
+                <span class="slider"></span>
+              </label>
             </div>
 
             <div class="setting-item">
@@ -121,7 +135,10 @@
                   >
                 </div>
               </div>
-              <n-switch v-model:value="messagingSettings.sound" />
+              <label class="switch">
+                <input type="checkbox" v-model="messagingSettings.sound" />
+                <span class="slider"></span>
+              </label>
             </div>
 
             <div class="setting-item">
@@ -134,7 +151,13 @@
                   >
                 </div>
               </div>
-              <n-switch v-model:value="messagingSettings.show_online_status" />
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  v-model="messagingSettings.show_online_status"
+                />
+                <span class="slider"></span>
+              </label>
             </div>
           </div>
         </transition>
@@ -142,7 +165,7 @@
 
       <!-- 3. Quyền riêng tư & Bảo mật -->
       <div class="settings-card">
-        <div class="card-header">
+        <div class="card-header" @click="toggleSection('privacy')">
           <div class="header-left">
             <i class="fas fa-shield-alt"></i>
             <div>
@@ -150,18 +173,18 @@
               <p>Quản lý ai có thể tương tác với bạn</p>
             </div>
           </div>
-          <n-button text @click="toggleSection('privacy')" class="toggle-btn">
+          <button class="toggle-btn">
             <i
               :class="
                 expanded.privacy ? 'fas fa-chevron-up' : 'fas fa-chevron-down'
               "
             ></i>
-          </n-button>
+          </button>
         </div>
 
         <transition name="expand">
           <div v-show="expanded.privacy" class="card-content">
-            <div class="setting-item" @click="openBlockedModal">
+            <div class="setting-item clickable" @click="openBlockedModal">
               <div class="setting-info">
                 <i class="fas fa-ban"></i>
                 <div>
@@ -181,14 +204,20 @@
                   <label>Chế độ riêng tư tài khoản</label>
                   <span class="setting-description">
                     {{
-                      privacySettings.privateAccount
+                      privacySettings.private_account
                         ? 'Tài khoản riêng tư'
                         : 'Tài khoản công khai'
                     }}
                   </span>
                 </div>
               </div>
-              <n-switch v-model:value="privacySettings.privateAccount" />
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  v-model="privacySettings.private_account"
+                />
+                <span class="slider"></span>
+              </label>
             </div>
 
             <div class="setting-item">
@@ -201,7 +230,10 @@
                   >
                 </div>
               </div>
-              <n-switch v-model:value="privacySettings.allowSearch" />
+              <label class="switch">
+                <input type="checkbox" v-model="privacySettings.allow_search" />
+                <span class="slider"></span>
+              </label>
             </div>
           </div>
         </transition>
@@ -209,7 +241,7 @@
 
       <!-- 4. Thông báo -->
       <div class="settings-card">
-        <div class="card-header">
+        <div class="card-header" @click="toggleSection('notifications')">
           <div class="header-left">
             <i class="fas fa-bell"></i>
             <div>
@@ -217,11 +249,7 @@
               <p>Chọn loại thông báo bạn muốn nhận</p>
             </div>
           </div>
-          <n-button
-            text
-            @click="toggleSection('notifications')"
-            class="toggle-btn"
-          >
+          <button class="toggle-btn">
             <i
               :class="
                 expanded.notifications
@@ -229,7 +257,7 @@
                   : 'fas fa-chevron-down'
               "
             ></i>
-          </n-button>
+          </button>
         </div>
 
         <transition name="expand">
@@ -244,7 +272,13 @@
                   >
                 </div>
               </div>
-              <n-switch v-model:value="notificationSettings.likesComments" />
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  v-model="notificationSettings.likesComments"
+                />
+                <span class="slider"></span>
+              </label>
             </div>
 
             <div class="setting-item">
@@ -257,7 +291,13 @@
                   >
                 </div>
               </div>
-              <n-switch v-model:value="notificationSettings.newFollowers" />
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  v-model="notificationSettings.newFollowers"
+                />
+                <span class="slider"></span>
+              </label>
             </div>
 
             <div class="setting-item">
@@ -270,7 +310,13 @@
                   >
                 </div>
               </div>
-              <n-switch v-model:value="notificationSettings.mentions" />
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  v-model="notificationSettings.mentions"
+                />
+                <span class="slider"></span>
+              </label>
             </div>
           </div>
         </transition>
@@ -279,16 +325,11 @@
 
     <!-- Save Button -->
     <div class="save-section">
-      <n-button
-        type="primary"
-        @click="saveSettings"
-        class="save-btn"
-        size="large"
-        :loading="saving"
-      >
-        <i class="fas fa-save"></i>
-        Lưu Tất Cả Thay Đổi
-      </n-button>
+      <button @click="saveSettings" class="save-btn" :disabled="saving">
+        <i v-if="saving" class="fas fa-spinner fa-spin"></i>
+        <i v-else class="fas fa-save"></i>
+        <span>{{ saving ? 'Đang lưu...' : 'Lưu Tất Cả Thay Đổi' }}</span>
+      </button>
     </div>
 
     <!-- Blocked List Modal -->
@@ -300,18 +341,18 @@
 import { useMenuProfile } from '../../../stores/use-menu-profile';
 useMenuProfile().onSelectedKey(['profile-settings']);
 import { ref, computed, onMounted } from 'vue';
-import { useMessage } from 'naive-ui';
+import { useToast } from '../../../stores/useToast';
 import api from '../../../services/axiosInterceptor';
 import apiLinks from '../../../services/api-links';
 import { useAuthStore } from '../../../stores/auth';
 import { useProfileStore } from '../../../stores/profile';
 import BlockedListModal from '../../../components/BlockedListModal.vue';
 
+const toast = useToast();
 const blockedModalRef = ref(null);
 const auth = useAuthStore();
 const profile = useProfileStore();
 const id = auth.user?.id;
-const message = useMessage();
 const saving = ref(false);
 
 // Expanded sections
@@ -342,8 +383,8 @@ const messagingSettings = ref({
 });
 
 const privacySettings = ref({
-  privateAccount: false,
-  allowSearch: true,
+  private_account: false,
+  allow_search: true,
 });
 
 const notificationSettings = ref({
@@ -424,7 +465,7 @@ onMounted(async () => {
       show_online_status: messagingRes.data.show_online_status,
     };
 
-    // Load privacy settings từ database (THAY ĐỔI Ở ĐÂY)
+    // Load privacy settings
     try {
       const privacySettingsRes = await apiLinks.profile.getPrivacySettings();
       privacySettings.value = {
@@ -435,7 +476,7 @@ onMounted(async () => {
       console.error('Error loading privacy settings:', error);
     }
 
-    // Notification settings vẫn dùng localStorage tạm thời
+    // Notification settings
     const savedNotificationSettings = localStorage.getItem(
       'notification_settings'
     );
@@ -459,25 +500,25 @@ const saveSettings = async () => {
     // Save messaging settings
     await apiLinks.chat.updateSettings(messagingSettings.value);
 
-    // Save privacy settings vào database (THAY ĐỔI Ở ĐÂY)
+    // Save privacy settings
     await apiLinks.profile.updatePrivacySettings({
       private_account: privacySettings.value.private_account,
       allow_search: privacySettings.value.allow_search,
     });
 
-    // Notification settings vẫn lưu localStorage tạm thời
+    // Notification settings
     localStorage.setItem(
       'notification_settings',
       JSON.stringify(notificationSettings.value)
     );
 
-    message.success('Đã lưu tất cả cài đặt!');
+    toast.success('Đã lưu tất cả cài đặt!');
 
     // Clear cache
     sessionStorage.removeItem('user_profile');
     profile.getProfile(id);
   } catch (error) {
-    message.error('Lỗi khi lưu cài đặt.');
+    toast.error('Lỗi khi lưu cài đặt.');
     console.error(error);
   } finally {
     saving.value = false;
@@ -489,7 +530,13 @@ const saveSettings = async () => {
 .settings-page {
   max-width: 900px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 80px 20px 60px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+}
+
+html.dark-mode .settings-page {
+  background: linear-gradient(180deg, #0a0a0a 0%, #121212 100%);
 }
 
 .settings-header {
@@ -527,8 +574,17 @@ const saveSettings = async () => {
   transition: all 0.3s ease;
 }
 
+html.dark-mode .settings-card {
+  background: #1e1e1e;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 .settings-card:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+html.dark-mode .settings-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
 .card-header {
@@ -539,6 +595,10 @@ const saveSettings = async () => {
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   cursor: pointer;
   user-select: none;
+}
+
+html.dark-mode .card-header {
+  background: linear-gradient(135deg, #252525 0%, #2a2a2a 100%);
 }
 
 .header-left {
@@ -553,11 +613,19 @@ const saveSettings = async () => {
   color: #667eea;
 }
 
+html.dark-mode .header-left > i {
+  color: #8b9cf6;
+}
+
 .card-header h2 {
   margin: 0 0 4px 0;
   font-size: 20px;
   font-weight: 600;
   color: #2d3748;
+}
+
+html.dark-mode .card-header h2 {
+  color: #e0e0e0;
 }
 
 .card-header p {
@@ -566,9 +634,26 @@ const saveSettings = async () => {
   color: #718096;
 }
 
+html.dark-mode .card-header p {
+  color: #b0b0b0;
+}
+
 .toggle-btn {
+  background: transparent;
+  border: none;
   color: #667eea;
   font-size: 20px;
+  cursor: pointer;
+  padding: 8px;
+  transition: all 0.3s ease;
+}
+
+html.dark-mode .toggle-btn {
+  color: #8b9cf6;
+}
+
+.toggle-btn:hover {
+  transform: scale(1.1);
 }
 
 .card-content {
@@ -586,22 +671,25 @@ const saveSettings = async () => {
   transition: all 0.2s ease;
 }
 
+html.dark-mode .setting-item {
+  background: #252525;
+}
+
 .setting-item:hover {
   background: #e9ecef;
   transform: translateX(4px);
 }
 
-.setting-item:last-child {
-  margin-bottom: 0;
+html.dark-mode .setting-item:hover {
+  background: #2a2a2a;
 }
 
-.setting-item.highlighted {
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0.1) 0%,
-    rgba(118, 75, 162, 0.1) 100%
-  );
-  border: 2px solid rgba(102, 126, 234, 0.3);
+.setting-item.clickable {
+  cursor: pointer;
+}
+
+.setting-item:last-child {
+  margin-bottom: 0;
 }
 
 .setting-info {
@@ -618,12 +706,21 @@ const saveSettings = async () => {
   text-align: center;
 }
 
+html.dark-mode .setting-info > i {
+  color: #8b9cf6;
+}
+
 .setting-info label {
   display: block;
   font-weight: 600;
   font-size: 15px;
   color: #2d3748;
   margin-bottom: 2px;
+  cursor: pointer;
+}
+
+html.dark-mode .setting-info label {
+  color: #e0e0e0;
 }
 
 .setting-description {
@@ -632,6 +729,66 @@ const saveSettings = async () => {
   color: #718096;
 }
 
+html.dark-mode .setting-description {
+  color: #b0b0b0;
+}
+
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 28px;
+}
+
+html.dark-mode .slider {
+  background-color: #444;
+}
+
+.slider:before {
+  position: absolute;
+  content: '';
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #667eea;
+}
+
+html.dark-mode input:checked + .slider {
+  background-color: #8b9cf6;
+}
+
+input:checked + .slider:before {
+  transform: translateX(24px);
+}
+
+/* Quick Actions */
 .quick-actions {
   display: flex;
   gap: 12px;
@@ -641,6 +798,41 @@ const saveSettings = async () => {
   border-top: 1px solid #e2e8f0;
 }
 
+html.dark-mode .quick-actions {
+  border-top-color: #333;
+}
+
+.quick-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.quick-action-btn.secondary {
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+  box-shadow: 0 2px 8px rgba(100, 116, 139, 0.3);
+}
+
+.quick-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.quick-action-btn.secondary:hover {
+  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.4);
+}
+
+/* Save Section */
 .save-section {
   display: flex;
   justify-content: center;
@@ -651,23 +843,57 @@ const saveSettings = async () => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+html.dark-mode .save-section {
+  background: #1e1e1e;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 .save-btn {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
   padding: 14px 48px;
-  border-radius: 28px;
+  border-radius: 50px;
   font-weight: 600;
   font-size: 16px;
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  position: relative;
+  overflow: hidden;
 }
 
-.save-btn:hover {
+.save-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s,
+    height 0.6s;
+}
+
+.save-btn:hover:not(:disabled)::before {
+  width: 300px;
+  height: 300px;
+}
+
+.save-btn:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+}
+
+.save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* Expand Animation */
@@ -687,5 +913,155 @@ const saveSettings = async () => {
 .expand-leave-from {
   max-height: 1000px;
   opacity: 1;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Tablet */
+@media (max-width: 768px) {
+  .settings-page {
+    padding: 70px 16px 50px;
+  }
+
+  .settings-header {
+    padding: 25px 18px;
+    margin-bottom: 32px;
+  }
+
+  .settings-header h1 {
+    font-size: 28px;
+  }
+
+  .settings-header p {
+    font-size: 15px;
+  }
+
+  .card-header {
+    padding: 18px 20px;
+  }
+
+  .header-left > i {
+    font-size: 28px;
+  }
+
+  .card-header h2 {
+    font-size: 18px;
+  }
+
+  .card-content {
+    padding: 18px 20px;
+  }
+
+  .setting-item {
+    padding: 14px;
+  }
+
+  .quick-actions {
+    flex-direction: column;
+  }
+
+  .quick-action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .save-section {
+    padding: 20px;
+  }
+
+  .save-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .settings-page {
+    padding: 60px 12px 40px;
+  }
+
+  .settings-header {
+    padding: 22px 16px;
+    margin-bottom: 28px;
+  }
+
+  .settings-header h1 {
+    font-size: 24px;
+  }
+
+  .settings-header p {
+    font-size: 14px;
+  }
+
+  .card-header {
+    padding: 16px 18px;
+  }
+
+  .header-left {
+    gap: 12px;
+  }
+
+  .header-left > i {
+    font-size: 26px;
+  }
+  .card-header h2 {
+    font-size: 16px;
+  }
+
+  .card-header p {
+    font-size: 12px;
+  }
+
+  .card-content {
+    padding: 16px;
+  }
+
+  .setting-item {
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .setting-info {
+    gap: 10px;
+  }
+
+  .setting-info > i {
+    font-size: 18px;
+  }
+
+  .setting-info label {
+    font-size: 14px;
+  }
+
+  .setting-description {
+    font-size: 11px;
+  }
+
+  .switch {
+    width: 46px;
+    height: 24px;
+  }
+
+  .slider:before {
+    width: 18px;
+    height: 18px;
+    left: 3px;
+    bottom: 3px;
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(22px);
+  }
+
+  .save-section {
+    padding: 16px;
+    margin-top: 24px;
+  }
+
+  .save-btn {
+    padding: 12px 32px;
+    font-size: 15px;
+  }
 }
 </style>

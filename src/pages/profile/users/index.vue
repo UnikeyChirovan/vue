@@ -1,10 +1,10 @@
 <template>
   <div class="profile-page">
-    <!-- Cover Section - Từ code cũ -->
+    <!-- Cover Section -->
     <div class="cover-section">
       <div class="cover-container" v-show="!showChange && !showEdit">
         <img
-          :src="coverUrl ? coverUrl : 'https://picsum.photos/1200x300'"
+          :src="coverUrl ? coverUrl : 'https://picsum.photos/1200/300'"
           alt="Cover Image"
           class="cover-img"
           :style="coverStyle"
@@ -12,16 +12,17 @@
       </div>
 
       <div class="cover-change" v-if="showChange">
-        <n-upload
-          :headers="uploadHeaders"
-          :max-file="1"
+        <input
+          type="file"
+          ref="coverInput"
+          @change="handleCoverUpload"
           accept="image/*"
-          @change="handleUpload"
-          class="upload-container"
-          :show-file-list="false"
-        >
-          <n-button type="primary" class="select-image-btn">Chọn hình</n-button>
-        </n-upload>
+          style="display: none"
+        />
+        <button @click="$refs.coverInput.click()" class="select-image-btn">
+          <i class="fa-solid fa-image"></i>
+          <span>Chọn hình</span>
+        </button>
 
         <div
           class="custom-cover"
@@ -37,26 +38,18 @@
           />
         </div>
 
-        <n-space class="slider-container">
-          <n-slider
-            v-model:value="coverPosition"
-            :min="-1000"
-            :max="0"
-            vertical
-          >
-            <template #thumb>
-              <n-icon-wrapper :size="24" :border-radius="12">
-                <n-icon :size="18" :component="AnimalCat24Regular" />
-              </n-icon-wrapper>
-            </template>
-          </n-slider>
-        </n-space>
-        <n-button @click="cancelChange" class="cancel-button" type="error"
-          >Hủy</n-button
-        >
-        <n-button @click="saveNewCover" class="save-button" type="info"
-          >Lưu</n-button
-        >
+        <div class="slider-container">
+          <input
+            type="range"
+            v-model="coverPosition"
+            min="-1000"
+            max="0"
+            orient="vertical"
+            class="vertical-slider"
+          />
+        </div>
+        <button @click="cancelChange" class="cancel-button">Hủy</button>
+        <button @click="saveNewCover" class="save-button">Lưu</button>
       </div>
 
       <div class="cover-edit" v-if="showEdit">
@@ -73,34 +66,46 @@
             :style="coverStyle"
           />
         </div>
-        <n-space class="slider-container">
-          <n-slider
-            v-model:value="coverPosition"
-            :min="-1000"
-            :max="0"
-            vertical
+        <div class="slider-container">
+          <input
+            type="range"
+            v-model="coverPosition"
+            min="-1000"
+            max="0"
+            orient="vertical"
+            class="vertical-slider"
           />
-        </n-space>
-        <n-button @click="cancelEdit" class="cancel-button" type="error"
-          >Hủy</n-button
-        >
-        <n-button @click="saveEditedCover" class="save-button" type="info"
-          >Lưu</n-button
-        >
+        </div>
+        <button @click="cancelEdit" class="cancel-button">Hủy</button>
+        <button @click="saveEditedCover" class="save-button">Lưu</button>
       </div>
 
       <div class="edit-cover-btn" v-if="authStore.user?.id === users.id">
-        <n-dropdown :options="options" @select="handleSelect">
-          <n-button strong secondary round type="primary">
+        <div class="dropdown">
+          <button class="dropdown-toggle">
             <i class="fa-solid fa-gear"></i>
-          </n-button>
-        </n-dropdown>
+          </button>
+          <div class="dropdown-menu">
+            <button @click="handleSelect('viewcover')" class="dropdown-item">
+              <i class="fa-solid fa-eye"></i>
+              <span>Coi Hình</span>
+            </button>
+            <button @click="handleSelect('changecover')" class="dropdown-item">
+              <i class="fa-solid fa-cloud-upload-alt"></i>
+              <span>Thay Hình</span>
+            </button>
+            <button @click="handleSelect('settingcover')" class="dropdown-item">
+              <i class="fa-solid fa-pen"></i>
+              <span>Sửa Hình</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Avatar Section - Từ code cũ -->
+    <!-- Avatar Section -->
     <div class="avatar-section">
-      <n-image
+      <img
         class="avatar-img"
         alt="User Profile"
         :src="avatarUrl || 'https://picsum.photos/150'"
@@ -114,11 +119,21 @@
       </button>
     </div>
 
-    <n-modal v-model:show="showViewModal" title="Xem hình cover">
-      <n-image :src="coverUrl" class="full-cover-img" />
-    </n-modal>
+    <!-- View Cover Modal -->
+    <div
+      v-if="showViewModal"
+      class="modal-overlay"
+      @click="showViewModal = false"
+    >
+      <div class="modal-content" @click.stop>
+        <button @click="showViewModal = false" class="modal-close">
+          <i class="fa-solid fa-times"></i>
+        </button>
+        <img :src="coverUrl" class="full-cover-img" />
+      </div>
+    </div>
 
-    <!-- Profile Header - Từ code mới -->
+    <!-- Profile Header -->
     <div class="profile-header-content">
       <h1 class="username-title">{{ users.name }}</h1>
       <div class="rating-stars">
@@ -149,7 +164,7 @@
       </div>
     </div>
 
-    <!-- Profile Content Cards - Từ code mới -->
+    <!-- Profile Content Cards -->
     <div class="profile-content-wrapper">
       <!-- Personal Info Card -->
       <div class="profile-card">
@@ -308,22 +323,19 @@
 <script setup>
 import { storeToRefs } from 'pinia';
 import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue';
-import { useMessage } from 'naive-ui';
 import { useAuthStore } from '../../../stores/auth.js';
 import { useMenuProfile } from '../../../stores/use-menu-profile.js';
 import { useProfileStore } from '../../../stores/profile.js';
 import { useGeneralStore } from '../../../stores/general';
 import { useChatStore } from '../../../stores/chatStore.js';
+import { useToast } from '../../../stores/useToast';
 import api from '../../../services/axiosInterceptor.js';
 import dayjs from 'dayjs';
-import AnimalCat24Regular from '@vicons/fluent/AnimalCat24Regular';
 import ExploreModal from '../../../components/ExploreModal.vue';
 import FollowingListModal from '../../../components/FollowingListModal.vue';
 import ChatInboxModal from '../../../components/ChatInboxModal.vue';
-import { h } from 'vue';
-import { NIcon } from 'naive-ui';
-import { Pencil, Eye, CloudUpload } from '@vicons/ionicons5';
 
+const toast = useToast();
 const chatInboxModalRef = ref(null);
 const chatStore = useChatStore();
 const exploreModalRef = ref(null);
@@ -341,7 +353,6 @@ const { isCropperModal, avatarUpdated } = storeToRefs(useGeneral);
 
 const id = authStore.user?.id;
 const { users, avatarUrl, coverUrl } = storeToRefs(useProfile);
-const message = useMessage();
 
 const handleCameraClick = () => {
   isCropperModal.value = true;
@@ -367,16 +378,6 @@ watch(
     }
   }
 );
-
-function renderIcon(icon) {
-  return () => h(NIcon, null, { default: () => h(icon) });
-}
-
-const options = [
-  { label: 'Coi Hình', key: 'viewcover', icon: renderIcon(Eye) },
-  { label: 'Thay Hình', key: 'changecover', icon: renderIcon(CloudUpload) },
-  { label: 'Sửa Hình', key: 'settingcover', icon: renderIcon(Pencil) },
-];
 
 const uploadHeaders = { Authorization: `Bearer ${authStore.accessToken}` };
 
@@ -431,24 +432,27 @@ const cancelDrag = () => {
   users.cover_position = originalCoverPosition;
   coverStyle.value.transform = `translateY(${users.cover_position}px)`;
   stopDrag();
-  message.info('Thao tác kéo đã bị hủy và vị trí đã được khôi phục.');
+  toast.info('Thao tác kéo đã bị hủy và vị trí đã được khôi phục.');
 };
 
 const newCoverFile = ref(null);
 const newCoverUrl = ref(null);
 
-const handleUpload = ({ file }) => {
+const handleCoverUpload = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
   const reader = new FileReader();
-  reader.onload = (event) => {
-    newCoverUrl.value = event.target.result;
+  reader.onload = (e) => {
+    newCoverUrl.value = e.target.result;
   };
-  newCoverFile.value = file.file;
-  reader.readAsDataURL(file.file);
+  newCoverFile.value = file;
+  reader.readAsDataURL(file);
 };
 
 const saveNewCover = () => {
   if (!newCoverFile.value) {
-    message.error('Vui lòng chọn một tệp hình ảnh!');
+    toast.error('Vui lòng chọn một tệp hình ảnh!');
     return;
   }
   const formData = new FormData();
@@ -463,22 +467,22 @@ const saveNewCover = () => {
         useProfile.updateCoverPosition(response.data.positionY);
         useProfile.updateCoverUrl(response.data.url);
         showChange.value = false;
-        message.success('Cover đã được lưu thành công!');
+        toast.success('Cover đã được lưu thành công!');
       }
     })
-    .catch(() => message.error('Lưu hình cover thất bại!'));
+    .catch(() => toast.error('Lưu hình cover thất bại!'));
 };
 
 const cancelChange = () => {
   showChange.value = false;
   newCoverUrl.value = null;
-  message.info('Đã hủy thao tác thay đổi hình cover.');
+  toast.info('Đã hủy thao tác thay đổi hình cover.');
 };
 
 const cancelEdit = () => {
   showEdit.value = false;
   cover_position.value = originalCoverPosition;
-  message.info('Đã hủy thao tác chỉnh sửa hình cover.');
+  toast.info('Đã hủy thao tác chỉnh sửa hình cover.');
 };
 
 const showViewModal = ref(false);
@@ -507,10 +511,10 @@ const saveEditedCover = () => {
       if (response.status === 200) {
         useProfile.updateCoverPosition(response.data.positionY);
         showEdit.value = false;
-        message.success('Vị trí cover đã được lưu thành công!');
+        toast.success('Vị trí cover đã được lưu thành công!');
       }
     })
-    .catch(() => message.error('Lưu vị trí cover thất bại!'));
+    .catch(() => toast.error('Lưu vị trí cover thất bại!'));
 };
 
 const lastChapter = ref('');
@@ -554,143 +558,393 @@ onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKeyDown);
 });
 </script>
-
 <style lang="scss" scoped>
-/* ========== COVER & AVATAR - Từ code cũ ========== */
+/* ========== COVER & AVATAR ========== */
 .profile-page {
   font-family: 'Arial', sans-serif;
   background: linear-gradient(135deg, #e8ecf1 0%, #f5f7fa 100%);
   min-height: 100vh;
   padding-bottom: 40px;
-
-  .cover-section {
-    position: relative;
-    height: 300px;
-    background-color: #282c34;
-    overflow: hidden;
-
-    .cover-container,
-    .cover-change,
-    .cover-edit {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      position: relative;
-
-      .cover-img {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        object-fit: cover;
-      }
-    }
-
-    .edit-cover-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      border-radius: 5px;
-      cursor: pointer;
-
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.7);
-      }
-    }
-  }
-
-  .avatar-section {
-    position: relative;
-    margin-top: -100px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
-    z-index: 9;
-
-    .avatar-img {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid white;
-    }
-
-    .camera-btn {
-      position: absolute;
-      right: 0;
-      top: 150px;
-      background-color: #e2e8f0;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      width: 40px;
-      height: 40px;
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-
-      &:hover {
-        background-color: #cbd5e1;
-      }
-      i {
-        color: #333;
-      }
-    }
-  }
 }
 
+html.dark-mode .profile-page {
+  background: linear-gradient(135deg, #0a0a0a 0%, #121212 100%);
+}
+
+.cover-section {
+  position: relative;
+  height: 300px;
+  background-color: #282c34;
+  overflow: hidden;
+}
+
+html.dark-mode .cover-section {
+  background-color: #1a1a1a;
+}
+
+.cover-container,
+.cover-change,
+.cover-edit {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.cover-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  object-fit: cover;
+}
+
+.edit-cover-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.3);
+}
+
+html.dark-mode .dropdown-toggle {
+  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+  box-shadow: 0 4px 12px rgba(15, 138, 74, 0.3);
+}
+
+.dropdown-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
+}
+
+html.dark-mode .dropdown-toggle:hover {
+  box-shadow: 0 6px 20px rgba(15, 138, 74, 0.4);
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  min-width: 180px;
+  z-index: 1000;
+}
+
+html.dark-mode .dropdown-menu {
+  background: #1e1e1e;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+html.dark-mode .dropdown-item {
+  color: #e0e0e0;
+}
+
+.dropdown-item:hover {
+  background: rgba(12, 113, 61, 0.1);
+  color: #0c713d;
+}
+
+html.dark-mode .dropdown-item:hover {
+  background: rgba(15, 138, 74, 0.2);
+  color: #0f8a4a;
+}
+
+.dropdown-item i {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+.avatar-section {
+  position: relative;
+  margin-top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+  z-index: 9;
+}
+
+html.dark-mode .avatar-section {
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
+}
+
+html.dark-mode .avatar-img {
+  border-color: #1e1e1e;
+}
+
+.camera-btn {
+  position: absolute;
+  right: 0;
+  top: 150px;
+  background-color: #e2e8f0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 40px;
+  height: 40px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+html.dark-mode .camera-btn {
+  background-color: #333;
+}
+
+.camera-btn:hover {
+  background-color: #cbd5e1;
+}
+
+html.dark-mode .camera-btn:hover {
+  background-color: #444;
+}
+
+.camera-btn i {
+  color: #333;
+}
+
+html.dark-mode .camera-btn i {
+  color: #e0e0e0;
+}
+
+/* Cover Upload Controls */
 .custom-cover {
   width: 100%;
   height: auto;
   position: relative;
   user-select: none;
-
-  .img-cover-custom {
-    width: 100%;
-    object-fit: cover;
-    transition: transform 0.2s ease;
-  }
 }
 
-.upload-container {
+.img-cover-custom {
+  width: 100%;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.select-image-btn {
   position: absolute;
   top: 10px;
-  right: -10px;
+  right: 10px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.3);
 }
 
-.save-button {
+html.dark-mode .select-image-btn {
+  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+  box-shadow: 0 4px 12px rgba(15, 138, 74, 0.3);
+}
+
+.select-image-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
+}
+
+html.dark-mode .select-image-btn:hover {
+  box-shadow: 0 6px 20px rgba(15, 138, 74, 0.4);
+}
+
+.save-button,
+.cancel-button {
   position: absolute;
-  bottom: 3.5rem;
   right: 3rem;
-  width: 15%;
-  max-width: 20%;
+  padding: 12px 28px;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 10;
 }
 
+.save-button {
+  bottom: 3.5rem;
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+}
+
+html.dark-mode .save-button {
+  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+}
+
+.save-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
+}
+
 .cancel-button {
-  position: absolute;
   bottom: 1rem;
-  right: 3rem;
-  width: 15%;
-  max-width: 20%;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+html.dark-mode .cancel-button {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.cancel-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
 }
 
 .slider-container {
   position: absolute;
   right: 20px;
-  top: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 10;
 }
 
-/* ========== PROFILE HEADER - Từ code mới ========== */
+.vertical-slider {
+  -webkit-appearance: slider-vertical;
+  width: 8px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  outline: none;
+}
+
+html.dark-mode .vertical-slider {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.vertical-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0c713d;
+  cursor: pointer;
+}
+
+html.dark-mode .vertical-slider::-webkit-slider-thumb {
+  background: #0f8a4a;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+html.dark-mode .modal-content {
+  background: #1e1e1e;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.modal-close:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: rotate(90deg);
+}
+
+.full-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ========== PROFILE HEADER ========== */
 .profile-header-content {
   text-align: center;
   max-width: 900px;
@@ -706,16 +960,21 @@ onBeforeUnmount(() => {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+html.dark-mode .username-title {
+  color: #e0e0e0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 .rating-stars {
   display: flex;
   justify-content: center;
   gap: 6px;
   margin-bottom: 25px;
+}
 
-  i {
-    color: #16a34a;
-    font-size: 22px;
-  }
+.rating-stars i {
+  color: #16a34a;
+  font-size: 22px;
 }
 
 /* ========== ACTION BUTTONS ========== */
@@ -742,53 +1001,70 @@ onBeforeUnmount(() => {
   gap: 8px;
   position: relative;
   overflow: hidden;
+}
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    transform: translate(-50%, -50%);
-    transition:
-      width 0.6s,
-      height 0.6s;
-  }
+html.dark-mode .action-btn {
+  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+  box-shadow: 0 4px 12px rgba(15, 138, 74, 0.3);
+}
 
-  &:hover::before {
-    width: 300px;
-    height: 300px;
-  }
+.action-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s,
+    height 0.6s;
+}
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
-  }
+.action-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
 
-  &:active {
-    transform: translateY(0);
-  }
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
+}
+
+html.dark-mode .action-btn:hover {
+  box-shadow: 0 6px 20px rgba(15, 138, 74, 0.4);
+}
+
+.action-btn:active {
+  transform: translateY(0);
 }
 
 .list-btn {
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
 
-  &:hover {
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-  }
+html.dark-mode .list-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.list-btn:hover {
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
 }
 
 .inbox-btn {
   background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
   box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+}
 
-  &:hover {
-    box-shadow: 0 6px 20px rgba(8, 145, 178, 0.4);
-  }
+html.dark-mode .inbox-btn {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+}
+
+.inbox-btn:hover {
+  box-shadow: 0 6px 20px rgba(8, 145, 178, 0.4);
 }
 
 .badge-count {
@@ -805,7 +1081,7 @@ onBeforeUnmount(() => {
   text-align: center;
 }
 
-/* ========== PROFILE CARDS (FULL WIDTH) ========== */
+/* ========== PROFILE CARDS ========== */
 .profile-content-wrapper {
   max-width: 900px;
   margin: 0 auto;
@@ -821,6 +1097,21 @@ onBeforeUnmount(() => {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   width: 100%;
+  transition: all 0.3s ease;
+}
+
+html.dark-mode .profile-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.profile-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+html.dark-mode .profile-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
 }
 
 .card-header-green {
@@ -833,15 +1124,23 @@ onBeforeUnmount(() => {
   font-size: 18px;
   font-weight: 700;
   text-transform: uppercase;
+}
 
-  i {
-    font-size: 22px;
-  }
+html.dark-mode .card-header-green {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+}
+
+.card-header-green i {
+  font-size: 22px;
 }
 
 .card-body-white {
   background: white;
   padding: 28px;
+}
+
+html.dark-mode .card-body-white {
+  background: #1e1e1e;
 }
 
 /* Info Rows */
@@ -851,34 +1150,50 @@ onBeforeUnmount(() => {
   gap: 16px;
   padding: 14px 0;
   border-bottom: 1px solid #e5e7eb;
+}
 
-  &:last-child {
-    border-bottom: none;
-  }
+html.dark-mode .info-row {
+  border-bottom-color: #333;
+}
 
-  .icon-label {
-    font-size: 20px;
-    color: #16a34a;
-    width: 24px;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
+.info-row:last-child {
+  border-bottom: none;
+}
 
-  .info-content {
-    flex: 1;
+.icon-label {
+  font-size: 20px;
+  color: #16a34a;
+  width: 24px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
 
-    strong {
-      display: inline;
-      color: #1f2937;
-      font-size: 15px;
-      margin-right: 6px;
-    }
+html.dark-mode .icon-label {
+  color: #22c55e;
+}
 
-    span {
-      color: #6b7280;
-      font-size: 15px;
-    }
-  }
+.info-content {
+  flex: 1;
+}
+
+.info-content strong {
+  display: inline;
+  color: #1f2937;
+  font-size: 15px;
+  margin-right: 6px;
+}
+
+html.dark-mode .info-content strong {
+  color: #e0e0e0;
+}
+
+.info-content span {
+  color: #6b7280;
+  font-size: 15px;
+}
+
+html.dark-mode .info-content span {
+  color: #b0b0b0;
 }
 
 /* Stats Grid */
@@ -927,10 +1242,18 @@ onBeforeUnmount(() => {
   margin: 0 0 6px 0;
 }
 
+html.dark-mode .stat-number {
+  color: #e0e0e0;
+}
+
 .stat-label {
   font-size: 14px;
   color: #6b7280;
   margin: 0;
+}
+
+html.dark-mode .stat-label {
+  color: #b0b0b0;
 }
 
 /* History Items */
@@ -943,31 +1266,48 @@ onBeforeUnmount(() => {
   background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
   border-radius: 12px;
   border-left: 4px solid #16a34a;
+}
 
-  &:last-child {
-    margin-bottom: 0;
-  }
+html.dark-mode .history-item-box {
+  background: linear-gradient(135deg, #1a2e1a 0%, #254025 100%);
+  border-left-color: #22c55e;
+}
 
-  .history-icon {
-    font-size: 24px;
-    color: #16a34a;
-  }
+.history-item-box:last-child {
+  margin-bottom: 0;
+}
 
-  .history-text {
-    flex: 1;
+.history-icon {
+  font-size: 24px;
+  color: #16a34a;
+}
 
-    span {
-      color: #374151;
-      font-size: 15px;
-      margin-right: 8px;
-    }
+html.dark-mode .history-icon {
+  color: #22c55e;
+}
 
-    .history-number {
-      color: #dc2626;
-      font-size: 18px;
-      font-weight: 700;
-    }
-  }
+.history-text {
+  flex: 1;
+}
+
+.history-text span {
+  color: #374151;
+  font-size: 15px;
+  margin-right: 8px;
+}
+
+html.dark-mode .history-text span {
+  color: #b0b0b0;
+}
+
+.history-number {
+  color: #dc2626;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+html.dark-mode .history-number {
+  color: #ef4444;
 }
 
 /* Social Icons */
@@ -990,22 +1330,25 @@ onBeforeUnmount(() => {
   text-decoration: none;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
 
-  &:hover {
-    transform: translateY(-4px) scale(1.1);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-  }
+.social-circle:hover {
+  transform: translateY(-4px) scale(1.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
 .facebook-color {
   background: #3b5998;
 }
+
 .twitter-color {
   background: #1da1f2;
 }
+
 .linkedin-color {
   background: #0077b5;
 }
+
 .youtube-color {
   background: #ff0000;
 }
@@ -1036,10 +1379,10 @@ onBeforeUnmount(() => {
 
   .rating-stars {
     margin-bottom: 20px;
+  }
 
-    i {
-      font-size: 20px;
-    }
+  .rating-stars i {
+    font-size: 20px;
   }
 
   .action-buttons-group {
@@ -1062,10 +1405,10 @@ onBeforeUnmount(() => {
   .card-header-green {
     padding: 16px 20px;
     font-size: 16px;
+  }
 
-    i {
-      font-size: 20px;
-    }
+  .card-header-green i {
+    font-size: 20px;
   }
 
   .card-body-white {
@@ -1085,6 +1428,10 @@ onBeforeUnmount(() => {
     background: #f9fafb;
     border-radius: 12px;
     gap: 20px;
+  }
+
+  html.dark-mode .stat-circle-item {
+    background: #252525;
   }
 
   .stat-circle {
@@ -1111,6 +1458,23 @@ onBeforeUnmount(() => {
     padding-bottom: 30px;
   }
 
+  .cover-section {
+    height: 250px;
+  }
+
+  .avatar-section {
+    width: 150px;
+    height: 150px;
+    margin-top: -75px;
+  }
+
+  .camera-btn {
+    width: 35px;
+    height: 35px;
+    top: 110px;
+    font-size: 16px;
+  }
+
   .profile-header-content {
     margin: 16px auto 32px;
     padding: 0 12px;
@@ -1122,10 +1486,10 @@ onBeforeUnmount(() => {
 
   .rating-stars {
     margin-bottom: 18px;
+  }
 
-    i {
-      font-size: 18px;
-    }
+  .rating-stars i {
+    font-size: 18px;
   }
 
   .action-btn {
@@ -1149,10 +1513,10 @@ onBeforeUnmount(() => {
   .card-header-green {
     padding: 14px 18px;
     font-size: 15px;
+  }
 
-    i {
-      font-size: 18px;
-    }
+  .card-header-green i {
+    font-size: 18px;
   }
 
   .card-body-white {
@@ -1162,20 +1526,19 @@ onBeforeUnmount(() => {
   .info-row {
     padding: 12px 0;
     gap: 12px;
+  }
 
-    .icon-label {
-      font-size: 18px;
-      width: 20px;
-    }
+  .icon-label {
+    font-size: 18px;
+    width: 20px;
+  }
 
-    .info-content {
-      strong {
-        font-size: 14px;
-      }
-      span {
-        font-size: 14px;
-      }
-    }
+  .info-content strong {
+    font-size: 14px;
+  }
+
+  .info-content span {
+    font-size: 14px;
   }
 
   .stat-circle-item {
@@ -1199,25 +1562,39 @@ onBeforeUnmount(() => {
   .history-item-box {
     padding: 14px;
     gap: 12px;
+  }
 
-    .history-icon {
-      font-size: 20px;
-    }
+  .history-icon {
+    font-size: 20px;
+  }
 
-    .history-text {
-      span {
-        font-size: 14px;
-      }
-      .history-number {
-        font-size: 16px;
-      }
-    }
+  .history-text span {
+    font-size: 14px;
+  }
+
+  .history-number {
+    font-size: 16px;
   }
 
   .social-circle {
     width: 50px;
     height: 50px;
     font-size: 20px;
+  }
+
+  .save-button,
+  .cancel-button {
+    right: 1rem;
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  .save-button {
+    bottom: 3rem;
+  }
+
+  .cancel-button {
+    bottom: 0.5rem;
   }
 }
 
@@ -1239,6 +1616,11 @@ onBeforeUnmount(() => {
 
   .card-body-white {
     padding: 18px;
+  }
+
+  .avatar-section {
+    width: 120px;
+    height: 120px;
   }
 }
 </style>

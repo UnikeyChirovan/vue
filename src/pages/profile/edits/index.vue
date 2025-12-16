@@ -1,184 +1,308 @@
 <template>
   <form @submit.prevent="updateUsers()">
-    <a-card title="Cập nhật Tài khoản" style="width: 100%">
-      <div class="row mb-3">
-        <div class="col-12 col-sm-3 mb-3">
-          <div class="row mb-4">
-            <div class="col-12 d-flex justify-content-center mb-3">
-              <div class="custom-avatar">
-                <img
-                  :src="avatarUrl || '../../../assets/users.jpg'"
-                  alt="Avatar"
-                  class="img-avatar"
-                />
+    <div class="edit-card">
+      <div class="card-header-custom">
+        <h2>Cập nhật Tài khoản</h2>
+      </div>
+
+      <div class="card-body-custom">
+        <div class="form-layout">
+          <!-- Avatar & Cover Section -->
+          <div class="media-section">
+            <!-- Avatar -->
+            <div class="media-column">
+              <div class="media-box">
+                <div class="media-preview avatar-preview">
+                  <img
+                    :src="avatarUrl || '../../../assets/users.jpg'"
+                    alt="Avatar"
+                    class="media-img"
+                  />
+                </div>
               </div>
+              <button
+                type="button"
+                @click="deleteAvatar"
+                class="delete-btn equal-btn"
+              >
+                <i class="fa-solid fa-trash"></i>
+                <span>Xóa Avatar</span>
+              </button>
             </div>
-            <div class="col-12 d-flex justify-content-center mb-2">
-              <a-button type="danger" class="ms-2" @click="deleteAvatar">
-                <i class="fa-solid fa-trash me-2"></i>
-                <span>Xóa</span>
-              </a-button>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-12 d-flex justify-content-center mb-3">
-              <div class="custom-cover">
-                <img
-                  :src="coverUrl || '../../../assets/cover.jpg'"
-                  alt="Cover"
-                  class="img-cover-custom"
-                  :style="{ transform: `translateY(${coverStyle}px)` }"
-                />
+
+            <!-- Cover -->
+            <div class="media-column">
+              <div class="media-box">
+                <div class="media-preview cover-preview">
+                  <img
+                    :src="coverUrl || '../../../assets/cover.jpg'"
+                    alt="Cover"
+                    class="media-img cover-img"
+                    :style="{ transform: `translateY(${coverStyle}px)` }"
+                  />
+                </div>
               </div>
-            </div>
-            <div class="col-12 d-flex justify-content-center">
-              <a-button type="danger" class="ms-2" @click="deleteCover">
-                <i class="fa-solid fa-trash me-2"></i>
-                <span>Xóa</span>
-              </a-button>
-            </div>
-          </div>
-        </div>
-        <div class="col-12 col-sm-4 mb-3">
-          <div
-            v-for="(field, index) in formFields"
-            :key="index"
-            class="row mb-3"
-          >
-            <div class="col-12 col-sm-4 text-start text-sm-end">
-              <label>
-                <span v-if="field.required" class="text-danger me-1">*</span>
-                <span :class="{ 'text-danger': errors[field.name] }"
-                  >{{ field.label }}:</span
-                >
-              </label>
-            </div>
-            <div class="col-12 col-sm-8">
-              <component
-                :is="field.component"
-                v-model:value="users[field.name]"
-                v-if="field.component !== 'a-checkbox'"
-                v-bind="field.attrs"
-                :class="{ 'input-danger': errors[field.name] }"
-              ></component>
-              <a-checkbox
-                v-if="field.component === 'a-checkbox'"
-                v-model:checked="users[field.name]"
+              <button
+                type="button"
+                @click="deleteCover"
+                class="delete-btn equal-btn"
               >
-                {{ field.label }}
-              </a-checkbox>
-              <div class="w-100"></div>
-              <small v-if="errors[field.name]" class="text-danger">{{
-                errors[field.name][0]
-              }}</small>
-            </div>
-          </div>
-        </div>
-        <div class="col-12 col-sm-5">
-          <div
-            v-for="(field, index) in formFields_2"
-            :key="index"
-            class="row mb-3"
-          >
-            <div class="col-12 col-sm-4 text-start text-sm-end">
-              <label>
-                <span v-if="field.required" class="text-danger me-1">*</span>
-                <span :class="{ 'text-danger': errors[field.name] }"
-                  >{{ field.label }}:</span
-                >
-              </label>
-            </div>
-            <div class="col-12 col-sm-8">
-              <component
-                :is="field.component"
-                v-model:value="users[field.name]"
-                v-if="field.component !== 'a-checkbox'"
-                v-bind="field.attrs"
-                :class="{ 'input-danger': errors[field.name] }"
-              ></component>
-              <a-checkbox
-                v-if="field.component === 'a-checkbox'"
-                v-model:checked="users[field.name]"
-              >
-                {{ field.label }}
-              </a-checkbox>
-              <div class="w-100"></div>
-              <small v-if="errors[field.name]" class="text-danger">{{
-                errors[field.name][0]
-              }}</small>
-            </div>
-          </div>
-          <div class="row mb-3" v-if="users.change_password">
-            <div class="col-12 col-sm-4 text-start text-sm-end">
-              <label>
-                <span class="text-danger me-1">*</span>
-                <span>Mật khẩu:</span>
-              </label>
-            </div>
-            <div class="col-12 col-sm-8">
-              <a-input-password
-                placeholder="Mật khẩu"
-                allow-clear
-                v-model:value="users.password"
-                :class="{ 'input-danger': errors.password }"
-              />
-              <div class="w-100"></div>
-              <small v-if="errors.password" class="text-danger">{{
-                errors.password[0]
-              }}</small>
+                <i class="fa-solid fa-trash"></i>
+                <span>Xóa Cover</span>
+              </button>
             </div>
           </div>
 
-          <div class="row mb-3" v-if="users.change_password">
-            <div class="col-12 col-sm-4 text-start text-sm-end">
-              <label>
-                <span class="text-danger me-1">*</span>
-                <span>Xác nhận mật khẩu:</span>
-              </label>
+          <!-- Form Fields -->
+          <div class="form-columns">
+            <!-- Column 1 -->
+            <div class="form-column">
+              <div
+                v-for="(field, index) in formFields"
+                :key="index"
+                class="form-group"
+              >
+                <label class="form-label">
+                  <span v-if="field.required" class="required">*</span>
+                  <span :class="{ 'text-error': errors[field.name] }">
+                    {{ field.label }}:
+                  </span>
+                </label>
+                <div class="form-control-wrapper">
+                  <!-- Text Input -->
+                  <input
+                    v-if="field.type === 'text'"
+                    type="text"
+                    v-model="users[field.name]"
+                    :placeholder="field.placeholder"
+                    :class="[
+                      'form-control',
+                      { 'input-error': errors[field.name] },
+                    ]"
+                  />
+
+                  <!-- Textarea -->
+                  <textarea
+                    v-else-if="field.type === 'textarea'"
+                    v-model="users[field.name]"
+                    :placeholder="field.placeholder"
+                    :rows="field.rows || 3"
+                    :class="[
+                      'form-control',
+                      { 'input-error': errors[field.name] },
+                    ]"
+                  ></textarea>
+
+                  <!-- Select -->
+                  <select
+                    v-else-if="field.type === 'select'"
+                    v-model="users[field.name]"
+                    :class="[
+                      'form-control',
+                      { 'input-error': errors[field.name] },
+                    ]"
+                  >
+                    <option value="">{{ field.placeholder }}</option>
+                    <option
+                      v-for="option in field.options"
+                      :key="option.value"
+                      :value="option.value"
+                    >
+                      {{ option.label }}
+                    </option>
+                  </select>
+
+                  <!-- Date Picker -->
+                  <input
+                    v-else-if="field.type === 'date'"
+                    type="date"
+                    v-model="users[field.name]"
+                    :class="[
+                      'form-control',
+                      { 'input-error': errors[field.name] },
+                    ]"
+                  />
+
+                  <small v-if="errors[field.name]" class="error-text">
+                    {{ errors[field.name][0] }}
+                  </small>
+                </div>
+              </div>
             </div>
-            <div class="col-12 col-sm-8">
-              <a-input-password
-                placeholder="Xác nhận mật khẩu"
-                allow-clear
-                v-model:value="users.password_confirmation"
-              />
+
+            <!-- Column 2 -->
+            <div class="form-column">
+              <div
+                v-for="(field, index) in formFields_2"
+                :key="index"
+                class="form-group"
+              >
+                <label class="form-label">
+                  <span v-if="field.required" class="required">*</span>
+                  <span :class="{ 'text-error': errors[field.name] }">
+                    {{ field.label }}:
+                  </span>
+                </label>
+                <div class="form-control-wrapper">
+                  <!-- Checkbox -->
+                  <label
+                    v-if="field.type === 'checkbox'"
+                    class="checkbox-label"
+                  >
+                    <input
+                      type="checkbox"
+                      v-model="users[field.name]"
+                      class="checkbox-input"
+                    />
+                    <span class="checkbox-text">{{ field.label }}</span>
+                  </label>
+
+                  <!-- Text Input -->
+                  <input
+                    v-else-if="field.type === 'text'"
+                    type="text"
+                    v-model="users[field.name]"
+                    :placeholder="field.placeholder"
+                    :class="[
+                      'form-control',
+                      { 'input-error': errors[field.name] },
+                    ]"
+                  />
+
+                  <!-- Textarea -->
+                  <textarea
+                    v-else-if="field.type === 'textarea'"
+                    v-model="users[field.name]"
+                    :placeholder="field.placeholder"
+                    :rows="field.rows || 3"
+                    :class="[
+                      'form-control',
+                      { 'input-error': errors[field.name] },
+                    ]"
+                  ></textarea>
+
+                  <!-- Date Input -->
+                  <input
+                    v-else-if="field.type === 'date'"
+                    type="date"
+                    v-model="users[field.name]"
+                    :class="[
+                      'form-control',
+                      { 'input-error': errors[field.name] },
+                    ]"
+                  />
+
+                  <small v-if="errors[field.name]" class="error-text">
+                    {{ errors[field.name][0] }}
+                  </small>
+                </div>
+              </div>
+
+              <!-- Password Fields (Conditional) -->
+              <div v-if="users.change_password" class="form-group">
+                <label class="form-label">
+                  <span class="required">*</span>
+                  <span>Mật khẩu:</span>
+                </label>
+                <div class="form-control-wrapper">
+                  <div class="password-wrapper">
+                    <input
+                      :type="showPassword ? 'text' : 'password'"
+                      v-model="users.password"
+                      placeholder="Nhập mật khẩu mới"
+                      :class="[
+                        'form-control',
+                        { 'input-error': errors.password },
+                      ]"
+                    />
+                    <button
+                      type="button"
+                      @click="showPassword = !showPassword"
+                      class="password-toggle"
+                    >
+                      <i
+                        :class="
+                          showPassword
+                            ? 'fa-solid fa-eye-slash'
+                            : 'fa-solid fa-eye'
+                        "
+                      ></i>
+                    </button>
+                  </div>
+                  <small v-if="errors.password" class="error-text">
+                    {{ errors.password[0] }}
+                  </small>
+                </div>
+              </div>
+
+              <div v-if="users.change_password" class="form-group">
+                <label class="form-label">
+                  <span class="required">*</span>
+                  <span>Xác nhận mật khẩu:</span>
+                </label>
+                <div class="form-control-wrapper">
+                  <div class="password-wrapper">
+                    <input
+                      :type="showPasswordConfirm ? 'text' : 'password'"
+                      v-model="users.password_confirmation"
+                      placeholder="Nhập lại mật khẩu"
+                      class="form-control"
+                    />
+                    <button
+                      type="button"
+                      @click="showPasswordConfirm = !showPasswordConfirm"
+                      class="password-toggle"
+                    >
+                      <i
+                        :class="
+                          showPasswordConfirm
+                            ? 'fa-solid fa-eye-slash'
+                            : 'fa-solid fa-eye'
+                        "
+                      ></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-12 d-grid d-sm-flex justify-content-sm-end mx-auto">
-          <a-button class="me-0 me-sm-2 mb-3 mb-sm-0">
-            <router-link :to="{ name: 'profile-info' }">
-              <span>Hủy</span>
-            </router-link>
-          </a-button>
-          <a-button type="primary" html-type="submit">
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+          <router-link :to="{ name: 'profile-info' }" class="btn-cancel">
+            <span>Hủy</span>
+          </router-link>
+          <button type="submit" class="btn-save">
             <span>Lưu</span>
-          </a-button>
+          </button>
         </div>
       </div>
-    </a-card>
+    </div>
   </form>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useAuthStore } from '../../../stores/auth';
-import { useRouter, useRoute } from 'vue-router';
-import { message } from 'ant-design-vue';
+import { useRouter } from 'vue-router';
+import { useToast } from '../../../stores/useToast';
 import { useMenuProfile } from '../../../stores/use-menu-profile';
 import { useProfileStore } from '../../../stores/profile';
 import api from '../../../services/axiosInterceptor';
 import dayjs from 'dayjs';
-import { Style } from 'ckeditor5';
 
+const toast = useToast();
 const authStore = useAuthStore();
 const useProfile = useProfileStore();
-let coverStyle = useProfile.cover_position * 0.2213;
-//console.log(coverStyle)
-const id = authStore.user?.id;
 const router = useRouter();
+
+const id = authStore.user?.id;
+let coverStyle = useProfile.cover_position * 0.2213;
+
+const showPassword = ref(false);
+const showPasswordConfirm = ref(false);
+
 const users = reactive({
   username: '',
   name: '',
@@ -193,84 +317,64 @@ const users = reactive({
   occupation: '',
   biography: '',
   hobbies: '',
-  birthday: null,
-  login_at: '',
-  change_password_at: '',
+  birthday: '',
 });
 
 const errors = ref({});
+const avatarUrl = ref(null);
+const coverUrl = ref(null);
+const backendUrl = 'http://127.0.0.1:8000';
 
 const formFields = [
   {
     name: 'username',
     label: 'Tên Tài khoản',
-    component: 'a-input',
+    type: 'text',
     required: true,
-    attrs: {
-      placeholder: 'Tên Tài khoản',
-      allowClear: true,
-    },
+    placeholder: 'Tên Tài khoản',
   },
   {
     name: 'name',
     label: 'Họ và Tên',
-    component: 'a-input',
+    type: 'text',
     required: true,
-    attrs: {
-      placeholder: 'Họ và Tên',
-      allowClear: true,
-    },
+    placeholder: 'Họ và Tên',
   },
   {
     name: 'nickname',
     label: 'Biệt Danh',
-    component: 'a-input',
+    type: 'text',
     required: true,
-    attrs: {
-      placeholder: 'Tên muốn hiển thị',
-      allowClear: true,
-    },
+    placeholder: 'Tên muốn hiển thị',
   },
   {
     name: 'email',
     label: 'Email',
-    component: 'a-input',
+    type: 'text',
     required: true,
-    attrs: {
-      placeholder: 'Email',
-      allowClear: true,
-    },
+    placeholder: 'Email',
   },
   {
     name: 'gender',
     label: 'Giới tính',
-    component: 'a-select',
-    attrs: {
-      options: [
-        { label: 'Nam', value: 'Nam' },
-        { label: 'Nữ', value: 'Nữ' },
-      ],
-      placeholder: 'Chọn giới tính',
-      allowClear: true,
-    },
+    type: 'select',
+    options: [
+      { label: 'Nam', value: 'Nam' },
+      { label: 'Nữ', value: 'Nữ' },
+    ],
+    placeholder: 'Chọn giới tính',
   },
   {
     name: 'address',
     label: 'Địa chỉ',
-    component: 'a-input',
-    attrs: {
-      placeholder: 'Địa chỉ',
-      allowClear: true,
-    },
+    type: 'text',
+    placeholder: 'Địa chỉ',
   },
   {
     name: 'phone_number',
     label: 'Số điện thoại',
-    component: 'a-input',
-    attrs: {
-      placeholder: 'Số điện thoại',
-      allowClear: true,
-    },
+    type: 'text',
+    placeholder: 'Số điện thoại',
   },
 ];
 
@@ -278,61 +382,42 @@ const formFields_2 = [
   {
     name: 'occupation',
     label: 'Nghề nghiệp',
-    component: 'a-input',
-    attrs: {
-      placeholder: 'Nghề nghiệp',
-      allowClear: true,
-    },
+    type: 'text',
+    placeholder: 'Nghề nghiệp',
   },
   {
     name: 'biography',
     label: 'Bio',
-    component: 'a-textarea',
-    attrs: {
-      placeholder: 'Bio',
-      allowClear: true,
-      rows: 4,
-    },
+    type: 'textarea',
+    placeholder: 'Bio',
+    rows: 4,
   },
   {
     name: 'hobbies',
     label: 'Sở thích',
-    component: 'a-textarea',
-    attrs: {
-      placeholder: 'Sở thích',
-      allowClear: true,
-      rows: 3,
-    },
+    type: 'textarea',
+    placeholder: 'Sở thích',
+    rows: 3,
   },
   {
     name: 'birthday',
     label: 'Sinh nhật',
-    component: 'a-date-picker',
-    attrs: {
-      placeholder: 'Chọn ngày sinh',
-      style: { width: '100%' },
-      format: 'DD-MM-YYYY',
-    },
+    type: 'date',
   },
   {
     name: 'change_password',
     label: 'Đổi Mật khẩu',
-    component: 'a-checkbox',
+    type: 'checkbox',
   },
 ];
 
-const avatarUrl = ref(null);
-const coverUrl = ref(null);
-
-const backendUrl = 'http://127.0.0.1:8000';
 const deleteAvatar = async () => {
   try {
     await api.delete(`/link/${id}/avatar`);
     avatarUrl.value = null;
-    message.success('Avatar đã được xóa thành công!');
+    toast.success('Avatar đã được xóa thành công!');
   } catch (error) {
-    // console.error('Lỗi khi xóa avatar:', error);
-    message.error('Xóa avatar thất bại!');
+    toast.error('Xóa avatar thất bại!');
   }
 };
 
@@ -340,10 +425,9 @@ const deleteCover = async () => {
   try {
     await api.delete(`/link/${id}/cover`);
     coverUrl.value = null;
-    message.success('Hình nền đã được xóa thành công!');
+    toast.success('Hình nền đã được xóa thành công!');
   } catch (error) {
-    // console.error('Lỗi khi xóa hình nền:', error);
-    message.error('Xóa hình nền thất bại!');
+    toast.error('Xóa hình nền thất bại!');
   }
 };
 
@@ -362,7 +446,9 @@ const getUsersEdit = () => {
       users.occupation = data.occupation;
       users.biography = data.biography;
       users.hobbies = data.hobbies;
-      users.birthday = data.birthday ? dayjs(data.birthday) : null;
+      users.birthday = data.birthday
+        ? dayjs(data.birthday).format('YYYY-MM-DD')
+        : '';
       if (data.avatar) {
         avatarUrl.value = `${backendUrl}/storage/avatars/${id}/${data.avatar}`;
       }
@@ -379,7 +465,7 @@ const updateUsers = () => {
   const payload = { ...users };
 
   if (payload.birthday) {
-    payload.birthday = payload.birthday.format('DD-MM-YYYY');
+    payload.birthday = dayjs(payload.birthday).format('DD-MM-YYYY');
   }
 
   if (!payload.change_password) {
@@ -391,7 +477,7 @@ const updateUsers = () => {
     .put(`/profile/${id}`, payload)
     .then((response) => {
       if (response.status === 200) {
-        message.success('Cập nhật thành công!');
+        toast.success('Cập nhật thành công!');
         useProfile.updateUser(payload);
         router.push({ name: 'profile-info' });
       }
@@ -405,57 +491,108 @@ const updateUsers = () => {
     });
 };
 
-const filterOption = (input, option) => {
-  return option.label.toLowerCase().includes(input.toLowerCase());
-};
-
 onMounted(() => {
   useMenuProfile().onSelectedKey(['profile-edit']);
   getUsersEdit();
 });
 </script>
-
 <style scoped>
-.select-danger {
-  border: 1px solid red;
+/* ========== EDIT CARD ========== */
+.edit-card {
+  width: 100%;
+  max-width: 1200px;
+  margin: 80px auto 60px;
+  padding: 0;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
-.input-danger {
-  border-color: red;
+html.dark-mode .edit-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
-.custom-avatar {
+.card-header-custom {
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  padding: 24px 32px;
+  border-bottom: 4px solid #0a5a31;
+}
+
+html.dark-mode .card-header-custom {
+  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+  border-bottom-color: #0c713d;
+}
+
+.card-header-custom h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.5px;
+}
+
+.card-body-custom {
+  padding: 40px 32px;
+}
+
+/* ========== FORM LAYOUT ========== */
+.form-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* ========== MEDIA SECTION ========== */
+.media-section {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 24px;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-radius: 16px;
+  border: 2px solid #0c713d;
+}
+
+html.dark-mode .media-section {
+  background: linear-gradient(135deg, #1a2e1a 0%, #0f1f0f 100%);
+  border-color: #0f8a4a;
+}
+
+.media-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.media-preview {
+  overflow: hidden;
+  border: 4px solid #0c713d;
+  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.2);
+}
+
+html.dark-mode .media-preview {
+  border-color: #0f8a4a;
+  box-shadow: 0 4px 12px rgba(15, 138, 74, 0.3);
+}
+
+.avatar-preview {
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  overflow: hidden;
-  border: 4px solid #4fb233;
 }
 
-.img-avatar {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.custom-cover {
+.cover-preview {
   width: 250px;
   height: calc(250px / 2.1);
-  overflow: hidden;
   position: relative;
-  border: 4px solid #4fb233;
 }
 
-.img-cover-custom {
-  width: 100%;
-  object-fit: cover;
-  position: absolute;
-  top: 25%;
-  left: 0;
-}
-
-.custom-cover::before,
-.custom-cover::after {
+.cover-preview::before,
+.cover-preview::after {
   content: '';
   position: absolute;
   left: 0;
@@ -465,15 +602,509 @@ onMounted(() => {
   z-index: 1;
 }
 
-.custom-cover::before {
+.cover-preview::before {
   top: 0;
 }
 
-.custom-cover::after {
+.cover-preview::after {
   bottom: 0;
 }
 
-.ms-2 {
-  margin-left: 0.5rem;
+.media-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cover-img {
+  position: absolute;
+  top: 25%;
+  left: 0;
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.delete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+}
+
+.delete-btn:active {
+  transform: translateY(0);
+}
+
+/* ========== FORM COLUMNS ========== */
+.form-columns {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ========== FORM GROUP ========== */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+html.dark-mode .form-label {
+  color: #e0e0e0;
+}
+
+.required {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.text-error {
+  color: #dc2626;
+}
+
+.form-control-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  background: white;
+  color: #333;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+html.dark-mode .form-control {
+  border-color: #333;
+  color: #e0e0e0;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #0c713d;
+  box-shadow: 0 0 0 3px rgba(12, 113, 61, 0.1);
+}
+
+html.dark-mode .form-control:focus {
+  border-color: #0f8a4a;
+  box-shadow: 0 0 0 3px rgba(15, 138, 74, 0.2);
+}
+
+.form-control::placeholder {
+  color: #9ca3af;
+}
+
+html.dark-mode .form-control::placeholder {
+  color: #6b7280;
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
+select.form-control {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+html.dark-mode select.form-control {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e0e0e0' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+}
+
+.input-error {
+  border-color: #dc2626 !important;
+}
+
+.error-text {
+  font-size: 0.85rem;
+  color: #dc2626;
+  margin: 0;
+}
+
+/* ========== CHECKBOX ========== */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-input {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #0c713d;
+}
+
+html.dark-mode .checkbox-input {
+  accent-color: #0f8a4a;
+}
+
+.checkbox-text {
+  font-size: 0.95rem;
+  color: #333;
+  font-weight: 500;
+}
+
+html.dark-mode .checkbox-text {
+  color: #e0e0e0;
+}
+
+/* ========== PASSWORD WRAPPER ========== */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper .form-control {
+  padding-right: 48px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+  color: #0c713d;
+}
+
+html.dark-mode .password-toggle {
+  color: #9ca3af;
+}
+
+html.dark-mode .password-toggle:hover {
+  color: #0f8a4a;
+}
+
+/* ========== FORM ACTIONS ========== */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 2px solid #e5e7eb;
+}
+
+html.dark-mode .form-actions {
+  border-top-color: #333;
+}
+
+.btn-cancel,
+.btn-save {
+  padding: 14px 32px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.btn-cancel::before,
+.btn-save::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s,
+    height 0.6s;
+}
+
+.btn-cancel:hover::before,
+.btn-save:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-cancel {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+}
+
+.btn-cancel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.3);
+}
+
+html.dark-mode .btn-save {
+  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+  box-shadow: 0 4px 12px rgba(15, 138, 74, 0.3);
+}
+
+.btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
+}
+
+html.dark-mode .btn-save:hover {
+  box-shadow: 0 6px 20px rgba(15, 138, 74, 0.4);
+}
+
+.btn-cancel:active,
+.btn-save:active {
+  transform: translateY(0);
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+
+/* Large Tablet */
+@media (max-width: 1024px) {
+  .edit-card {
+    margin: 70px 20px 50px;
+  }
+
+  .card-header-custom {
+    padding: 20px 28px;
+  }
+
+  .card-header-custom h2 {
+    font-size: 1.6rem;
+  }
+
+  .card-body-custom {
+    padding: 32px 28px;
+  }
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .edit-card {
+    margin: 60px 15px 40px;
+    border-radius: 16px;
+  }
+
+  .card-header-custom {
+    padding: 18px 24px;
+  }
+
+  .card-header-custom h2 {
+    font-size: 1.4rem;
+  }
+
+  .card-body-custom {
+    padding: 28px 24px;
+  }
+
+  .form-columns {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .media-section {
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn-cancel,
+  .btn-save {
+    width: 100%;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .edit-card {
+    margin: 50px 10px 30px;
+    border-radius: 14px;
+  }
+
+  .card-header-custom {
+    padding: 16px 20px;
+  }
+
+  .card-header-custom h2 {
+    font-size: 1.2rem;
+  }
+
+  .card-body-custom {
+    padding: 24px 20px;
+  }
+
+  .form-layout {
+    gap: 32px;
+  }
+
+  .media-section {
+    padding: 16px;
+    gap: 20px;
+  }
+
+  .avatar-preview {
+    width: 120px;
+    height: 120px;
+  }
+
+  .cover-preview {
+    width: 200px;
+    height: calc(200px / 2.1);
+  }
+
+  .delete-btn {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  .form-column {
+    gap: 20px;
+  }
+
+  .form-group {
+    gap: 6px;
+  }
+
+  .form-label {
+    font-size: 0.9rem;
+  }
+
+  .form-control {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+
+  .btn-cancel,
+  .btn-save {
+    padding: 12px 24px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 360px) {
+  .edit-card {
+    margin: 40px 8px 20px;
+  }
+
+  .card-header-custom h2 {
+    font-size: 1.1rem;
+  }
+
+  .avatar-preview {
+    width: 100px;
+    height: 100px;
+  }
+
+  .cover-preview {
+    width: 180px;
+    height: calc(180px / 2.1);
+  }
+
+  .form-control {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+}
+.media-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 40px;
+  justify-items: center;
+}
+
+.media-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.media-box {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-preview {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+}
+
+.cover-preview {
+  width: 280px;
+  height: 150px;
+  position: relative;
+}
+
+.equal-btn {
+  min-width: 150px;
+  justify-content: center;
 }
 </style>
