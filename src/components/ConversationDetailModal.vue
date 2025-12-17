@@ -243,7 +243,7 @@ const sendMessage = async () => {
     await supportApi.markAsReadByManager(props.conversation.id);
   } catch (error) {
     console.error('Error sending message:', error);
-    if (toast) toast.error('Không thể gửi tin nhắn');
+    if (toast) toast.error('Không thể gởi tin nhắn');
     messageText.value = text;
   } finally {
     sending.value = false;

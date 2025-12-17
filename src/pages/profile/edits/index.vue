@@ -10,43 +10,31 @@
           <!-- Avatar & Cover Section -->
           <div class="media-section">
             <!-- Avatar -->
-            <div class="media-column">
-              <div class="media-box">
-                <div class="media-preview avatar-preview">
-                  <img
-                    :src="avatarUrl || '../../../assets/users.jpg'"
-                    alt="Avatar"
-                    class="media-img"
-                  />
-                </div>
+            <div class="media-item">
+              <div class="media-preview avatar-preview">
+                <img
+                  :src="avatarUrl || '../../../assets/users.jpg'"
+                  alt="Avatar"
+                  class="media-img"
+                />
               </div>
-              <button
-                type="button"
-                @click="deleteAvatar"
-                class="delete-btn equal-btn"
-              >
+              <button type="button" @click="deleteAvatar" class="delete-btn">
                 <i class="fa-solid fa-trash"></i>
                 <span>Xóa Avatar</span>
               </button>
             </div>
 
             <!-- Cover -->
-            <div class="media-column">
-              <div class="media-box">
-                <div class="media-preview cover-preview">
-                  <img
-                    :src="coverUrl || '../../../assets/cover.jpg'"
-                    alt="Cover"
-                    class="media-img cover-img"
-                    :style="{ transform: `translateY(${coverStyle}px)` }"
-                  />
-                </div>
+            <div class="media-item">
+              <div class="media-preview cover-preview">
+                <img
+                  :src="coverUrl || '../../../assets/cover.jpg'"
+                  alt="Cover"
+                  class="media-img cover-img"
+                  :style="{ transform: `translateY(${coverStyle}px)` }"
+                />
               </div>
-              <button
-                type="button"
-                @click="deleteCover"
-                class="delete-btn equal-btn"
-              >
+              <button type="button" @click="deleteCover" class="delete-btn">
                 <i class="fa-solid fa-trash"></i>
                 <span>Xóa Cover</span>
               </button>
@@ -496,6 +484,7 @@ onMounted(() => {
   getUsersEdit();
 });
 </script>
+
 <style scoped>
 /* ========== EDIT CARD ========== */
 .edit-card {
@@ -544,13 +533,13 @@ html.dark-mode .card-header-custom {
   gap: 40px;
 }
 
-/* ========== MEDIA SECTION ========== */
+/* ========== MEDIA SECTION - RESPONSIVE FIRST ========== */
 .media-section {
   display: flex;
-  gap: 32px;
-  justify-content: center;
   flex-wrap: wrap;
-  padding: 24px;
+  gap: 48px;
+  justify-content: space-around;
+  padding: 32px 48px;
   background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
   border-radius: 16px;
   border: 2px solid #0c713d;
@@ -561,17 +550,25 @@ html.dark-mode .media-section {
   border-color: #0f8a4a;
 }
 
-.media-group {
+.media-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  flex: 1 1 280px;
+  max-width: 380px;
+  min-width: 240px;
 }
 
 .media-preview {
   overflow: hidden;
   border: 4px solid #0c713d;
   box-shadow: 0 4px 12px rgba(12, 113, 61, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.media-preview:hover {
+  transform: scale(1.02);
 }
 
 html.dark-mode .media-preview {
@@ -580,15 +577,17 @@ html.dark-mode .media-preview {
 }
 
 .avatar-preview {
-  width: 150px;
-  height: 150px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
 }
 
 .cover-preview {
-  width: 250px;
-  height: calc(250px / 2.1);
+  width: 100%;
+  max-width: 380px;
+  height: 180px;
   position: relative;
+  border-radius: 12px;
 }
 
 .cover-preview::before,
@@ -604,10 +603,12 @@ html.dark-mode .media-preview {
 
 .cover-preview::before {
   top: 0;
+  border-radius: 12px 12px 0 0;
 }
 
 .cover-preview::after {
   bottom: 0;
+  border-radius: 0 0 12px 12px;
 }
 
 .media-img {
@@ -626,7 +627,7 @@ html.dark-mode .media-preview {
   background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 12px 24px;
   font-size: 0.9rem;
   font-weight: 600;
   border-radius: 50px;
@@ -635,7 +636,11 @@ html.dark-mode .media-preview {
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  width: 100%;
+  max-width: 200px;
+  min-height: 44px;
 }
 
 .delete-btn:hover {
@@ -919,6 +924,17 @@ html.dark-mode .btn-save:hover {
 
 /* ========== RESPONSIVE DESIGN ========== */
 
+/* Large Desktop */
+@media (min-width: 1025px) {
+  .media-section {
+    flex-wrap: nowrap;
+  }
+
+  .media-item {
+    flex: 0 1 auto;
+  }
+}
+
 /* Large Tablet */
 @media (max-width: 1024px) {
   .edit-card {
@@ -938,7 +954,7 @@ html.dark-mode .btn-save:hover {
   }
 }
 
-/* Tablet */
+/* Tablet - Media section becomes single column */
 @media (max-width: 768px) {
   .edit-card {
     margin: 60px 15px 40px;
@@ -965,6 +981,15 @@ html.dark-mode .btn-save:hover {
   .media-section {
     flex-direction: column;
     padding: 20px;
+  }
+
+  .media-item {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .cover-preview {
+    max-width: 100%;
   }
 
   .form-actions {
@@ -1002,21 +1027,20 @@ html.dark-mode .btn-save:hover {
 
   .media-section {
     padding: 16px;
-    gap: 20px;
+    gap: 24px;
   }
 
   .avatar-preview {
-    width: 120px;
-    height: 120px;
+    width: 130px;
+    height: 130px;
   }
 
   .cover-preview {
-    width: 200px;
-    height: calc(200px / 2.1);
+    height: 140px;
   }
 
   .delete-btn {
-    padding: 8px 16px;
+    padding: 10px 20px;
     font-size: 0.85rem;
   }
 
@@ -1055,56 +1079,17 @@ html.dark-mode .btn-save:hover {
   }
 
   .avatar-preview {
-    width: 100px;
-    height: 100px;
+    width: 110px;
+    height: 110px;
   }
 
   .cover-preview {
-    width: 180px;
-    height: calc(180px / 2.1);
+    height: 120px;
   }
 
   .form-control {
     padding: 10px 12px;
     font-size: 0.85rem;
   }
-}
-.media-section {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 40px;
-  justify-items: center;
-}
-
-.media-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-}
-
-.media-box {
-  height: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.avatar-preview {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-}
-
-.cover-preview {
-  width: 280px;
-  height: 150px;
-  position: relative;
-}
-
-.equal-btn {
-  min-width: 150px;
-  justify-content: center;
 }
 </style>

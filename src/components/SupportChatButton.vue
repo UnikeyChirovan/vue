@@ -330,14 +330,14 @@ onMounted(() => {
   supportStore.loadUnreadCount();
   supportStore.subscribeToUserChannel();
 
-  const interval = setInterval(() => {
-    if (authStore.isLoggedIn) {
-      supportStore.loadUnreadCount();
-    }
-  }, 30000);
+  // const interval = setInterval(() => {
+  //   if (authStore.isLoggedIn) {
+  //     supportStore.loadUnreadCount();
+  //   }
+  // }, 30000);
 
   onUnmounted(() => {
-    clearInterval(interval);
+    // clearInterval(interval);
     window.removeEventListener('resize', handleResize);
     window.removeEventListener('supportButtonToggle', handleToggle);
   });

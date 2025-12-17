@@ -13,6 +13,8 @@
   --dark-accent-green: #0c713d;
   --dark-accent-green-light: #0f8a4a;
   --dark-accent-hover: #12a55c;
+  --dark-accent-red: #d43030;
+  --dark-accent-red-light: #e74545;
 }
 
 /* ========== BASE DARK MODE ========== */

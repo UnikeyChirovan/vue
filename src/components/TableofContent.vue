@@ -1,93 +1,97 @@
 <template>
   <div>
-    <button
-      @click="toggleDropdown"
-      class="table-of-content"
-      :class="{ active: isOpen }"
+    <n-dropdown
+      trigger="click"
+      placement="bottom"
+      :options="chapterOptions"
+      @select="selectChapter"
+      :style="dropdownStyle"
     >
-      <span class="button-text">Mục Lục</span>
-      <i class="fas fa-list mobile-icon"></i>
-    </button>
-
-    <div v-if="isOpen" class="dropdown-backdrop" @click="closeDropdown"></div>
-
-    <transition name="dropdown">
-      <div v-if="isOpen" class="dropdown-menu" ref="dropdown">
-        <div class="dropdown-content">
-          <button
-            v-for="chapter in chapterOptions"
-            :key="chapter.value"
-            @click="selectChapter(chapter.value)"
-            class="dropdown-option"
-            :class="{ active: chapterStore.selectedChapter === chapter.value }"
-          >
-            {{ chapter.label }}: {{ chapter.title }}
-          </button>
-        </div>
-      </div>
-    </transition>
+      <n-button type="error" class="table-of-content">
+        <span class="button-text">Mục Lục</span>
+        <i class="fas fa-list mobile-icon"></i>
+      </n-button>
+    </n-dropdown>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import { useChapterStore } from '../stores/chapterStore';
+import { NButton, NDropdown } from 'naive-ui';
 
 const chapterStore = useChapterStore();
-const isOpen = ref(false);
 
-const chapterOptions = computed(() => chapterStore.chapterOptions);
+const dropdownStyle = computed(() => ({
+  maxHeight: '500px',
+  overflowY: 'auto',
+}));
 
-const toggleDropdown = () => {
-  isOpen.value = !isOpen.value;
-};
-
-const closeDropdown = () => {
-  isOpen.value = false;
-};
+const chapterOptions = computed(() =>
+  chapterStore.chapterOptions.map((chapter) => ({
+    label: `${chapter.label}: ${chapter.title}`,
+    key: chapter.value,
+    type: chapterStore.selectedChapter === chapter.value ? 'active' : null,
+    props: {
+      style:
+        chapterStore.selectedChapter === chapter.value
+          ? 'background-color: #0c713d; color: white; font-weight: 600;'
+          : '',
+    },
+  }))
+);
 
 const selectChapter = (chapter) => {
   chapterStore.setSelectedChapter(chapter);
-  closeDropdown();
 };
+
+// Dark mode handling
+const applyDarkModeToDropdown = () => {
+  const html = document.documentElement;
+  const isDark = html.classList.contains('dark-mode');
+
+  const dropdownMenu = document.querySelector('.n-dropdown-menu');
+  if (dropdownMenu) {
+    if (isDark) {
+      dropdownMenu.classList.add('dark-mode');
+    } else {
+      dropdownMenu.classList.remove('dark-mode');
+    }
+  }
+};
+
+const handleThemeChange = () => {
+  applyDarkModeToDropdown();
+};
+
+onMounted(() => {
+  window.addEventListener('themeChanged', handleThemeChange);
+  // Apply initial theme
+  setTimeout(() => {
+    applyDarkModeToDropdown();
+  }, 50);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('themeChanged', handleThemeChange);
+});
 </script>
 
 <style scoped>
-/* ========== TABLE OF CONTENT BUTTON ========== */
 .table-of-content {
   position: fixed;
-  top: 150px;
+  top: 135px;
   right: 80px;
   z-index: 1000;
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
   min-width: 110px;
   padding: 10px 20px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
 }
 
 .table-of-content:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
-  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
-}
-
-.table-of-content:active {
-  transform: translateY(0);
-}
-
-.table-of-content.active {
-  background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .button-text {
@@ -98,139 +102,28 @@ const selectChapter = (chapter) => {
   display: none;
 }
 
-/* ========== DROPDOWN BACKDROP ========== */
-.dropdown-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
-  z-index: 999;
-  cursor: default;
-}
-
-/* ========== DROPDOWN MENU ========== */
-.dropdown-menu {
-  position: fixed;
-  top: 180px;
-  right: 80px;
-  z-index: 1001;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-  min-width: 280px;
-  max-width: 400px;
-}
-
-.dropdown-content {
+/* ========== DROPDOWN MENU STYLES ========== */
+:deep(.n-dropdown-menu) {
   max-height: 500px;
   overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
 }
 
-.dropdown-option {
-  width: 100%;
-  padding: 14px 18px;
-  background: white;
-  border: none;
-  border-bottom: 1px solid #f0f0f0;
+:deep(.n-dropdown-option) {
+  padding: 12px 16px;
   cursor: pointer;
   transition: all 0.2s ease;
-  text-align: left;
-  font-size: 0.95rem;
-  color: #333;
-  font-weight: 500;
 }
 
-.dropdown-option:last-child {
-  border-bottom: none;
+:deep(.n-dropdown-option:hover) {
+  background-color: rgba(12, 113, 61, 0.1);
 }
 
-.dropdown-option:hover {
-  background-color: rgba(12, 113, 61, 0.08);
-  padding-left: 24px;
-}
-
-.dropdown-option.active {
+:deep(.n-dropdown-option.active) {
   background-color: #0c713d;
   color: white;
-  font-weight: 700;
-}
-
-.dropdown-option.active:hover {
-  background-color: #0a5a31;
-}
-
-/* ========== SCROLLBAR STYLING ========== */
-.dropdown-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.dropdown-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-.dropdown-content::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
-}
-
-.dropdown-content::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-/* ========== DROPDOWN ANIMATION ========== */
-.dropdown-enter-active,
-.dropdown-leave-active {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.dropdown-enter-from {
-  opacity: 0;
-  transform: translateY(-10px) scale(0.95);
-}
-
-.dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(-10px) scale(0.95);
-}
-
-/* ========== DARK MODE - APP-WIDE ========== */
-html.dark-mode .dropdown-menu {
-  background: var(--dark-bg-elevated);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-}
-
-html.dark-mode .dropdown-option {
-  background: var(--dark-bg-elevated);
-  color: var(--dark-text-primary);
-  border-bottom-color: var(--dark-border);
-}
-
-html.dark-mode .dropdown-option:hover {
-  background-color: var(--dark-bg-card);
-}
-
-html.dark-mode .dropdown-option.active {
-  background-color: var(--dark-accent-green);
-  color: white;
-}
-
-html.dark-mode .dropdown-option.active:hover {
-  background-color: var(--dark-accent-green-light);
-}
-
-html.dark-mode .dropdown-content::-webkit-scrollbar-track {
-  background: var(--dark-bg-primary);
-}
-
-html.dark-mode .dropdown-content::-webkit-scrollbar-thumb {
-  background: var(--dark-bg-elevated);
-}
-
-html.dark-mode .dropdown-content::-webkit-scrollbar-thumb:hover {
-  background: var(--dark-border);
+  font-weight: 600;
 }
 
 /* ========== RESPONSIVE DESIGN ========== */
@@ -238,12 +131,7 @@ html.dark-mode .dropdown-content::-webkit-scrollbar-thumb:hover {
 /* Large Desktop (1440px+) */
 @media (min-width: 1441px) {
   .table-of-content {
-    top: 150px;
-    right: 80px;
-  }
-
-  .dropdown-menu {
-    top: 180px;
+    top: 135px;
     right: 80px;
   }
 }
@@ -251,12 +139,7 @@ html.dark-mode .dropdown-content::-webkit-scrollbar-thumb:hover {
 /* Desktop (1280px - 1440px) */
 @media (min-width: 1280px) and (max-width: 1440px) {
   .table-of-content {
-    top: 150px;
-    right: 80px;
-  }
-
-  .dropdown-menu {
-    top: 180px;
+    top: 135px;
     right: 80px;
   }
 }
@@ -264,16 +147,10 @@ html.dark-mode .dropdown-content::-webkit-scrollbar-thumb:hover {
 /* Small Laptop (1024px - 1279px) - VẪN DESKTOP MODE */
 @media (min-width: 1024px) and (max-width: 1279px) {
   .table-of-content {
-    top: 135px;
+    top: 120px;
     right: 60px;
     min-width: 100px;
     padding: 9px 18px;
-  }
-
-  .dropdown-menu {
-    top: 165px;
-    right: 60px;
-    min-width: 260px;
   }
 
   /* VẪN GIỮ NGUYÊN TEXT, ẨN ICON */
@@ -290,12 +167,15 @@ html.dark-mode .dropdown-content::-webkit-scrollbar-thumb:hover {
 @media (max-width: 1023px) {
   .table-of-content {
     top: auto;
-    bottom: 25px;
+    bottom: 15px;
     right: 15px;
     min-width: 48px;
     width: 48px;
     height: 48px;
     padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 50%;
   }
 
@@ -309,20 +189,13 @@ html.dark-mode .dropdown-content::-webkit-scrollbar-thumb:hover {
     font-size: 1.2rem;
   }
 
-  .dropdown-menu {
-    top: auto;
-    bottom: 70px;
-    right: 15px;
-    min-width: 250px;
+  :deep(.n-dropdown-menu) {
+    max-height: 400px;
     max-width: 90vw;
   }
 
-  .dropdown-content {
-    max-height: 400px;
-  }
-
-  .dropdown-option {
-    padding: 12px 16px;
+  :deep(.n-dropdown-option) {
+    padding: 10px 14px;
     font-size: 0.9rem;
   }
 }
@@ -330,7 +203,7 @@ html.dark-mode .dropdown-content::-webkit-scrollbar-thumb:hover {
 /* Mobile (480px - 767px) */
 @media (min-width: 480px) and (max-width: 767px) {
   .table-of-content {
-    bottom: 25px;
+    bottom: 15px;
     right: 15px;
     width: 48px;
     height: 48px;
@@ -345,17 +218,12 @@ html.dark-mode .dropdown-content::-webkit-scrollbar-thumb:hover {
     display: inline !important;
     font-size: 1.2rem;
   }
-
-  .dropdown-menu {
-    bottom: 70px;
-    right: 15px;
-  }
 }
 
 /* Small Mobile (361px - 480px) */
 @media (max-width: 480px) {
   .table-of-content {
-    bottom: 22px;
+    bottom: 12px;
     right: 12px;
     width: 48px;
     height: 48px;
@@ -371,19 +239,13 @@ html.dark-mode .dropdown-content::-webkit-scrollbar-thumb:hover {
     font-size: 1.15rem;
   }
 
-  .dropdown-menu {
-    bottom: 68px;
-    right: 12px;
-    min-width: 230px;
+  :deep(.n-dropdown-menu) {
+    max-height: 350px;
     max-width: 85vw;
   }
 
-  .dropdown-content {
-    max-height: 350px;
-  }
-
-  .dropdown-option {
-    padding: 10px 14px;
+  :deep(.n-dropdown-option) {
+    padding: 9px 12px;
     font-size: 0.85rem;
   }
 }
@@ -391,7 +253,7 @@ html.dark-mode .dropdown-content::-webkit-scrollbar-thumb:hover {
 /* Extra Small Mobile (≤360px) */
 @media (max-width: 360px) {
   .table-of-content {
-    bottom: 20px;
+    bottom: 10px;
     right: 10px;
     width: 45px;
     height: 45px;
@@ -407,19 +269,74 @@ html.dark-mode .dropdown-content::-webkit-scrollbar-thumb:hover {
     font-size: 1.1rem;
   }
 
-  .dropdown-menu {
-    bottom: 62px;
-    right: 10px;
-    min-width: 200px;
-  }
-
-  .dropdown-content {
+  :deep(.n-dropdown-menu) {
     max-height: 300px;
   }
 
-  .dropdown-option {
-    padding: 9px 12px;
+  :deep(.n-dropdown-option) {
+    padding: 8px 10px;
     font-size: 0.8rem;
   }
+}
+/* ========== DARK MODE STYLES ========== */
+
+/* Button Dark Mode */
+.dark-mode .table-of-content {
+  background: linear-gradient(
+    135deg,
+    var(--dark-accent-red) 0%,
+    var(--dark-accent-red-light) 100%
+  ) !important;
+  color: var(--dark-text-primary) !important;
+  border: 1px solid var(--dark-border) !important;
+  box-shadow: 0 4px 12px rgba(212, 48, 48, 0.4) !important;
+}
+
+.dark-mode .table-of-content:hover {
+  box-shadow: 0 6px 16px rgba(212, 48, 48, 0.5) !important;
+}
+
+/* Dropdown Menu Dark Mode */
+.dark-mode :deep(.n-dropdown-menu) {
+  background-color: var(--dark-bg-card) !important;
+  border: 1px solid var(--dark-border) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+}
+
+.dark-mode :deep(.n-dropdown-option) {
+  color: var(--dark-text-primary) !important;
+  background-color: transparent !important;
+}
+
+.dark-mode :deep(.n-dropdown-option:hover) {
+  background-color: rgba(212, 48, 48, 0.15) !important;
+}
+
+.dark-mode :deep(.n-dropdown-option.active) {
+  background-color: var(--dark-accent-red) !important;
+  color: var(--dark-text-primary) !important;
+}
+
+.dark-mode :deep(.n-dropdown-divider) {
+  background-color: var(--dark-border) !important;
+}
+
+/* Scrollbar Dark Mode */
+.dark-mode :deep(.n-dropdown-menu::-webkit-scrollbar) {
+  width: 8px;
+}
+
+.dark-mode :deep(.n-dropdown-menu::-webkit-scrollbar-track) {
+  background: var(--dark-bg-primary);
+  border-radius: 4px;
+}
+
+.dark-mode :deep(.n-dropdown-menu::-webkit-scrollbar-thumb) {
+  background: var(--dark-bg-elevated);
+  border-radius: 4px;
+}
+
+.dark-mode :deep(.n-dropdown-menu::-webkit-scrollbar-thumb:hover) {
+  background: var(--dark-border);
 }
 </style>

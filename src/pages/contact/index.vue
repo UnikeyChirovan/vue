@@ -46,8 +46,8 @@
                 :disabled="isSubmitting"
                 @click="submitForm"
               >
-                <span v-if="isSubmitting">Đang gửi...</span>
-                <span v-else>Gửi</span>
+                <span v-if="isSubmitting">Đang gởi...</span>
+                <span v-else>gởi</span>
               </button>
             </div>
           </div>
@@ -282,7 +282,7 @@ const submitForm = async () => {
       'http://127.0.0.1:8000/api/noauth/contact',
       formData
     );
-    showToast(response.data.message || 'Gửi thông tin thành công!', 'success');
+    showToast(response.data.message || 'gởi thông tin thành công!', 'success');
     defaultForm();
   } catch (error) {
     console.error(error);

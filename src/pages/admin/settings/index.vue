@@ -208,7 +208,7 @@
           <div class="setting-item">
             <div class="setting-info">
               <label>SMTP Host</label>
-              <p>Máy chủ gửi email</p>
+              <p>Máy chủ gởi email</p>
             </div>
             <n-input
               v-model:value="settings.smtpHost"
@@ -233,8 +233,8 @@
 
           <div class="setting-item">
             <div class="setting-info">
-              <label>Email Gửi</label>
-              <p>Địa chỉ email dùng để gửi</p>
+              <label>Email gởi</label>
+              <p>Địa chỉ email dùng để gởi</p>
             </div>
             <n-input
               v-model:value="settings.smtpEmail"
@@ -261,7 +261,7 @@
         <div class="test-email-section">
           <button class="test-email-btn" @click="testEmail">
             <i class="fas fa-paper-plane"></i>
-            <span>Gửi Email Thử Nghiệm</span>
+            <span>gởi Email Thử Nghiệm</span>
           </button>
         </div>
       </div>
@@ -433,9 +433,9 @@ const resetSettings = () => {
 };
 
 const testEmail = () => {
-  message.info('Đang gửi email thử nghiệm...');
+  message.info('Đang gởi email thử nghiệm...');
   setTimeout(() => {
-    message.success('Email đã được gửi thành công!');
+    message.success('Email đã được gởi thành công!');
   }, 2000);
 };
 

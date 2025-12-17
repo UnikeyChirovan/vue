@@ -91,17 +91,11 @@ onUnmounted(() => {
 /* Import Dark Mode CSS */
 @import './assets/styles/dark-mode.css';
 
-.error {
-  color: red;
-  margin-top: -4px !important;
-  margin-bottom: 4px !important;
-}
-
-#app {
+/* #app {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
+} */
 </style>

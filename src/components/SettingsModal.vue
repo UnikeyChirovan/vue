@@ -374,7 +374,7 @@ const customGradientOptions = [
   { label: 'Megatron', value: 'megatron' },
 ];
 
-const backgroundOptions = ref([{ label: 'Không có', value: 'none' }]);
+const backgroundOptions = ref([{ label: 'Mặc Định', value: 'none' }]);
 
 const createComputedProperty = (key) =>
   computed({
@@ -410,6 +410,18 @@ const saveInitialSettings = () => {
     fontFamily: fontFamily.value,
     fontSize: fontSize.value,
     lineHeight: lineHeight.value,
+    brightness: brightness.value,
+    mode: mode.value,
+    yellowLightMode: yellowLightMode.value,
+    screenMode: screenMode.value,
+    backgroundStyle: backgroundStyle.value,
+    backgroundColor: backgroundColor.value,
+    selectedGradient: selectedGradient.value,
+    backgroundOpacity: backgroundOpacity.value,
+    customBackgroundStyle: customBackgroundStyle.value,
+    customBackgroundColor: customBackgroundColor.value,
+    customSelectedGradient: customSelectedGradient.value,
+    customBackgroundOpacity: customBackgroundOpacity.value,
   };
 };
 
@@ -418,11 +430,22 @@ const hasSettingsChanged = () => {
     backgroundStoryId.value !== initialSettings.backgroundStoryId ||
     fontFamily.value !== initialSettings.fontFamily ||
     fontSize.value !== initialSettings.fontSize ||
-    lineHeight.value !== initialSettings.lineHeight
+    lineHeight.value !== initialSettings.lineHeight ||
+    brightness.value !== initialSettings.brightness ||
+    mode.value !== initialSettings.mode ||
+    yellowLightMode.value !== initialSettings.yellowLightMode ||
+    screenMode.value !== initialSettings.screenMode ||
+    backgroundStyle.value !== initialSettings.backgroundStyle ||
+    backgroundColor.value !== initialSettings.backgroundColor ||
+    selectedGradient.value !== initialSettings.selectedGradient ||
+    backgroundOpacity.value !== initialSettings.backgroundOpacity ||
+    customBackgroundStyle.value !== initialSettings.customBackgroundStyle ||
+    customBackgroundColor.value !== initialSettings.customBackgroundColor ||
+    customSelectedGradient.value !== initialSettings.customSelectedGradient ||
+    customBackgroundOpacity.value !== initialSettings.customBackgroundOpacity
   );
 };
 
-// Auto scroll functions
 const startAutoScroll = () => {
   if (!autoScrollEnabled.value || isScrolling.value) return;
 
@@ -479,15 +502,48 @@ const handleKeyPress = (e) => {
   }
 };
 
+const getBackgroundModeForBackend = () => {
+  // Không có background_story_id -> none
+  if (!backgroundStoryId.value || selectedBackground.value === 'none') {
+    return 'none';
+  }
+
+  // Có background_story_id nhưng không có path -> no-image
+  if (
+    !backgroundImage.value ||
+    selectedBackground.value === null ||
+    selectedBackground.value === 'null'
+  ) {
+    return 'no-image';
+  }
+
+  // Có cả id và path -> with-image
+  return 'with-image';
+};
+
 const saveSettings = async () => {
   if (!hasSettingsChanged()) return;
 
   const settingsData = {
-    background_story_id: backgroundStoryId.value,
+    background_story_id: backgroundStoryId.value || null,
+    background_mode: getBackgroundModeForBackend(),
+    screen_mode: screenMode.value, // ✅ gởi screen_mode lên backend
     font_family: fontFamily.value,
     font_size: fontSize.value,
     line_height: lineHeight.value,
+    brightness: brightness.value,
+    mode: mode.value,
+    yellow_light_mode: yellowLightMode.value,
+    background_style: backgroundStyle.value,
+    background_color: backgroundColor.value,
+    selected_gradient: selectedGradient.value || null,
+    background_opacity: backgroundOpacity.value,
+    custom_background_style: customBackgroundStyle.value,
+    custom_background_color: customBackgroundColor.value,
+    custom_selected_gradient: customSelectedGradient.value || null,
+    custom_background_opacity: customBackgroundOpacity.value,
   };
+
   try {
     if (hasSettings.value) {
       await api.put('/story/settings', settingsData);
@@ -495,7 +551,7 @@ const saveSettings = async () => {
       await api.post('/story/save-settings', settingsData);
     }
     saveInitialSettings();
-    fetchUserSettings(userId);
+    await fetchUserSettings(userId);
   } catch (error) {
     console.error('Error saving settings:', error);
   }
@@ -561,22 +617,90 @@ const applySettings = () => {
   };
 
   if (route.path === '/stories') {
-    if (settings.selectedBackground === 'none' || !settings.backgroundImage) {
+    // ========================================
+    // CASE 1: NONE - Reset hoàn toàn, chỉ màu mặc định
+    // ========================================
+    if (settings.selectedBackground === 'none') {
       reset();
+
       if (storyContainer) {
         storyContainer.style.backgroundColor =
           settings.mode === 'night' ? '#2c2c2c' : 'rgba(255, 255, 255, 0.98)';
       }
+
       if (readingWrapper) {
         readingWrapper.style.background =
           settings.mode === 'night'
             ? '#2c2c2c'
             : 'linear-gradient(180deg, rgba(250, 250, 250, 0.95) 0%, rgba(255, 255, 255, 0.95) 100%)';
       }
-    } else {
+    }
+
+    // ========================================
+    // CASE 2: NO-IMAGE - Không có hình, nhưng VẪN áp dụng màu nền/gradient
+    // ========================================
+    else if (!settings.backgroundImage) {
+      reset();
+
+      // Night mode: Chỉ dùng màu tối
+      if (settings.mode === 'night') {
+        if (storyContainer) {
+          storyContainer.style.backgroundColor = '#2c2c2c';
+        }
+        if (readingWrapper) {
+          readingWrapper.style.background = '#2c2c2c';
+        }
+      }
+      // Day mode: Áp dụng background style
+      else {
+        // Container chính: Áp dụng background style
+        if (storyContainer) {
+          if (settings.backgroundStyle === 'solid') {
+            storyContainer.style.backgroundColor = settings.backgroundColor;
+            storyContainer.style.backgroundImage = 'none';
+          } else if (settings.backgroundStyle === 'gradient') {
+            storyContainer.style.backgroundColor = 'transparent';
+            storyContainer.style.backgroundImage = getGradient(
+              settings.selectedGradient,
+              settings.backgroundOpacity
+            );
+          }
+        }
+
+        // Reading area: Phụ thuộc vào screenMode
+        if (readingWrapper) {
+          if (screenMode.value === 'custom') {
+            // Custom mode: Áp dụng custom background style
+            if (settings.customBackgroundStyle === 'solid') {
+              readingWrapper.style.backgroundColor =
+                settings.customBackgroundColor;
+              readingWrapper.style.backgroundImage = 'none';
+            } else if (settings.customBackgroundStyle === 'gradient') {
+              readingWrapper.style.backgroundColor = 'transparent';
+              readingWrapper.style.backgroundImage = getGradient(
+                settings.customSelectedGradient,
+                settings.customBackgroundOpacity
+              );
+            }
+          } else {
+            // Full/Partial mode: Transparent hoặc theo container
+            readingWrapper.style.background = 'transparent';
+          }
+        }
+      }
+    }
+
+    // ========================================
+    // CASE 3: WITH-IMAGE - Có hình nền + màu nền/gradient
+    // ========================================
+    else {
       switch (screenMode.value) {
+        // ====================================
+        // FULL MODE: Hình nền toàn màn hình
+        // ====================================
         case 'full':
           reset();
+
           if (backgroundImageContainer) {
             backgroundImageContainer.style.width = '100%';
             backgroundImageContainer.style.backgroundImage =
@@ -599,6 +723,7 @@ const applySettings = () => {
             } else {
               if (settings.backgroundStyle === 'solid') {
                 storyContainer.style.backgroundColor = settings.backgroundColor;
+                storyContainer.style.backgroundImage = 'none';
               } else if (settings.backgroundStyle === 'gradient') {
                 storyContainer.style.backgroundColor = 'transparent';
                 storyContainer.style.backgroundImage = getGradient(
@@ -608,18 +733,14 @@ const applySettings = () => {
               }
             }
           }
-
-          // FULL: custom-background-layer và custom-solid-layer KHÔNG CÓ TÁC DỤNG
-          if (customBackgroundLayer) {
-            customBackgroundLayer.style.opacity = '0';
-          }
-          if (customSolidLayer) {
-            customSolidLayer.style.opacity = '0';
-          }
           break;
 
+        // ====================================
+        // PARTIAL MODE: Hình nền 66.67%
+        // ====================================
         case 'partial':
           reset();
+
           if (backgroundImageContainer) {
             backgroundImageContainer.style.width = '66.6667%';
             backgroundImageContainer.style.backgroundImage =
@@ -639,6 +760,7 @@ const applySettings = () => {
             } else {
               if (settings.backgroundStyle === 'solid') {
                 storyContainer.style.backgroundColor = settings.backgroundColor;
+                storyContainer.style.backgroundImage = 'none';
               } else if (settings.backgroundStyle === 'gradient') {
                 storyContainer.style.backgroundColor = 'transparent';
                 storyContainer.style.backgroundImage = getGradient(
@@ -648,26 +770,21 @@ const applySettings = () => {
               }
             }
           }
-
-          // PARTIAL: custom-background-layer và custom-solid-layer KHÔNG CÓ TÁC DỤNG
-          if (customBackgroundLayer) {
-            customBackgroundLayer.style.opacity = '0';
-          }
-          if (customSolidLayer) {
-            customSolidLayer.style.opacity = '0';
-          }
           break;
 
+        // ====================================
+        // CUSTOM MODE: Hình nền + custom layers
+        // ====================================
         case 'custom':
           reset();
 
-          // ẨN background ở backgroundImageContainer đi
+          // Background image container (ẩn hình)
           if (backgroundImageContainer) {
             backgroundImageContainer.style.width = '66.6667%';
-            backgroundImageContainer.style.backgroundImage = 'none'; // ẨN ĐI
+            backgroundImageContainer.style.backgroundImage = 'none';
           }
 
-          // XỬ LÝ READING WRAPPER - Nền tùy chỉnh (lớp 3)
+          // Reading area: Custom background style
           if (readingWrapper) {
             if (settings.mode === 'night') {
               readingWrapper.style.background = '#2c2c2c';
@@ -686,28 +803,21 @@ const applySettings = () => {
             }
           }
 
-          // XỬ LÝ CUSTOM BACKGROUND LAYER - Nền trung gian (lớp 2)
+          // Custom background layer (hiển thị hình nền mờ phía sau)
           if (customBackgroundLayer) {
             if (settings.mode === 'night') {
               customBackgroundLayer.style.opacity = '0';
             } else {
               customBackgroundLayer.style.opacity = '0.5';
               customBackgroundLayer.style.backgroundColor = '#ffffff';
-
-              // HIỂN THỊ HÌNH NỀN LÊN LỚP 2
-              if (settings.backgroundImage) {
-                customBackgroundLayer.style.backgroundImage = `url(${settings.backgroundImage})`;
-                customBackgroundLayer.style.backgroundSize = 'cover';
-                customBackgroundLayer.style.backgroundPosition =
-                  'center center';
-                customBackgroundLayer.style.backgroundRepeat = 'no-repeat';
-              } else {
-                customBackgroundLayer.style.backgroundImage = 'none';
-              }
+              customBackgroundLayer.style.backgroundImage = `url(${settings.backgroundImage})`;
+              customBackgroundLayer.style.backgroundSize = 'cover';
+              customBackgroundLayer.style.backgroundPosition = 'center center';
+              customBackgroundLayer.style.backgroundRepeat = 'no-repeat';
             }
           }
 
-          // XỬ LÝ CUSTOM SOLID LAYER - Lớp màu đặc (không có background image)
+          // Custom solid layer (lớp trắng che)
           if (customSolidLayer) {
             if (settings.mode === 'night') {
               customSolidLayer.style.opacity = '0';
@@ -717,7 +827,7 @@ const applySettings = () => {
             }
           }
 
-          // XỬ LÝ CONTAINER - Kiểu nền (lớp 1)
+          // Container chính: Vẫn áp dụng background style
           if (storyContainer) {
             if (settings.mode === 'night') {
               storyContainer.style.backgroundColor = '#2c2c2c';
@@ -739,23 +849,35 @@ const applySettings = () => {
     }
   }
 
+  // ========================================
+  // Áp dụng font settings (cho tất cả cases)
+  // ========================================
   if (contentContainer) {
     contentContainer.style.fontFamily = settings.fontFamily;
     contentContainer.style.fontSize = `${settings.fontSize}px`;
     contentContainer.style.lineHeight = settings.lineHeight;
   }
 
+  // ========================================
+  // Áp dụng filter (brightness/yellow light)
+  // ========================================
   if (storyContainer) {
     storyContainer.style.filter = settings.yellowLightMode
       ? 'sepia(70%) brightness(100%)'
       : `brightness(${settings.brightness}%)`;
   }
 
+  // ========================================
+  // Màu chữ theo mode
+  // ========================================
   if (parentComponent) {
     parentComponent.style.color =
       settings.mode === 'night' ? '#ffffff' : '#000000';
   }
 
+  // ========================================
+  // Lưu settings và đóng modal
+  // ========================================
   saveSettings();
 
   if (autoScrollEnabled.value && !isScrolling.value) {
@@ -790,7 +912,7 @@ const fetchBackgrounds = async () => {
       backgroundStoryId: background.id,
     }));
     backgroundOptions.value = [
-      { label: 'Không có', value: 'none' },
+      { label: 'Mặc Định', value: 'none' },
       ...backgrounds,
     ];
   } catch (error) {
@@ -809,10 +931,16 @@ const handleBackgroundSelection = (selectedValue) => {
   const selected = backgroundOptions.value.find(
     (option) => option.value === selectedValue
   );
+
   if (selected) {
     backgroundStoryId.value = selected.backgroundStoryId;
     selectedBackground.value = selected.value;
-    backgroundImage.value = `${BaseURL}/storage/${selected.value}`;
+
+    if (selected.value === null || selected.value === 'null') {
+      backgroundImage.value = '';
+    } else {
+      backgroundImage.value = `${BaseURL}/storage/${selected.value}`;
+    }
   }
 };
 
@@ -820,15 +948,47 @@ const fetchUserSettings = async (userId) => {
   try {
     const response = await api.get(`/story/${userId}/settings`);
     const settings = response.data.settings;
+
     fontFamily.value = settings.font_family;
     fontSize.value = settings.font_size;
     lineHeight.value = settings.line_height;
+    brightness.value = settings.brightness ?? 100;
+    mode.value = settings.mode ?? 'day';
+    yellowLightMode.value = settings.yellow_light_mode ?? false;
+    backgroundStyle.value = settings.background_style ?? 'solid';
+    backgroundColor.value = settings.background_color ?? '#ffffff';
+    selectedGradient.value = settings.selected_gradient ?? '';
+    backgroundOpacity.value = settings.background_opacity ?? 1;
+    customBackgroundStyle.value = settings.custom_background_style ?? 'solid';
+    customBackgroundColor.value = settings.custom_background_color ?? '#ffffff';
+    customSelectedGradient.value = settings.custom_selected_gradient ?? '';
+    customBackgroundOpacity.value = settings.custom_background_opacity ?? 1;
+    screenMode.value = settings.screen_mode ?? 'full';
 
-    if (settings.background_story?.background_image_path) {
-      selectedBackground.value =
-        settings.background_story.background_image_path;
-      backgroundImage.value = `${BaseURL}/storage/${settings.background_story.background_image_path}`;
+    if (settings.background_story_id) {
+      backgroundStoryId.value = settings.background_story_id;
+
+      if (settings.background_story?.background_image_path) {
+        // Case: WITH-IMAGE
+        selectedBackground.value =
+          settings.background_story.background_image_path;
+        backgroundImage.value = `${BaseURL}/storage/${settings.background_story.background_image_path}`;
+      } else {
+        // Case: NO-IMAGE
+        const matchingOption = backgroundOptions.value.find(
+          (option) => option.backgroundStoryId === settings.background_story_id
+        );
+
+        if (matchingOption) {
+          selectedBackground.value = matchingOption.value;
+        } else {
+          selectedBackground.value = `Không Hình Nền`;
+        }
+        backgroundImage.value = '';
+      }
     } else {
+      // Case: NONE
+      backgroundStoryId.value = '';
       selectedBackground.value = 'none';
       backgroundImage.value = '';
     }
@@ -839,7 +999,6 @@ const fetchUserSettings = async (userId) => {
     console.error('Lỗi khi lấy cài đặt người dùng:', error);
   }
 };
-
 const resetSettings = () => {
   const parentComponent = document.querySelector('body');
   const readingWrapper = document.querySelector('.reading-wrapper');
@@ -862,11 +1021,37 @@ const resetSettings = () => {
   }
 };
 
+const applyDarkModeToModal = () => {
+  const html = document.documentElement;
+  const isDark = html.classList.contains('dark-mode');
+
+  const modalElement = document.querySelector('.settings-modal');
+  if (modalElement) {
+    if (isDark) {
+      modalElement.classList.add('dark-mode');
+    } else {
+      modalElement.classList.remove('dark-mode');
+    }
+  }
+};
+
+const handleThemeChange = () => {
+  applyDarkModeToModal();
+};
+
 watch(autoScrollEnabled, (enabled) => {
   if (enabled && !isScrolling.value) {
     startAutoScroll();
   } else if (!enabled) {
     stopAutoScroll();
+  }
+});
+
+watch(showModal, (isOpen) => {
+  if (isOpen) {
+    setTimeout(() => {
+      applyDarkModeToModal();
+    }, 50);
   }
 });
 
@@ -878,22 +1063,22 @@ onBeforeRouteLeave((to, from) => {
 });
 
 onMounted(async () => {
-  const savedSettings = sessionStorage.getItem('user-settings');
-  if (savedSettings) {
-    settingsStore.loadSettings();
-  } else {
-    await fetchUserSettings(userId);
-    settingsStore.saveSettings();
-  }
+  // Load settings từ backend
+  await fetchUserSettings(userId);
   saveInitialSettings();
-  applySettings();
   await fetchBackgrounds();
+
+  // Apply settings sau khi load xong
+  applySettings();
 
   window.addEventListener('wheel', handleUserInteraction, { passive: true });
   window.addEventListener('touchmove', handleUserInteraction, {
     passive: true,
   });
   window.addEventListener('keydown', handleKeyPress);
+  window.addEventListener('themeChanged', handleThemeChange);
+
+  applyDarkModeToModal();
 });
 
 onUnmounted(() => {
@@ -901,6 +1086,7 @@ onUnmounted(() => {
   window.removeEventListener('wheel', handleUserInteraction);
   window.removeEventListener('touchmove', handleUserInteraction);
   window.removeEventListener('keydown', handleKeyPress);
+  window.removeEventListener('themeChanged', handleThemeChange);
 });
 </script>
 

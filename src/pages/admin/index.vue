@@ -343,12 +343,12 @@ const modules = ref([
   },
   {
     key: 'communication',
-    title: 'Gửi Thông Báo & Email',
+    title: 'gởi Thông Báo & Email',
     icon: 'fas fa-envelope-open-text',
     gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
     links: [
       {
-        label: 'Gửi Email Hàng Loạt',
+        label: 'gởi Email Hàng Loạt',
         icon: 'fas fa-paper-plane',
         route: 'admin-infos',
       },

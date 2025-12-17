@@ -67,7 +67,7 @@
             <i class="fas fa-comment-dots"></i>
             <div>
               <h2>Tin Nhắn & Giao Tiếp</h2>
-              <p>Cài đặt cách bạn nhận và gửi tin nhắn</p>
+              <p>Cài đặt cách bạn nhận và gởi tin nhắn</p>
             </div>
           </div>
           <n-button text @click="toggleSection('messaging')" class="toggle-btn">

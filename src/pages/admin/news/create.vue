@@ -162,7 +162,7 @@
           </div>
         </div>
 
-        <!-- Nút gửi -->
+        <!-- Nút gởi -->
         <div class="submit-section">
           <button type="submit" class="submit-btn">
             <span class="submit-content">

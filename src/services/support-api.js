@@ -9,7 +9,7 @@ const supportApi = {
   // Lấy hoặc tạo conversation
   getOrCreateConversation: () => api.get('/support/conversation'),
 
-  // Gửi tin nhắn
+  // gởi tin nhắn
   sendMessage: (conversationId, message) =>
     api.post('/support/messages/send', {
       conversation_id: conversationId,
@@ -49,7 +49,7 @@ const supportApi = {
   claimConversation: (conversationId) =>
     api.post(`/support/manage/conversations/${conversationId}/claim`),
 
-  // Gửi tin nhắn as support
+  // gởi tin nhắn as support
   sendManagerMessage: (conversationId, message) =>
     api.post('/support/manage/messages/send', {
       conversation_id: conversationId,

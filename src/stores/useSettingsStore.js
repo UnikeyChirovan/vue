@@ -8,6 +8,7 @@ export const useSettingsStore = defineStore('settings', {
     screenMode: 'full',
     fontFamily: 'Arial',
     fontSize: 20,
+    backgroundMode: 'none',
     backgroundImage: '',
     backgroundColor: '#ffffff',
     lineHeight: 1.5,
@@ -18,13 +19,18 @@ export const useSettingsStore = defineStore('settings', {
     customBackgroundOpacity: 1,
     backgroundStyle: 'solid',
     selectedGradient: '',
-    selectedBackground: '',
+    selectedBackground: 'none',
   }),
   actions: {
     loadSettings() {
       const savedSettings = sessionStorage.getItem('user-settings');
       if (savedSettings) {
-        Object.assign(this.$state, JSON.parse(savedSettings));
+        const parsed = JSON.parse(savedSettings);
+        Object.keys(parsed).forEach((key) => {
+          if (this.$state.hasOwnProperty(key)) {
+            this.$state[key] = parsed[key];
+          }
+        });
       }
     },
     saveSettings() {

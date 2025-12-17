@@ -95,7 +95,7 @@
             class="submit-rating-btn"
             :disabled="selectedRating === 0"
           >
-            Gửi đánh giá
+            gởi đánh giá
           </button>
         </div>
       </div>

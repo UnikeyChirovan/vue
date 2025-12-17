@@ -12,17 +12,19 @@
       </div>
 
       <div class="cover-change" v-if="showChange">
-        <input
-          type="file"
-          ref="coverInput"
-          @change="handleCoverUpload"
+        <n-upload
+          :headers="uploadHeaders"
+          :max="1"
           accept="image/*"
-          style="display: none"
-        />
-        <button @click="$refs.coverInput.click()" class="select-image-btn">
-          <i class="fa-solid fa-image"></i>
-          <span>Chọn hình</span>
-        </button>
+          @change="handleUpload"
+          class="upload-container"
+          :show-file-list="false"
+        >
+          <n-button type="primary" class="select-image-btn">
+            <i class="fa-solid fa-image"></i>
+            <span>Chọn hình</span>
+          </n-button>
+        </n-upload>
 
         <div
           class="custom-cover"
@@ -38,18 +40,20 @@
           />
         </div>
 
-        <div class="slider-container">
-          <input
-            type="range"
-            v-model="coverPosition"
-            min="-1000"
-            max="0"
-            orient="vertical"
-            class="vertical-slider"
+        <n-space class="slider-container">
+          <n-slider
+            v-model:value="coverPosition"
+            :min="-1000"
+            :max="0"
+            vertical
           />
-        </div>
-        <button @click="cancelChange" class="cancel-button">Hủy</button>
-        <button @click="saveNewCover" class="save-button">Lưu</button>
+        </n-space>
+        <n-button @click="cancelChange" class="cancel-button" type="error">
+          Hủy
+        </n-button>
+        <n-button @click="saveNewCover" class="save-button" type="info">
+          Lưu
+        </n-button>
       </div>
 
       <div class="cover-edit" v-if="showEdit">
@@ -66,46 +70,40 @@
             :style="coverStyle"
           />
         </div>
-        <div class="slider-container">
-          <input
-            type="range"
-            v-model="coverPosition"
-            min="-1000"
-            max="0"
-            orient="vertical"
-            class="vertical-slider"
+        <n-space class="slider-container">
+          <n-slider
+            v-model:value="coverPosition"
+            :min="-1000"
+            :max="0"
+            vertical
           />
-        </div>
-        <button @click="cancelEdit" class="cancel-button">Hủy</button>
-        <button @click="saveEditedCover" class="save-button">Lưu</button>
+        </n-space>
+        <n-button @click="cancelEdit" class="cancel-button" type="error">
+          Hủy
+        </n-button>
+        <n-button @click="saveEditedCover" class="save-button" type="info">
+          Lưu
+        </n-button>
       </div>
 
       <div class="edit-cover-btn" v-if="authStore.user?.id === users.id">
-        <div class="dropdown">
-          <button class="dropdown-toggle">
+        <n-dropdown :options="options" @select="handleSelect">
+          <n-button
+            strong
+            secondary
+            round
+            type="primary"
+            class="dropdown-toggle"
+          >
             <i class="fa-solid fa-gear"></i>
-          </button>
-          <div class="dropdown-menu">
-            <button @click="handleSelect('viewcover')" class="dropdown-item">
-              <i class="fa-solid fa-eye"></i>
-              <span>Coi Hình</span>
-            </button>
-            <button @click="handleSelect('changecover')" class="dropdown-item">
-              <i class="fa-solid fa-cloud-upload-alt"></i>
-              <span>Thay Hình</span>
-            </button>
-            <button @click="handleSelect('settingcover')" class="dropdown-item">
-              <i class="fa-solid fa-pen"></i>
-              <span>Sửa Hình</span>
-            </button>
-          </div>
-        </div>
+          </n-button>
+        </n-dropdown>
       </div>
     </div>
 
     <!-- Avatar Section -->
     <div class="avatar-section">
-      <img
+      <n-image
         class="avatar-img"
         alt="User Profile"
         :src="avatarUrl || 'https://picsum.photos/150'"
@@ -120,18 +118,14 @@
     </div>
 
     <!-- View Cover Modal -->
-    <div
-      v-if="showViewModal"
-      class="modal-overlay"
-      @click="showViewModal = false"
+    <n-modal
+      v-model:show="showViewModal"
+      preset="card"
+      title="Xem hình cover"
+      class="view-cover-modal"
     >
-      <div class="modal-content" @click.stop>
-        <button @click="showViewModal = false" class="modal-close">
-          <i class="fa-solid fa-times"></i>
-        </button>
-        <img :src="coverUrl" class="full-cover-img" />
-      </div>
-    </div>
+      <n-image :src="coverUrl" class="full-cover-img" />
+    </n-modal>
 
     <!-- Profile Header -->
     <div class="profile-header-content">
@@ -322,20 +316,20 @@
 
 <script setup>
 import { storeToRefs } from 'pinia';
-import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue';
+import { ref, onMounted, computed, watch, onBeforeUnmount, h } from 'vue';
+import { useMessage, NIcon } from 'naive-ui';
 import { useAuthStore } from '../../../stores/auth.js';
 import { useMenuProfile } from '../../../stores/use-menu-profile.js';
 import { useProfileStore } from '../../../stores/profile.js';
 import { useGeneralStore } from '../../../stores/general';
 import { useChatStore } from '../../../stores/chatStore.js';
-import { useToast } from '../../../stores/useToast';
 import api from '../../../services/axiosInterceptor.js';
 import dayjs from 'dayjs';
+import { Pencil, Eye, CloudUpload } from '@vicons/ionicons5';
 import ExploreModal from '../../../components/ExploreModal.vue';
 import FollowingListModal from '../../../components/FollowingListModal.vue';
 import ChatInboxModal from '../../../components/ChatInboxModal.vue';
 
-const toast = useToast();
 const chatInboxModalRef = ref(null);
 const chatStore = useChatStore();
 const exploreModalRef = ref(null);
@@ -353,6 +347,7 @@ const { isCropperModal, avatarUpdated } = storeToRefs(useGeneral);
 
 const id = authStore.user?.id;
 const { users, avatarUrl, coverUrl } = storeToRefs(useProfile);
+const message = useMessage();
 
 const handleCameraClick = () => {
   isCropperModal.value = true;
@@ -378,6 +373,16 @@ watch(
     }
   }
 );
+
+function renderIcon(icon) {
+  return () => h(NIcon, null, { default: () => h(icon) });
+}
+
+const options = [
+  { label: 'Coi Hình', key: 'viewcover', icon: renderIcon(Eye) },
+  { label: 'Thay Hình', key: 'changecover', icon: renderIcon(CloudUpload) },
+  { label: 'Sửa Hình', key: 'settingcover', icon: renderIcon(Pencil) },
+];
 
 const uploadHeaders = { Authorization: `Bearer ${authStore.accessToken}` };
 
@@ -432,27 +437,24 @@ const cancelDrag = () => {
   users.cover_position = originalCoverPosition;
   coverStyle.value.transform = `translateY(${users.cover_position}px)`;
   stopDrag();
-  toast.info('Thao tác kéo đã bị hủy và vị trí đã được khôi phục.');
+  message.info('Thao tác kéo đã bị hủy và vị trí đã được khôi phục.');
 };
 
 const newCoverFile = ref(null);
 const newCoverUrl = ref(null);
 
-const handleCoverUpload = (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-
+const handleUpload = ({ file }) => {
   const reader = new FileReader();
-  reader.onload = (e) => {
-    newCoverUrl.value = e.target.result;
+  reader.onload = (event) => {
+    newCoverUrl.value = event.target.result;
   };
-  newCoverFile.value = file;
-  reader.readAsDataURL(file);
+  newCoverFile.value = file.file;
+  reader.readAsDataURL(file.file);
 };
 
 const saveNewCover = () => {
   if (!newCoverFile.value) {
-    toast.error('Vui lòng chọn một tệp hình ảnh!');
+    message.error('Vui lòng chọn một tệp hình ảnh!');
     return;
   }
   const formData = new FormData();
@@ -467,22 +469,22 @@ const saveNewCover = () => {
         useProfile.updateCoverPosition(response.data.positionY);
         useProfile.updateCoverUrl(response.data.url);
         showChange.value = false;
-        toast.success('Cover đã được lưu thành công!');
+        message.success('Cover đã được lưu thành công!');
       }
     })
-    .catch(() => toast.error('Lưu hình cover thất bại!'));
+    .catch(() => message.error('Lưu hình cover thất bại!'));
 };
 
 const cancelChange = () => {
   showChange.value = false;
   newCoverUrl.value = null;
-  toast.info('Đã hủy thao tác thay đổi hình cover.');
+  message.info('Đã hủy thao tác thay đổi hình cover.');
 };
 
 const cancelEdit = () => {
   showEdit.value = false;
   cover_position.value = originalCoverPosition;
-  toast.info('Đã hủy thao tác chỉnh sửa hình cover.');
+  message.info('Đã hủy thao tác chỉnh sửa hình cover.');
 };
 
 const showViewModal = ref(false);
@@ -511,10 +513,10 @@ const saveEditedCover = () => {
       if (response.status === 200) {
         useProfile.updateCoverPosition(response.data.positionY);
         showEdit.value = false;
-        toast.success('Vị trí cover đã được lưu thành công!');
+        message.success('Vị trí cover đã được lưu thành công!');
       }
     })
-    .catch(() => toast.error('Lưu vị trí cover thất bại!'));
+    .catch(() => message.error('Lưu vị trí cover thất bại!'));
 };
 
 const lastChapter = ref('');
@@ -606,15 +608,11 @@ html.dark-mode .cover-section {
   z-index: 10;
 }
 
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-toggle {
-  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
-  color: white;
-  border: none;
+/* Dropdown Toggle Button */
+.edit-cover-btn :deep(.dropdown-toggle) {
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%) !important;
+  color: white !important;
+  border: none !important;
   padding: 12px 16px;
   border-radius: 50px;
   cursor: pointer;
@@ -623,77 +621,56 @@ html.dark-mode .cover-section {
   box-shadow: 0 4px 12px rgba(12, 113, 61, 0.3);
 }
 
-html.dark-mode .dropdown-toggle {
-  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+html.dark-mode .edit-cover-btn :deep(.dropdown-toggle) {
+  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%) !important;
   box-shadow: 0 4px 12px rgba(15, 138, 74, 0.3);
 }
 
-.dropdown-toggle:hover {
+.edit-cover-btn :deep(.dropdown-toggle:hover) {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
 }
 
-html.dark-mode .dropdown-toggle:hover {
+html.dark-mode .edit-cover-btn :deep(.dropdown-toggle:hover) {
   box-shadow: 0 6px 20px rgba(15, 138, 74, 0.4);
 }
 
-.dropdown:hover .dropdown-menu {
-  display: block;
-}
-
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 8px;
-  background: white;
+/* Dropdown Menu Styling */
+.edit-cover-btn :deep(.n-dropdown-menu) {
+  background: white !important;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   min-width: 180px;
-  z-index: 1000;
 }
 
-html.dark-mode .dropdown-menu {
-  background: #1e1e1e;
+html.dark-mode .edit-cover-btn :deep(.n-dropdown-menu) {
+  background: #1e1e1e !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
-.dropdown-item {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.edit-cover-btn :deep(.n-dropdown-option) {
+  color: #333 !important;
   padding: 12px 16px;
-  background: transparent;
-  border: none;
-  color: #333;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
   transition: all 0.2s ease;
-  text-align: left;
 }
 
-html.dark-mode .dropdown-item {
-  color: #e0e0e0;
+html.dark-mode .edit-cover-btn :deep(.n-dropdown-option) {
+  color: #e0e0e0 !important;
 }
 
-.dropdown-item:hover {
-  background: rgba(12, 113, 61, 0.1);
-  color: #0c713d;
+.edit-cover-btn :deep(.n-dropdown-option:hover) {
+  background: rgba(12, 113, 61, 0.1) !important;
+  color: #0c713d !important;
 }
 
-html.dark-mode .dropdown-item:hover {
-  background: rgba(15, 138, 74, 0.2);
-  color: #0f8a4a;
+html.dark-mode .edit-cover-btn :deep(.n-dropdown-option:hover) {
+  background: rgba(15, 138, 74, 0.2) !important;
+  color: #0f8a4a !important;
 }
 
-.dropdown-item i {
-  font-size: 16px;
-  width: 20px;
-  text-align: center;
+.edit-cover-btn :deep(.n-dropdown-option .n-dropdown-option__icon) {
+  color: inherit;
 }
 
 .avatar-section {
@@ -775,18 +752,21 @@ html.dark-mode .camera-btn i {
   transition: transform 0.2s ease;
 }
 
-.select-image-btn {
+.upload-container {
   position: absolute;
   top: 10px;
   right: 10px;
   z-index: 10;
+}
+
+.select-image-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
-  color: white;
-  border: none;
+  padding: 12px 24px !important;
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%) !important;
+  color: white !important;
+  border: none !important;
   border-radius: 50px;
   font-weight: 600;
   cursor: pointer;
@@ -795,7 +775,7 @@ html.dark-mode .camera-btn i {
 }
 
 html.dark-mode .select-image-btn {
-  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%) !important;
   box-shadow: 0 4px 12px rgba(15, 138, 74, 0.3);
 }
 
@@ -825,30 +805,10 @@ html.dark-mode .select-image-btn:hover {
 
 .save-button {
   bottom: 3.5rem;
-  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
-}
-
-html.dark-mode .save-button {
-  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
-}
-
-.save-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
 }
 
 .cancel-button {
   bottom: 1rem;
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-}
-
-html.dark-mode .cancel-button {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-}
-
-.cancel-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
 }
 
 .slider-container {
@@ -857,90 +817,68 @@ html.dark-mode .cancel-button {
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
-}
-
-.vertical-slider {
-  -webkit-appearance: slider-vertical;
-  width: 8px;
   height: 200px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-  outline: none;
+  display: flex;
+  align-items: center;
 }
 
-html.dark-mode .vertical-slider {
+.slider-container :deep(.n-slider) {
+  height: 200px;
+}
+
+.slider-container :deep(.n-slider-rail) {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+html.dark-mode .slider-container :deep(.n-slider-rail) {
   background: rgba(0, 0, 0, 0.3);
 }
 
-.vertical-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
+.slider-container :deep(.n-slider-fill) {
   background: #0c713d;
-  cursor: pointer;
 }
 
-html.dark-mode .vertical-slider::-webkit-slider-thumb {
+html.dark-mode .slider-container :deep(.n-slider-fill) {
   background: #0f8a4a;
 }
 
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 20px;
-}
-
-.modal-content {
-  position: relative;
-  max-width: 90%;
-  max-height: 90%;
+.slider-container :deep(.n-slider-handle) {
+  border: 2px solid #0c713d;
   background: white;
-  border-radius: 16px;
-  overflow: hidden;
 }
 
-html.dark-mode .modal-content {
+html.dark-mode .slider-container :deep(.n-slider-handle) {
+  border-color: #0f8a4a;
   background: #1e1e1e;
 }
 
-.modal-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
-  border: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  z-index: 10;
+/* Modal Styling */
+:deep(.view-cover-modal.n-card) {
+  max-width: 90vw;
+  max-height: 90vh;
+  background: white;
+  border-radius: 16px;
 }
 
-.modal-close:hover {
-  background: rgba(0, 0, 0, 0.8);
-  transform: rotate(90deg);
+html.dark-mode :deep(.view-cover-modal.n-card) {
+  background: #1e1e1e;
+}
+
+:deep(.view-cover-modal .n-card__header) {
+  background: transparent;
+  color: #1f2937;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+html.dark-mode :deep(.view-cover-modal .n-card__header) {
+  color: #e0e0e0;
+  border-bottom-color: #333;
 }
 
 .full-cover-img {
   width: 100%;
-  height: 100%;
+  height: auto;
+  max-height: 80vh;
   object-fit: contain;
 }
 
@@ -1369,6 +1307,23 @@ html.dark-mode .history-number {
 
 /* Tablet */
 @media (max-width: 768px) {
+  .cover-section {
+    height: 250px;
+  }
+
+  .avatar-section {
+    width: 150px;
+    height: 150px;
+    margin-top: -75px;
+  }
+
+  .camera-btn {
+    width: 35px;
+    height: 35px;
+    top: 110px;
+    font-size: 16px;
+  }
+
   .profile-header-content {
     padding: 0 16px;
   }
@@ -1449,6 +1404,20 @@ html.dark-mode .history-number {
     width: 55px;
     height: 55px;
     font-size: 22px;
+  }
+
+  .save-button,
+  .cancel-button {
+    right: 1.5rem;
+    padding: 10px 20px;
+  }
+
+  .save-button {
+    bottom: 3rem;
+  }
+
+  .cancel-button {
+    bottom: 0.8rem;
   }
 }
 

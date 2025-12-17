@@ -31,13 +31,13 @@
           >
             <i v-if="loading" class="fa-solid fa-spinner fa-spin"></i>
             <i v-else class="fa-solid fa-paper-plane"></i>
-            <span>{{ loading ? 'Đang gửi...' : 'Gửi yêu cầu' }}</span>
+            <span>{{ loading ? 'Đang gởi...' : 'gởi yêu cầu' }}</span>
           </button>
         </n-form>
 
         <div class="card-footer">
           <i class="fa-solid fa-info-circle"></i>
-          <p>Kiểm tra hộp thư email của bạn sau khi gửi yêu cầu</p>
+          <p>Kiểm tra hộp thư email của bạn sau khi gởi yêu cầu</p>
         </div>
       </div>
     </div>

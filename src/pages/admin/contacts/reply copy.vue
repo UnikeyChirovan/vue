@@ -63,7 +63,7 @@
             </button>
             <button type="submit" class="submit-btn">
               <i class="fa-solid fa-paper-plane"></i>
-              <span>Gửi phản hồi</span>
+              <span>gởi phản hồi</span>
             </button>
           </div>
         </form>

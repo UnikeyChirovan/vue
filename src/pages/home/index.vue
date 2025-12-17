@@ -661,6 +661,7 @@ body {
   justify-content: center;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  opacity: 0.5;
 }
 
 .prev-btn::before,
@@ -680,7 +681,7 @@ body {
 
 .prev-btn:hover::before,
 .next-btn:hover::before {
-  opacity: 1;
+  opacity: 0.8;
 }
 
 .prev-btn {
