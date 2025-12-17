@@ -204,6 +204,7 @@ import Notification from '../../components/Notification.vue';
 import LoadingModal from '../../components/LoadingModal.vue';
 import { useLoadingStore } from '../../stores/loadingStore';
 import { useCategoryStore } from '../../stores/useCategoryStore';
+import { useToast } from '../../stores/useToast';
 
 const BaseURL = 'http://127.0.0.1:8000';
 const getVideoUrl = (path) => `${BaseURL}/storage/${path}`;
@@ -213,6 +214,7 @@ const voteStore = useVoteStore();
 const authStore = useAuthStore();
 const categoryStore = useCategoryStore();
 const router = useRouter();
+const toast = useToast();
 
 const futureProjectTitle = computed(() =>
   categoryStore.getCategoryTitle('2', 'home', 'Dự Án Tương Lai')
@@ -280,7 +282,7 @@ const features = ref([]);
 const handleButtonClick = () => {
   if (currentButtonText.value === 'Get Started') {
     scrollToFeatures();
-  } else if (currentButtonText.value === 'Tới Trang Liên Hệ') {
+  } else if (currentButtonText.value === 'Tới Trang liên lạc') {
     goToContacts();
   } else if (currentButtonText.value === 'Tới Trang Giới Thiệu') {
     goToAbout();
@@ -306,7 +308,9 @@ const goToMaps = () => {
 };
 const goToStories = () => {
   if (!authStore.isLoggedIn) {
-    showToast('Vui lòng đăng nhập để đọc truyện bạn nhé!', 'warning');
+    if (toast) {
+      toast.warning('Vui lòng đăng nhập để đọc truyện bạn nhé!');
+    }
   } else {
     router.push({ name: 'stories' });
   }
@@ -314,43 +318,81 @@ const goToStories = () => {
 
 const hoveredFeature = ref(null);
 const voteUpdated = ref(false);
+const isVoting = ref(false);
 
-const showToast = (message, type = 'info') => {
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.textContent = message;
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.classList.add('show');
-  }, 10);
-
-  setTimeout(() => {
-    toast.classList.remove('show');
-    setTimeout(() => {
-      document.body.removeChild(toast);
-    }, 300);
-  }, 3000);
-};
-
+// ========== HÀM VOTE MỚI VỚI TOAST ==========
 const vote = async (choice) => {
+  // Kiểm tra đăng nhập
   if (!authStore.isLoggedIn) {
-    showToast('Vui lòng đăng nhập để vote!', 'warning');
+    if (toast) {
+      toast.warning('Vui lòng đăng nhập để vote!');
+    }
     return;
   }
 
+  // Tránh spam click
+  if (isVoting.value) {
+    return;
+  }
+
+  isVoting.value = true;
+
   try {
     const response = await api.post('/vote/createOrUpdate', { choice });
-    showToast(response.data.message, 'success');
 
+    // Hiển thị thông báo thành công
+    if (toast) {
+      toast.success(response.data.message || 'Vote thành công!');
+    }
+
+    // Cập nhật store
     voteStore.userVoteChoice = choice;
     voteUpdated.value = true;
+
+    // Cập nhật kết quả vote
     await updateVoteResults();
   } catch (error) {
-    showToast(
-      error.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại!',
-      'error'
-    );
+    // Xử lý các loại lỗi
+    if (error.response) {
+      const status = error.response.status;
+      const message = error.response.data?.message;
+
+      switch (status) {
+        case 403:
+          if (toast) {
+            toast.warning('Bạn phải đăng nhập để vote!');
+          }
+          break;
+        case 409:
+          if (toast) {
+            toast.warning(
+              message || 'Bạn chỉ có thể thay đổi vote sau 7 ngày!'
+            );
+          }
+          break;
+        case 500:
+          if (toast) {
+            toast.error('Lỗi server, vui lòng thử lại sau!');
+          }
+          break;
+        default:
+          if (toast) {
+            toast.error(message || 'Có lỗi xảy ra, vui lòng thử lại!');
+          }
+      }
+    } else if (error.request) {
+      if (toast) {
+        toast.error('Không thể kết nối đến server!');
+      }
+    } else {
+      if (toast) {
+        toast.error('Có lỗi xảy ra, vui lòng thử lại!');
+      }
+    }
+
+    console.error('Vote error:', error);
+  } finally {
+    isVoting.value = false;
   }
 };
 
@@ -374,6 +416,9 @@ const updateVoteResults = async () => {
     }
   } catch (error) {
     console.error('Lỗi khi cập nhật kết quả vote:', error);
+    if (toast) {
+      toast.error('Không thể tải kết quả vote!');
+    }
   }
 };
 
@@ -431,22 +476,27 @@ const fetchFeaturedVideo = async () => {
 onMounted(async () => {
   const beforeStatus = localStorage.getItem('Before');
   const finalStatus = localStorage.getItem('Final');
+
   await AOS.init({
     duration: 800,
     once: true,
     easing: 'ease-out-cubic',
   });
+
   observeLocalStorageChange();
   loadHeroSlidesFromStorage();
   loadFutureProjectsFromStorage();
   loadFeaturesFromStorage();
   fetchFeaturedVideo();
+
   if (finalStatus !== 'ok') {
     if (beforeStatus !== 'ok') {
       await loadingStore.fetchDataBeforeLogin(() => {});
     }
   }
+
   await updateVoteResults();
+
   if (authStore.isLoggedIn) {
     await voteStore.getUserVote();
   }

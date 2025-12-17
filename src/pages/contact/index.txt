@@ -164,7 +164,7 @@ async function fetchCategories() {
     }
   }
 }
-const contactTitle = computed(() => isCategoriesReady.value? categories.value.find(category => category.code === '5' && category.page === 'contact')?.name : 'TRANG LIÊN HỆ QUẢN TRỊ');
+const contactTitle = computed(() => isCategoriesReady.value? categories.value.find(category => category.code === '5' && category.page === 'contact')?.name : 'TRANG liên lạc QUẢN TRỊ');
 const titleAddress = computed(() => isCategoriesReady.value ? categories.value.find(category => category.code === '6' && category.page === 'contact')?.name : 'Địa chỉ:');
 const titlePhone = computed(() => isCategoriesReady.value ? categories.value.find(category => category.code === '7' && category.page === 'contact')?.name : 'Điện thoại:');
 const titleEmail = computed(() => isCategoriesReady.value ? categories.value.find(category => category.code === '8' && category.page === 'contact')?.name : 'Email:');

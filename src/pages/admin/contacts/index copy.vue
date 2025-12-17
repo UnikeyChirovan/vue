@@ -5,7 +5,7 @@
         <div class="card-header-content">
           <div class="header-left">
             <i class="fa-solid fa-envelope header-icon"></i>
-            <span class="header-title">Danh Sách Liên Hệ</span>
+            <span class="header-title">Danh Sách liên lạc</span>
           </div>
         </div>
       </template>
@@ -19,7 +19,7 @@
           :pagination="{
             pageSize: 10,
             showSizeChanger: true,
-            showTotal: (total) => `Tổng ${total} liên hệ`,
+            showTotal: (total) => `Tổng ${total} liên lạc`,
           }"
         >
           <template #bodyCell="{ column, index, record }">
@@ -150,7 +150,7 @@
     <!-- Delete Modal -->
     <a-modal
       v-model:visible="isModalVisible"
-      title="Xác nhận xóa liên hệ"
+      title="Xác nhận xóa liên lạc"
       @ok="handleOk"
       @cancel="handleCancel"
       okText="Xác nhận"
@@ -159,7 +159,7 @@
     >
       <div class="modal-content">
         <i class="fa-solid fa-circle-exclamation warning-icon"></i>
-        <p>Bạn có chắc chắn muốn xóa liên hệ này không?</p>
+        <p>Bạn có chắc chắn muốn xóa liên lạc này không?</p>
       </div>
     </a-modal>
   </div>
@@ -211,7 +211,7 @@ const columns = [
     align: 'center',
   },
   {
-    title: 'Thời gian Liên hệ',
+    title: 'Thời gian liên lạc',
     dataIndex: 'contacted_at',
     key: 'contacted_at',
     align: 'center',
@@ -228,7 +228,7 @@ const getContacts = async () => {
     const response = await api.get('/noauth/contacts');
     contacts.value = response.data;
   } catch (error) {
-    message.error('Không thể tải danh sách liên hệ');
+    message.error('Không thể tải danh sách liên lạc');
   }
 };
 
@@ -245,12 +245,12 @@ const handleOk = () => {
     .delete(`/noauth/contacts/${contactIdToDelete.value}`)
     .then((res) => {
       if (res.status === 200) {
-        message.success('Xóa liên hệ thành công');
+        message.success('Xóa liên lạc thành công');
         getContacts();
       }
     })
     .catch((err) => {
-      message.error('Lỗi xóa liên hệ');
+      message.error('Lỗi xóa liên lạc');
     })
     .finally(() => {
       isModalVisible.value = false;

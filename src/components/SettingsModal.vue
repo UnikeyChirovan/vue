@@ -1,6 +1,11 @@
 <template>
   <div>
-    <n-button type="primary" @click="showModal = true" class="settings-button">
+    <n-button
+      type="primary"
+      @click="showModal = true"
+      class="settings-button"
+      :class="{ 'dark-mode': themeStore.isDarkMode }"
+    >
       <span class="button-text">Cài đặt</span>
       <i class="fas fa-cog mobile-icon"></i>
     </n-button>
@@ -10,6 +15,7 @@
       title="Cài đặt"
       :style="modalStyle"
       class="settings-modal"
+      :class="{ 'dark-mode': themeStore.isDarkMode }"
     >
       <n-space vertical>
         <n-form-item label="Độ sáng">
@@ -278,6 +284,7 @@
 <script setup>
 import { ref, onMounted, computed, watch, onUnmounted } from 'vue';
 import { useAuthStore } from '../stores/auth';
+import { useThemeStore } from '../stores/themeStore';
 import {
   NButton,
   NModal,
@@ -300,6 +307,7 @@ import { useRoute, onBeforeRouteLeave } from 'vue-router';
 
 const route = useRoute();
 const settingsStore = useSettingsStore();
+const themeStore = useThemeStore();
 const userId = useAuthStore().user?.id;
 const showModal = ref(false);
 const hasSettings = ref(false);
@@ -503,12 +511,10 @@ const handleKeyPress = (e) => {
 };
 
 const getBackgroundModeForBackend = () => {
-  // Không có background_story_id -> none
   if (!backgroundStoryId.value || selectedBackground.value === 'none') {
     return 'none';
   }
 
-  // Có background_story_id nhưng không có path -> no-image
   if (
     !backgroundImage.value ||
     selectedBackground.value === null ||
@@ -517,7 +523,6 @@ const getBackgroundModeForBackend = () => {
     return 'no-image';
   }
 
-  // Có cả id và path -> with-image
   return 'with-image';
 };
 
@@ -527,7 +532,7 @@ const saveSettings = async () => {
   const settingsData = {
     background_story_id: backgroundStoryId.value || null,
     background_mode: getBackgroundModeForBackend(),
-    screen_mode: screenMode.value, // ✅ gởi screen_mode lên backend
+    screen_mode: screenMode.value,
     font_family: fontFamily.value,
     font_size: fontSize.value,
     line_height: lineHeight.value,
@@ -617,9 +622,6 @@ const applySettings = () => {
   };
 
   if (route.path === '/stories') {
-    // ========================================
-    // CASE 1: NONE - Reset hoàn toàn, chỉ màu mặc định
-    // ========================================
     if (settings.selectedBackground === 'none') {
       reset();
 
@@ -635,14 +637,9 @@ const applySettings = () => {
             : 'linear-gradient(180deg, rgba(250, 250, 250, 0.95) 0%, rgba(255, 255, 255, 0.95) 100%)';
       }
     }
-
-    // ========================================
-    // CASE 2: NO-IMAGE - Không có hình, nhưng VẪN áp dụng màu nền/gradient
-    // ========================================
     else if (!settings.backgroundImage) {
       reset();
 
-      // Night mode: Chỉ dùng màu tối
       if (settings.mode === 'night') {
         if (storyContainer) {
           storyContainer.style.backgroundColor = '#2c2c2c';
@@ -651,9 +648,7 @@ const applySettings = () => {
           readingWrapper.style.background = '#2c2c2c';
         }
       }
-      // Day mode: Áp dụng background style
       else {
-        // Container chính: Áp dụng background style
         if (storyContainer) {
           if (settings.backgroundStyle === 'solid') {
             storyContainer.style.backgroundColor = settings.backgroundColor;
@@ -667,10 +662,8 @@ const applySettings = () => {
           }
         }
 
-        // Reading area: Phụ thuộc vào screenMode
         if (readingWrapper) {
           if (screenMode.value === 'custom') {
-            // Custom mode: Áp dụng custom background style
             if (settings.customBackgroundStyle === 'solid') {
               readingWrapper.style.backgroundColor =
                 settings.customBackgroundColor;
@@ -683,21 +676,13 @@ const applySettings = () => {
               );
             }
           } else {
-            // Full/Partial mode: Transparent hoặc theo container
             readingWrapper.style.background = 'transparent';
           }
         }
       }
     }
-
-    // ========================================
-    // CASE 3: WITH-IMAGE - Có hình nền + màu nền/gradient
-    // ========================================
     else {
       switch (screenMode.value) {
-        // ====================================
-        // FULL MODE: Hình nền toàn màn hình
-        // ====================================
         case 'full':
           reset();
 
@@ -735,9 +720,6 @@ const applySettings = () => {
           }
           break;
 
-        // ====================================
-        // PARTIAL MODE: Hình nền 66.67%
-        // ====================================
         case 'partial':
           reset();
 
@@ -772,19 +754,14 @@ const applySettings = () => {
           }
           break;
 
-        // ====================================
-        // CUSTOM MODE: Hình nền + custom layers
-        // ====================================
         case 'custom':
           reset();
 
-          // Background image container (ẩn hình)
           if (backgroundImageContainer) {
             backgroundImageContainer.style.width = '66.6667%';
             backgroundImageContainer.style.backgroundImage = 'none';
           }
 
-          // Reading area: Custom background style
           if (readingWrapper) {
             if (settings.mode === 'night') {
               readingWrapper.style.background = '#2c2c2c';
@@ -803,7 +780,6 @@ const applySettings = () => {
             }
           }
 
-          // Custom background layer (hiển thị hình nền mờ phía sau)
           if (customBackgroundLayer) {
             if (settings.mode === 'night') {
               customBackgroundLayer.style.opacity = '0';
@@ -817,7 +793,6 @@ const applySettings = () => {
             }
           }
 
-          // Custom solid layer (lớp trắng che)
           if (customSolidLayer) {
             if (settings.mode === 'night') {
               customSolidLayer.style.opacity = '0';
@@ -827,7 +802,6 @@ const applySettings = () => {
             }
           }
 
-          // Container chính: Vẫn áp dụng background style
           if (storyContainer) {
             if (settings.mode === 'night') {
               storyContainer.style.backgroundColor = '#2c2c2c';
@@ -849,35 +823,23 @@ const applySettings = () => {
     }
   }
 
-  // ========================================
-  // Áp dụng font settings (cho tất cả cases)
-  // ========================================
   if (contentContainer) {
     contentContainer.style.fontFamily = settings.fontFamily;
     contentContainer.style.fontSize = `${settings.fontSize}px`;
     contentContainer.style.lineHeight = settings.lineHeight;
   }
 
-  // ========================================
-  // Áp dụng filter (brightness/yellow light)
-  // ========================================
   if (storyContainer) {
     storyContainer.style.filter = settings.yellowLightMode
       ? 'sepia(70%) brightness(100%)'
       : `brightness(${settings.brightness}%)`;
   }
 
-  // ========================================
-  // Màu chữ theo mode
-  // ========================================
   if (parentComponent) {
     parentComponent.style.color =
       settings.mode === 'night' ? '#ffffff' : '#000000';
   }
 
-  // ========================================
-  // Lưu settings và đóng modal
-  // ========================================
   saveSettings();
 
   if (autoScrollEnabled.value && !isScrolling.value) {
@@ -969,12 +931,10 @@ const fetchUserSettings = async (userId) => {
       backgroundStoryId.value = settings.background_story_id;
 
       if (settings.background_story?.background_image_path) {
-        // Case: WITH-IMAGE
         selectedBackground.value =
           settings.background_story.background_image_path;
         backgroundImage.value = `${BaseURL}/storage/${settings.background_story.background_image_path}`;
       } else {
-        // Case: NO-IMAGE
         const matchingOption = backgroundOptions.value.find(
           (option) => option.backgroundStoryId === settings.background_story_id
         );
@@ -987,7 +947,6 @@ const fetchUserSettings = async (userId) => {
         backgroundImage.value = '';
       }
     } else {
-      // Case: NONE
       backgroundStoryId.value = '';
       selectedBackground.value = 'none';
       backgroundImage.value = '';
@@ -999,6 +958,7 @@ const fetchUserSettings = async (userId) => {
     console.error('Lỗi khi lấy cài đặt người dùng:', error);
   }
 };
+
 const resetSettings = () => {
   const parentComponent = document.querySelector('body');
   const readingWrapper = document.querySelector('.reading-wrapper');
@@ -1021,37 +981,11 @@ const resetSettings = () => {
   }
 };
 
-const applyDarkModeToModal = () => {
-  const html = document.documentElement;
-  const isDark = html.classList.contains('dark-mode');
-
-  const modalElement = document.querySelector('.settings-modal');
-  if (modalElement) {
-    if (isDark) {
-      modalElement.classList.add('dark-mode');
-    } else {
-      modalElement.classList.remove('dark-mode');
-    }
-  }
-};
-
-const handleThemeChange = () => {
-  applyDarkModeToModal();
-};
-
 watch(autoScrollEnabled, (enabled) => {
   if (enabled && !isScrolling.value) {
     startAutoScroll();
   } else if (!enabled) {
     stopAutoScroll();
-  }
-});
-
-watch(showModal, (isOpen) => {
-  if (isOpen) {
-    setTimeout(() => {
-      applyDarkModeToModal();
-    }, 50);
   }
 });
 
@@ -1063,12 +997,9 @@ onBeforeRouteLeave((to, from) => {
 });
 
 onMounted(async () => {
-  // Load settings từ backend
   await fetchUserSettings(userId);
   saveInitialSettings();
   await fetchBackgrounds();
-
-  // Apply settings sau khi load xong
   applySettings();
 
   window.addEventListener('wheel', handleUserInteraction, { passive: true });
@@ -1076,9 +1007,6 @@ onMounted(async () => {
     passive: true,
   });
   window.addEventListener('keydown', handleKeyPress);
-  window.addEventListener('themeChanged', handleThemeChange);
-
-  applyDarkModeToModal();
 });
 
 onUnmounted(() => {
@@ -1086,7 +1014,6 @@ onUnmounted(() => {
   window.removeEventListener('wheel', handleUserInteraction);
   window.removeEventListener('touchmove', handleUserInteraction);
   window.removeEventListener('keydown', handleKeyPress);
-  window.removeEventListener('themeChanged', handleThemeChange);
 });
 </script>
 

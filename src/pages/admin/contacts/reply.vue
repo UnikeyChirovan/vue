@@ -2,7 +2,7 @@
   <div class="container mt-5">
     <h1 class="text-center" style="color: red">TRANG PHẢN HỒI EMAIL</h1>
     <div class="form-group">
-      <label>Nội dung liên hệ:</label>
+      <label>Nội dung liên lạc:</label>
       <textarea
         class="form-control contact-message"
         rows="5"

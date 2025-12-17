@@ -194,7 +194,7 @@ const statistics = ref([
   },
   {
     key: 'contacts',
-    label: 'Liên Hệ Mới',
+    label: 'liên lạc Mới',
     value: '0',
     icon: 'fas fa-envelope',
     gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
@@ -325,7 +325,7 @@ const modules = ref([
         route: 'admin-company',
       },
       {
-        label: 'Liên Hệ Khách Hàng',
+        label: 'liên lạc Khách Hàng',
         icon: 'fas fa-paper-plane',
         route: 'admin-contacts',
       },

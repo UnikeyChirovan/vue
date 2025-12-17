@@ -88,7 +88,7 @@
           <h5 class="column-title">VỀ CHÚNG TÔI</h5>
           <ul class="footer-links">
             <li><router-link to="/about">Giới Thiệu</router-link></li>
-            <li><router-link to="/contact">Liên Hệ</router-link></li>
+            <li><router-link to="/contact">liên lạc</router-link></li>
           </ul>
         </div>
 
@@ -104,7 +104,7 @@
 
         <!-- Contact Section -->
         <div class="footer-column">
-          <h5 class="column-title">THÔNG TIN LIÊN HỆ</h5>
+          <h5 class="column-title">THÔNG TIN liên lạc</h5>
           <div class="contact-info">
             <p class="contact-item">
               <span class="contact-icon">✉</span>

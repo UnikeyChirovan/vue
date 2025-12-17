@@ -58,7 +58,7 @@
         <i class="fa-solid fa-info-circle"></i>
         <span
           >Hiện không có support online, vui lòng để lại tin nhắn trong phần
-          <router-link to="/contact">liên hệ</router-link></span
+          <router-link to="/contact">liên lạc</router-link></span
         >
       </div>
 
@@ -213,7 +213,7 @@ const submitRating = async () => {
 
     setTimeout(() => {
       message.info(
-        'Cảm ơn bạn đã đánh giá! Nếu cần hỗ trợ thêm, hãy liên hệ lại.'
+        'Cảm ơn bạn đã đánh giá! Nếu cần hỗ trợ thêm, hãy liên lạc lại.'
       );
     }, 300);
   } catch (error) {
@@ -293,6 +293,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* ========== CHAT WINDOW ========== */
 .support-chat-window {
   position: fixed;
   bottom: 20px;
@@ -306,8 +307,15 @@ onUnmounted(() => {
   flex-direction: column;
   z-index: 1001;
   overflow: hidden;
+  transition: all 0.3s ease;
 }
 
+html.dark-mode .support-chat-window {
+  background: #1e1e1e;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* ========== CHAT HEADER ========== */
 .chat-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -315,16 +323,24 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
+}
+
+html.dark-mode .chat-header {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
 }
 
 .header-info {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex: 1;
+  min-width: 0;
 }
 
 .support-avatar {
   position: relative;
+  flex-shrink: 0;
 }
 
 .support-avatar img {
@@ -332,6 +348,11 @@ onUnmounted(() => {
   height: 48px;
   border-radius: 50%;
   border: 2px solid white;
+  object-fit: cover;
+}
+
+html.dark-mode .support-avatar img {
+  border-color: rgba(255, 255, 255, 0.9);
 }
 
 .online-dot {
@@ -343,26 +364,48 @@ onUnmounted(() => {
   background: #44b700;
   border: 2px solid white;
   border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.header-text {
+  flex: 1;
+  min-width: 0;
 }
 
 .header-text h3 {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header-text p {
   margin: 4px 0 0 0;
   font-size: 12px;
   opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .status-online {
-  color: #44b700;
+  color: #a7f3d0;
 }
 
 .status-offline {
-  color: #ffcc00;
+  color: #fde68a;
 }
 
 .close-btn {
@@ -376,14 +419,20 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  transition: all 0.3s ease;
   flex-shrink: 0;
 }
 
 .close-btn:hover {
   background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
 }
 
+.close-btn:active {
+  transform: rotate(90deg) scale(0.95);
+}
+
+/* ========== CHAT MESSAGES ========== */
 .chat-messages {
   flex: 1;
   overflow-y: auto;
@@ -394,8 +443,16 @@ onUnmounted(() => {
   gap: 12px;
 }
 
+html.dark-mode .chat-messages {
+  background: #121212;
+}
+
 .chat-messages::-webkit-scrollbar {
   width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .chat-messages::-webkit-scrollbar-thumb {
@@ -403,6 +460,19 @@ onUnmounted(() => {
   border-radius: 3px;
 }
 
+html.dark-mode .chat-messages::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}
+
+html.dark-mode .chat-messages::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* ========== LOADING & EMPTY STATE ========== */
 .loading-state,
 .empty-state {
   display: flex;
@@ -414,11 +484,23 @@ onUnmounted(() => {
   gap: 12px;
 }
 
+html.dark-mode .loading-state,
+html.dark-mode .empty-state {
+  color: #9ca3af;
+}
+
 .loading-state i,
 .empty-state i {
   font-size: 48px;
 }
 
+.empty-state p {
+  font-size: 15px;
+  text-align: center;
+  max-width: 80%;
+}
+
+/* ========== MESSAGES ========== */
 .message {
   display: flex;
   gap: 8px;
@@ -440,10 +522,15 @@ onUnmounted(() => {
   flex-direction: row-reverse;
 }
 
+.message-avatar {
+  flex-shrink: 0;
+}
+
 .message-avatar img {
   width: 32px;
   height: 32px;
   border-radius: 50%;
+  object-fit: cover;
 }
 
 .message-content {
@@ -451,6 +538,11 @@ onUnmounted(() => {
   padding: 10px 14px;
   border-radius: 16px;
   word-wrap: break-word;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+html.dark-mode .message-content {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .message.support .message-content {
@@ -459,10 +551,19 @@ onUnmounted(() => {
   border-bottom-left-radius: 4px;
 }
 
+html.dark-mode .message.support .message-content {
+  background: #2a2a2a;
+  color: #e0e0e0;
+}
+
 .message.user .message-content {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border-bottom-right-radius: 4px;
+}
+
+html.dark-mode .message.user .message-content {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
 }
 
 .message-content p {
@@ -476,6 +577,7 @@ onUnmounted(() => {
   opacity: 0.7;
 }
 
+/* ========== OFFLINE NOTICE ========== */
 .offline-notice {
   background: #fff3cd;
   color: #856404;
@@ -485,17 +587,44 @@ onUnmounted(() => {
   gap: 8px;
   font-size: 13px;
   border-top: 1px solid #ffeaa7;
+  flex-shrink: 0;
+}
+
+html.dark-mode .offline-notice {
+  background: #3a3100;
+  color: #fde68a;
+  border-top-color: #4a4100;
 }
 
 .offline-notice a {
   color: #667eea;
   text-decoration: underline;
+  font-weight: 600;
 }
 
+html.dark-mode .offline-notice a {
+  color: #a78bfa;
+}
+
+.offline-notice a:hover {
+  color: #764ba2;
+}
+
+html.dark-mode .offline-notice a:hover {
+  color: #c4b5fd;
+}
+
+/* ========== RATING SECTION ========== */
 .rating-section {
   padding: 16px;
   background: white;
   border-top: 1px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+html.dark-mode .rating-section {
+  background: #1e1e1e;
+  border-top-color: #333;
 }
 
 .rating-header {
@@ -503,11 +632,15 @@ onUnmounted(() => {
   align-items: center;
   gap: 8px;
   margin-bottom: 12px;
-  color: #4caf50;
 }
 
 .rating-header i {
   font-size: 24px;
+  color: #4caf50;
+}
+
+html.dark-mode .rating-header i {
+  color: #6ee7b7;
 }
 
 .rating-header h4 {
@@ -517,16 +650,26 @@ onUnmounted(() => {
   color: #333;
 }
 
-.rating-section p {
+html.dark-mode .rating-header h4 {
+  color: #e0e0e0;
+}
+
+.rating-section > p {
   margin: 0 0 12px 0;
   font-weight: 600;
   color: #333;
+  font-size: 14px;
+}
+
+html.dark-mode .rating-section > p {
+  color: #d1d5db;
 }
 
 .rating-stars {
   display: flex;
   gap: 8px;
   margin-bottom: 12px;
+  justify-content: center;
 }
 
 .rating-stars i {
@@ -542,12 +685,39 @@ onUnmounted(() => {
 
 .rating-section textarea {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   border: 1px solid #ddd;
   border-radius: 8px;
   resize: none;
   font-family: inherit;
   margin-bottom: 12px;
+  font-size: 14px;
+  background: white;
+  color: #333;
+  transition: border-color 0.2s;
+}
+
+html.dark-mode .rating-section textarea {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+.rating-section textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+html.dark-mode .rating-section textarea:focus {
+  border-color: #764ba2;
+}
+
+.rating-section textarea::placeholder {
+  color: #999;
+}
+
+html.dark-mode .rating-section textarea::placeholder {
+  color: #6b7280;
 }
 
 .rating-actions {
@@ -563,7 +733,8 @@ onUnmounted(() => {
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: all 0.3s ease;
+  font-size: 14px;
 }
 
 .skip-rating-btn {
@@ -571,30 +742,59 @@ onUnmounted(() => {
   color: #666;
 }
 
+html.dark-mode .skip-rating-btn {
+  background: #374151;
+  color: #d1d5db;
+}
+
 .skip-rating-btn:hover {
-  opacity: 0.8;
+  background: #d0d0d0;
+  transform: translateY(-1px);
+}
+
+html.dark-mode .skip-rating-btn:hover {
+  background: #4b5563;
 }
 
 .submit-rating-btn {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+html.dark-mode .submit-rating-btn {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  box-shadow: 0 4px 12px rgba(118, 75, 162, 0.4);
 }
 
 .submit-rating-btn:hover:not(:disabled) {
-  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+html.dark-mode .submit-rating-btn:hover:not(:disabled) {
+  box-shadow: 0 6px 16px rgba(118, 75, 162, 0.5);
 }
 
 .submit-rating-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
+/* ========== CHAT INPUT ========== */
 .chat-input {
   padding: 12px;
   background: white;
   border-top: 1px solid #e0e0e0;
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
+}
+
+html.dark-mode .chat-input {
+  background: #1e1e1e;
+  border-top-color: #333;
 }
 
 .chat-input input {
@@ -605,15 +805,40 @@ onUnmounted(() => {
   outline: none;
   font-size: 14px;
   transition: border-color 0.2s;
+  background: white;
+  color: #333;
+}
+
+html.dark-mode .chat-input input {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border-color: #444;
 }
 
 .chat-input input:focus {
   border-color: #667eea;
 }
 
+html.dark-mode .chat-input input:focus {
+  border-color: #764ba2;
+}
+
 .chat-input input:disabled {
   background: #f5f5f5;
   cursor: not-allowed;
+  opacity: 0.7;
+}
+
+html.dark-mode .chat-input input:disabled {
+  background: #1a1a1a;
+}
+
+.chat-input input::placeholder {
+  color: #999;
+}
+
+html.dark-mode .chat-input input::placeholder {
+  color: #6b7280;
 }
 
 .send-btn {
@@ -627,12 +852,27 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.2s;
+  transition: all 0.3s ease;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+html.dark-mode .send-btn {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  box-shadow: 0 2px 8px rgba(118, 75, 162, 0.4);
 }
 
 .send-btn:hover:not(:disabled) {
-  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+html.dark-mode .send-btn:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(118, 75, 162, 0.5);
+}
+
+.send-btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .send-btn:disabled {
@@ -640,6 +880,7 @@ onUnmounted(() => {
   cursor: not-allowed;
 }
 
+/* ========== ANIMATIONS ========== */
 .slide-up-enter-active,
 .slide-up-leave-active {
   transition: all 0.3s ease;
@@ -657,7 +898,7 @@ onUnmounted(() => {
 
 /* ========== RESPONSIVE DESIGN ========== */
 
-/* Tablet (769px - 1023px) */
+/* Large Tablet (769px - 1023px) */
 @media (max-width: 1023px) {
   .support-chat-window {
     width: 90%;
@@ -690,7 +931,7 @@ onUnmounted(() => {
   }
 }
 
-/* Mobile (481px - 768px) */
+/* Tablet & Mobile (≤768px) - Full Screen */
 @media (max-width: 768px) {
   .support-chat-window {
     width: 100%;
@@ -699,21 +940,19 @@ onUnmounted(() => {
     right: 0;
     border-radius: 0;
     max-width: none;
-    /* ✅ SỬA: Thêm padding-top để không bị navbar che */
     padding-top: env(safe-area-inset-top, 0);
   }
 
-  /* ✅ SỬA: Header nhỏ gọn hơn + margin-top để tránh navbar */
   .chat-header {
     padding: 12px 16px;
-    margin-top: 60px; /* Tránh navbar */
+    margin-top: 60px;
     position: relative;
   }
 
   .header-info {
     gap: 10px;
     flex: 1;
-    min-width: 0; /* Cho phép text truncate */
+    min-width: 0;
   }
 
   .support-avatar img {
@@ -729,7 +968,7 @@ onUnmounted(() => {
 
   .header-text {
     flex: 1;
-    min-width: 0; /* Cho phép text truncate */
+    min-width: 0;
   }
 
   .header-text h3 {
@@ -743,7 +982,6 @@ onUnmounted(() => {
     font-size: 11px;
   }
 
-  /* ✅ SỬA: Nút close trong mobile */
   .close-btn {
     width: 36px;
     height: 36px;
@@ -768,10 +1006,15 @@ onUnmounted(() => {
 
   .message-content {
     max-width: 75%;
+    padding: 9px 12px;
   }
 
   .message-content p {
     font-size: 13px;
+  }
+
+  .message-time {
+    font-size: 10px;
   }
 
   .offline-notice {
@@ -783,12 +1026,31 @@ onUnmounted(() => {
     padding: 14px;
   }
 
+  .rating-header i {
+    font-size: 22px;
+  }
+
   .rating-header h4 {
     font-size: 15px;
   }
 
+  .rating-section > p {
+    font-size: 13px;
+  }
+
   .rating-stars i {
     font-size: 26px;
+  }
+
+  .rating-section textarea {
+    padding: 9px;
+    font-size: 13px;
+  }
+
+  .skip-rating-btn,
+  .submit-rating-btn {
+    padding: 9px;
+    font-size: 13px;
   }
 
   .chat-input {
@@ -808,10 +1070,9 @@ onUnmounted(() => {
 
 /* Small Mobile (361px - 480px) */
 @media (max-width: 480px) {
-  /* ✅ SỬA: Header compact hơn + margin-top */
   .chat-header {
     padding: 10px 12px;
-    margin-top: 55px; /* Tránh navbar trên màn nhỏ */
+    margin-top: 55px;
   }
 
   .header-info {
@@ -836,7 +1097,6 @@ onUnmounted(() => {
     font-size: 10px;
   }
 
-  /* ✅ SỬA: Nút close nhỏ hơn nhưng vẫn dễ bấm */
   .close-btn {
     width: 34px;
     height: 34px;
@@ -858,7 +1118,7 @@ onUnmounted(() => {
   }
 
   .message-content {
-    padding: 9px 12px;
+    padding: 8px 11px;
   }
 
   .message-content p {
@@ -879,15 +1139,15 @@ onUnmounted(() => {
   }
 
   .rating-header i {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .rating-header h4 {
     font-size: 14px;
   }
 
-  .rating-section p {
-    font-size: 13px;
+  .rating-section > p {
+    font-size: 12px;
   }
 
   .rating-stars {
@@ -899,14 +1159,14 @@ onUnmounted(() => {
   }
 
   .rating-section textarea {
-    padding: 7px;
-    font-size: 13px;
+    padding: 8px;
+    font-size: 12px;
   }
 
   .skip-rating-btn,
   .submit-rating-btn {
-    padding: 9px;
-    font-size: 13px;
+    padding: 8px;
+    font-size: 12px;
   }
 
   .chat-input {
@@ -926,10 +1186,9 @@ onUnmounted(() => {
 
 /* Extra Small Mobile (≤360px) */
 @media (max-width: 360px) {
-  /* ✅ SỬA: Header siêu compact + margin-top */
   .chat-header {
     padding: 9px 10px;
-    margin-top: 50px; /* Tránh navbar trên màn rất nhỏ */
+    margin-top: 50px;
   }
 
   .header-info {
@@ -954,7 +1213,6 @@ onUnmounted(() => {
     font-size: 9px;
   }
 
-  /* ✅ SỬA: Nút close nhỏ nhất */
   .close-btn {
     width: 32px;
     height: 32px;
@@ -987,6 +1245,15 @@ onUnmounted(() => {
     font-size: 9px;
   }
 
+  .loading-state i,
+  .empty-state i {
+    font-size: 40px;
+  }
+
+  .empty-state p {
+    font-size: 13px;
+  }
+
   .offline-notice {
     padding: 8px;
     font-size: 10px;
@@ -997,15 +1264,15 @@ onUnmounted(() => {
   }
 
   .rating-header i {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .rating-header h4 {
     font-size: 13px;
   }
 
-  .rating-section p {
-    font-size: 12px;
+  .rating-section > p {
+    font-size: 11px;
   }
 
   .rating-stars {
@@ -1017,14 +1284,14 @@ onUnmounted(() => {
   }
 
   .rating-section textarea {
-    padding: 6px;
-    font-size: 12px;
+    padding: 7px;
+    font-size: 11px;
   }
 
   .skip-rating-btn,
   .submit-rating-btn {
-    padding: 8px;
-    font-size: 12px;
+    padding: 7px;
+    font-size: 11px;
   }
 
   .chat-input {

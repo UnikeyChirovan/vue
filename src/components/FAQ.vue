@@ -75,12 +75,12 @@ const faqList = ref([
   {
     question: 'Nếu quên mật khẩu thì làm thế nào?',
     answer:
-      'Bạn bấm vào nút đăng nhập rồi bấm quên mật khẩu để có thể cấp lại mật khẩu, hoặc có thể liên hệ với chúng tôi',
+      'Bạn bấm vào nút đăng nhập rồi bấm quên mật khẩu để có thể cấp lại mật khẩu, hoặc có thể liên lạc với chúng tôi',
   },
   {
-    question: 'Làm thế nào để liên hệ với bộ phận hỗ trợ?',
+    question: 'Làm thế nào để liên lạc với bộ phận hỗ trợ?',
     answer:
-      'Bạn có thể liên hệ với chúng tôi qua email, điện thoại hoặc điền vào form liên hệ trên trang Liên hệ.',
+      'Bạn có thể liên lạc với chúng tôi qua email, điện thoại hoặc điền vào form liên lạc trên trang liên lạc.',
   },
 ]);
 </script>

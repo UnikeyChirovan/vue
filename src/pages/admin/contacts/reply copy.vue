@@ -11,7 +11,7 @@
         <div class="message-section">
           <div class="section-header">
             <i class="fa-solid fa-message"></i>
-            <span>Nội dung liên hệ từ khách hàng</span>
+            <span>Nội dung liên lạc từ khách hàng</span>
           </div>
           <div class="message-box">
             <textarea

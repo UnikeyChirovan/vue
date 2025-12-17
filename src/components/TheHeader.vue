@@ -191,7 +191,7 @@ const listItem = reactive([
     isAdmin: false,
   },
   {
-    name: 'Liên Hệ',
+    name: 'Liên Lạc',
     link: 'contact',
     icon: 'fas fa-envelope',
     requiresLogin: false,

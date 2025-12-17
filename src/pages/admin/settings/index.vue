@@ -38,7 +38,7 @@
 
           <div class="setting-item">
             <div class="setting-info">
-              <label>Email Liên Hệ</label>
+              <label>Email liên lạc</label>
               <p>Email chính để nhận thông tin từ khách hàng</p>
             </div>
             <n-input

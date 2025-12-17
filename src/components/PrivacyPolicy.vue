@@ -69,7 +69,7 @@ const privacyPolicySections = ref([
   },
   {
     title: 'Quyền Của Người Dùng',
-    content: `Bạn có quyền truy cập, chỉnh sửa hoặc yêu cầu xóa bỏ thông tin cá nhân của mình bất cứ lúc nào bằng cách liên hệ với chúng tôi. Nếu bạn có bất kỳ thắc mắc hoặc lo ngại nào về chính sách bảo mật của chúng tôi, vui lòng liên hệ qua địa chỉ email hỗ trợ.`,
+    content: `Bạn có quyền truy cập, chỉnh sửa hoặc yêu cầu xóa bỏ thông tin cá nhân của mình bất cứ lúc nào bằng cách liên lạc với chúng tôi. Nếu bạn có bất kỳ thắc mắc hoặc lo ngại nào về chính sách bảo mật của chúng tôi, vui lòng liên lạc qua địa chỉ email hỗ trợ.`,
   },
 ]);
 </script>

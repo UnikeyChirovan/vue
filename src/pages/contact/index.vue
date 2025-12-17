@@ -19,10 +19,12 @@
                 <input
                   :type="field.type"
                   :id="field.id"
-                  v-model="field.model.value"
+                  v-model="formData[field.modelKey]"
                   :class="[
                     'form-input',
-                    field.required && !field.model.value ? 'invalid' : '',
+                    field.required && !formData[field.modelKey]
+                      ? 'invalid'
+                      : '',
                   ]"
                   :placeholder="field.placeholder"
                   :required="field.required"
@@ -35,7 +37,7 @@
                   <span>Nội dung:</span>
                 </label>
                 <div class="ckeditor-wrapper">
-                  <CKEditor v-model="message" />
+                  <CKEditor v-model="formData.message" />
                 </div>
               </div>
             </div>
@@ -158,7 +160,7 @@ const categoryStore = useCategoryStore();
 const companyInfoStore = useCompanyInfoStore();
 
 const contactTitle = computed(() =>
-  categoryStore.getCategoryTitle('5', 'contact', 'TRANG LIÊN HỆ QUẢN TRỊ')
+  categoryStore.getCategoryTitle('5', 'contact', 'TRANG liên lạc QUẢN TRỊ')
 );
 const titleAddress = computed(() =>
   categoryStore.getCategoryTitle('6', 'contact', 'Địa chỉ:')
@@ -178,11 +180,15 @@ const titleMap = computed(() =>
 
 const companyInfo = computed(() => companyInfoStore.companyInfo);
 
-const username = ref('');
-const name = ref('');
-const email = ref('');
-const message = ref('');
-const title = ref('');
+// Form data - sử dụng reactive object thay vì refs riêng lẻ
+const formData = reactive({
+  username: '',
+  name: '',
+  email: '',
+  message: '',
+  title: '',
+});
+
 const isSubmitting = ref(false);
 
 // Toast system
@@ -211,12 +217,13 @@ const removeToast = (id) => {
   }
 };
 
-const formFields = reactive([
+// Form fields configuration - sử dụng modelKey thay vì model
+const formFields = [
   {
     id: 'username',
     label: 'Username:',
     type: 'text',
-    model: username,
+    modelKey: 'username',
     placeholder: 'Nhập username nếu có',
     required: false,
   },
@@ -224,7 +231,7 @@ const formFields = reactive([
     id: 'name',
     label: 'Họ và tên:',
     type: 'text',
-    model: name,
+    modelKey: 'name',
     placeholder: 'Nhập họ tên của bạn',
     required: true,
   },
@@ -232,7 +239,7 @@ const formFields = reactive([
     id: 'email',
     label: 'Email:',
     type: 'email',
-    model: email,
+    modelKey: 'email',
     placeholder: 'Nhập email của bạn',
     required: true,
   },
@@ -240,42 +247,34 @@ const formFields = reactive([
     id: 'problem',
     label: 'Vấn đề:',
     type: 'text',
-    model: title,
+    modelKey: 'title',
     placeholder: 'Tiêu đề vấn đề',
     required: true,
   },
-]);
+];
 
 const submitForm = async () => {
   if (isSubmitting.value) return;
 
   // Validation
-  if (!name.value.trim()) {
+  if (!formData.name.trim()) {
     showToast('Vui lòng nhập họ tên!', 'warning');
     return;
   }
-  if (!email.value.trim()) {
+  if (!formData.email.trim()) {
     showToast('Vui lòng nhập email!', 'warning');
     return;
   }
-  if (!title.value.trim()) {
+  if (!formData.title.trim()) {
     showToast('Vui lòng nhập tiêu đề vấn đề!', 'warning');
     return;
   }
-  if (!message.value.trim()) {
+  if (!formData.message.trim()) {
     showToast('Vui lòng nhập nội dung!', 'warning');
     return;
   }
 
   isSubmitting.value = true;
-
-  const formData = {
-    username: username.value,
-    name: name.value,
-    email: email.value,
-    message: message.value,
-    title: title.value,
-  };
 
   try {
     const response = await axios.post(
@@ -295,13 +294,14 @@ const submitForm = async () => {
 };
 
 const defaultForm = () => {
-  username.value = '';
-  name.value = '';
-  email.value = '';
-  message.value = '';
-  title.value = '';
+  formData.username = '';
+  formData.name = '';
+  formData.email = '';
+  formData.message = '';
+  formData.title = '';
 };
 </script>
+
 <style scoped>
 /* ========== MODERN CONTACT PAGE DESIGN ========== */
 .contact-wrapper {

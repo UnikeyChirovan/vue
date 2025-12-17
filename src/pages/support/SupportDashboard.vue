@@ -477,10 +477,17 @@ html.dark-mode .tab.active {
   color: #0c713d;
 }
 
-html.dark-mode .tab.active .tab-badge {
-  color: #0f8a4a;
+html.dark-mode .tab-badge {
+  background: #ff3b30;
+  color: white;
 }
 
+/* Dark mode - tab active badge xanh nền tối */
+html.dark-mode .tab.active .tab-badge {
+  background: rgba(250, 150, 0, 0.99);
+  color: #22c55e;
+  box-shadow: 0 2px 6px rgba(34, 197, 94, 0.3);
+}
 /* ========== CONVERSATIONS ========== */
 .conversations-container {
   max-width: 1200px;

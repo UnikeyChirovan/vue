@@ -27,7 +27,7 @@
             </div>
             <n-switch
               v-model:value="isDarkMode"
-              @update:value="toggleTheme"
+              @update:value="handleToggleTheme"
               size="large"
             />
           </div>
@@ -110,52 +110,36 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { NSwitch } from 'naive-ui';
 import TheHeader from '../../components/TheHeader.vue';
 import TheFooter from '../../components/TheFooter.vue';
 import { useAuthStore } from '../../stores/auth';
+import { useThemeStore } from '../../stores/themeStore';
 import { useMessage } from 'naive-ui';
 
 const auth = useAuthStore();
+const themeStore = useThemeStore();
 const message = useMessage();
 
-const isDarkMode = ref(localStorage.getItem('theme') === 'dark');
+// Reactive với theme store
+const isDarkMode = computed({
+  get: () => themeStore.isDarkMode,
+  set: (value) => themeStore.setDarkMode(value),
+});
+
 const isSupportButtonEnabled = ref(
   localStorage.getItem('supportButtonEnabled') !== 'false'
 );
 
-const applyTheme = async (dark) => {
-  const html = document.documentElement;
-  if (dark) {
-    html.classList.add('dark-mode');
-    html.classList.remove('light-mode');
-  } else {
-    html.classList.add('light-mode');
-    html.classList.remove('dark-mode');
-  }
-  localStorage.setItem('theme', dark ? 'dark' : 'light');
-  await nextTick();
-};
-
-const toggleTheme = (value) => {
-  isDarkMode.value = value;
-  const html = document.documentElement;
+const handleToggleTheme = (value) => {
+  themeStore.toggleTheme(value);
 
   if (value) {
-    html.classList.add('dark-mode');
-    html.classList.remove('light-mode');
-    localStorage.setItem('theme', 'dark');
+    message.success('Đã bật chế độ tối');
   } else {
-    html.classList.add('light-mode');
-    html.classList.remove('dark-mode');
-    localStorage.setItem('theme', 'light');
+    message.info('Đã tắt chế độ tối');
   }
-
-  // Emit event để App.vue biết
-  window.dispatchEvent(
-    new CustomEvent('themeChanged', { detail: value ? 'dark' : 'light' })
-  );
 };
 
 const toggleSupportButton = (value) => {
@@ -209,7 +193,8 @@ const confirmDeleteAccount = async () => {
 };
 
 onMounted(() => {
-  applyTheme(isDarkMode.value);
+  // Initialize theme from store
+  themeStore.initializeTheme();
 
   const handleToggle = (event) => {
     isSupportButtonEnabled.value = event.detail;

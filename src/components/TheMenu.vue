@@ -80,7 +80,7 @@
     <a-menu-item key="admin-contacts" class="menu-item">
       <RouterLink :to="{ name: 'admin-contacts' }" class="menu-link">
         <i class="fa-regular fa-paper-plane menu-icon"></i>
-        <span class="menu-text">Quản lý liên hệ</span>
+        <span class="menu-text">Quản lý liên lạc</span>
       </RouterLink>
     </a-menu-item>
     <a-menu-item key="admin-blacklists" class="menu-item">
