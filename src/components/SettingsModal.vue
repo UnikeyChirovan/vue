@@ -636,8 +636,7 @@ const applySettings = () => {
             ? '#2c2c2c'
             : 'linear-gradient(180deg, rgba(250, 250, 250, 0.95) 0%, rgba(255, 255, 255, 0.95) 100%)';
       }
-    }
-    else if (!settings.backgroundImage) {
+    } else if (!settings.backgroundImage) {
       reset();
 
       if (settings.mode === 'night') {
@@ -647,8 +646,7 @@ const applySettings = () => {
         if (readingWrapper) {
           readingWrapper.style.background = '#2c2c2c';
         }
-      }
-      else {
+      } else {
         if (storyContainer) {
           if (settings.backgroundStyle === 'solid') {
             storyContainer.style.backgroundColor = settings.backgroundColor;
@@ -675,13 +673,28 @@ const applySettings = () => {
                 settings.customBackgroundOpacity
               );
             }
+          }
+          if (customSolidLayer) {
+            if (settings.mode === 'night') {
+              customSolidLayer.style.opacity = '0';
+            } else {
+              customSolidLayer.style.opacity = '1';
+              customSolidLayer.style.backgroundColor = '#ffffff';
+            }
           } else {
             readingWrapper.style.background = 'transparent';
           }
         }
+        if (customSolidLayer) {
+          if (settings.mode === 'night') {
+            customSolidLayer.style.opacity = '0';
+          } else {
+            customSolidLayer.style.opacity = '1';
+            customSolidLayer.style.backgroundColor = '#ffffff';
+          }
+        }
       }
-    }
-    else {
+    } else {
       switch (screenMode.value) {
         case 'full':
           reset();
@@ -784,7 +797,7 @@ const applySettings = () => {
             if (settings.mode === 'night') {
               customBackgroundLayer.style.opacity = '0';
             } else {
-              customBackgroundLayer.style.opacity = '0.5';
+              customBackgroundLayer.style.opacity = '0.2';
               customBackgroundLayer.style.backgroundColor = '#ffffff';
               customBackgroundLayer.style.backgroundImage = `url(${settings.backgroundImage})`;
               customBackgroundLayer.style.backgroundSize = 'cover';

@@ -632,6 +632,12 @@ body[style*='color:#ffffff'] .reading-page-wrapper .reading-wrapper {
     rgba(10, 10, 10, 0.95) 100%
   ) !important;
 }
+body[style*='color: rgb(255, 255, 255)']
+  .reading-page-wrapper
+  .custom-solid-layer,
+body[style*='color:#ffffff'] .reading-page-wrapper .custom-solid-layer {
+  background: rgba(10, 10, 10, 0.95) !important;
+}
 
 body[style*='color: rgb(255, 255, 255)'] .reading-page-wrapper .container,
 body[style*='color:#ffffff'] .reading-page-wrapper .container {
@@ -688,7 +694,9 @@ html.dark-mode .reading-page-wrapper .reading-wrapper {
     rgba(10, 10, 10, 0.95) 100%
   ) !important;
 }
-
+html.dark-mode .reading-page-wrapper .custom-solid-layer {
+  background: rgba(10, 10, 10, 0.95) !important;
+}
 html.dark-mode .reading-page-wrapper .container {
   background: rgba(26, 26, 26, 0.98) !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
