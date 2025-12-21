@@ -4,10 +4,9 @@
     <div class="cover-section">
       <div class="cover-container">
         <img
-          :src="coverUrl ? coverUrl : 'https://picsum.photos/1200/300'"
+          :src="coverUrl ? coverUrl : 'https://picsum.photos/1200/400'"
           alt="Cover Image"
           class="cover-img"
-          :style="coverStyle"
         />
       </div>
     </div>
@@ -239,7 +238,6 @@ const route = useRoute();
 
 const id = route.params.id;
 const useGuest = useGuestStore();
-const { cover_position } = storeToRefs(useGuest);
 const { users, avatarUrl, coverUrl } = storeToRefs(useGuest);
 
 const allowChat = ref(false);
@@ -308,10 +306,6 @@ const formattedBirthday = computed(() => {
 const fetchGuest = async () => {
   await useGuest.getGuest(id);
 };
-
-const coverStyle = computed(() => ({
-  transform: `translateY(${cover_position.value}px)`,
-}));
 
 const lastChapter = ref('');
 const lastEpisode = ref('');
@@ -386,8 +380,8 @@ onMounted(async () => {
 });
 </script>
 
-<style scoped>
-/* ========== BASE LAYOUT ========== */
+<style lang="scss" scoped>
+/* ========== COVER & AVATAR ========== */
 .profile-page {
   font-family: 'Arial', sans-serif;
   background: linear-gradient(135deg, #e8ecf1 0%, #f5f7fa 100%);
@@ -401,15 +395,27 @@ html.dark-mode .profile-page {
 
 .cover-section {
   position: relative;
-  height: 300px;
+  height: 400px;
   background-color: #282c34;
   overflow: hidden;
 }
 
+html.dark-mode .cover-section {
+  background-color: #1a1a1a;
+}
+
+.cover-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
 .cover-img {
   width: 100%;
-  border-radius: 12px;
+  height: 100%;
   object-fit: cover;
+  object-position: center;
 }
 
 .avatar-section {
@@ -422,6 +428,10 @@ html.dark-mode .profile-page {
   border-radius: 50%;
   box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
   z-index: 9;
+}
+
+html.dark-mode .avatar-section {
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
 }
 
 .avatar-img {
@@ -482,6 +492,7 @@ html.dark-mode .profile-online-dot {
 
 html.dark-mode .username-title {
   color: #e0e0e0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .rating-stars {
@@ -496,10 +507,6 @@ html.dark-mode .username-title {
   font-size: 22px;
 }
 
-html.dark-mode .rating-stars i {
-  color: #0f8a4a;
-}
-
 /* ========== ACTION BUTTONS ========== */
 .action-buttons-group {
   display: flex;
@@ -509,7 +516,6 @@ html.dark-mode .rating-stars i {
 }
 
 .action-btn {
-  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
   color: white;
   border: none;
   padding: 12px 28px;
@@ -518,17 +524,11 @@ html.dark-mode .rating-stars i {
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.3);
   display: inline-flex;
   align-items: center;
   gap: 8px;
   position: relative;
   overflow: hidden;
-}
-
-html.dark-mode .action-btn {
-  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
-  box-shadow: 0 4px 12px rgba(15, 138, 74, 0.3);
 }
 
 .action-btn::before {
@@ -553,11 +553,6 @@ html.dark-mode .action-btn {
 
 .action-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
-}
-
-html.dark-mode .action-btn:hover {
-  box-shadow: 0 6px 20px rgba(15, 138, 74, 0.4);
 }
 
 .action-btn:active {
@@ -567,33 +562,56 @@ html.dark-mode .action-btn:hover {
 .action-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none !important;
+}
+
+.follow-btn {
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.3);
+}
+
+html.dark-mode .follow-btn {
+  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+  box-shadow: 0 4px 12px rgba(15, 138, 74, 0.3);
+}
+
+.follow-btn:hover {
+  box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
+}
+
+html.dark-mode .follow-btn:hover {
+  box-shadow: 0 6px 20px rgba(15, 138, 74, 0.4);
 }
 
 .unfollow-btn {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
 .unfollow-btn:hover {
-  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4) !important;
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
 }
 
 .block-btn {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
 }
 
 .block-btn:hover {
-  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4) !important;
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
 }
 
 .chat-btn {
-  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%) !important;
+  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
   box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
 }
 
+html.dark-mode .chat-btn {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+}
+
 .chat-btn:hover {
-  box-shadow: 0 6px 20px rgba(8, 145, 178, 0.4) !important;
+  box-shadow: 0 6px 20px rgba(8, 145, 178, 0.4);
 }
 
 /* ========== PROFILE CARDS ========== */
@@ -612,11 +630,21 @@ html.dark-mode .action-btn:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   width: 100%;
+  transition: all 0.3s ease;
 }
 
 html.dark-mode .profile-card {
   background: #1e1e1e;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.profile-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+html.dark-mode .profile-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
 }
 
 .card-header-green {
@@ -632,7 +660,7 @@ html.dark-mode .profile-card {
 }
 
 html.dark-mode .card-header-green {
-  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
 }
 
 .card-header-green i {
@@ -648,7 +676,6 @@ html.dark-mode .card-body-white {
   background: #1e1e1e;
 }
 
-/* Info Rows */
 .info-row {
   display: flex;
   align-items: flex-start;
@@ -674,7 +701,7 @@ html.dark-mode .info-row {
 }
 
 html.dark-mode .icon-label {
-  color: #0f8a4a;
+  color: #22c55e;
 }
 
 .info-content {
@@ -701,7 +728,6 @@ html.dark-mode .info-content span {
   color: #b0b0b0;
 }
 
-/* Stats Grid */
 .stats-grid-content {
   display: flex;
   justify-content: space-around;
@@ -761,7 +787,6 @@ html.dark-mode .stat-label {
   color: #b0b0b0;
 }
 
-/* History Items */
 .history-item-box {
   display: flex;
   align-items: center;
@@ -774,8 +799,8 @@ html.dark-mode .stat-label {
 }
 
 html.dark-mode .history-item-box {
-  background: linear-gradient(135deg, #1a2e1a 0%, #0f1f0f 100%);
-  border-left-color: #0f8a4a;
+  background: linear-gradient(135deg, #1a2e1a 0%, #254025 100%);
+  border-left-color: #22c55e;
 }
 
 .history-item-box:last-child {
@@ -788,7 +813,7 @@ html.dark-mode .history-item-box {
 }
 
 html.dark-mode .history-icon {
-  color: #0f8a4a;
+  color: #22c55e;
 }
 
 .history-text {
@@ -815,7 +840,6 @@ html.dark-mode .history-number {
   color: #ef4444;
 }
 
-/* Social Icons */
 .social-icons-row {
   display: flex;
   justify-content: center;
@@ -845,12 +869,15 @@ html.dark-mode .history-number {
 .facebook-color {
   background: #3b5998;
 }
+
 .twitter-color {
   background: #1da1f2;
 }
+
 .linkedin-color {
   background: #0077b5;
 }
+
 .youtube-color {
   background: #ff0000;
 }
@@ -860,7 +887,7 @@ html.dark-mode .history-number {
 /* Large Tablet */
 @media (max-width: 1024px) {
   .username-title {
-    font-size: 32px;
+    font-size: 28px;
   }
 
   .profile-content-wrapper {
@@ -871,12 +898,30 @@ html.dark-mode .history-number {
 
 /* Tablet */
 @media (max-width: 768px) {
+  .cover-section {
+    height: 300px;
+  }
+
+  .avatar-section {
+    width: 150px;
+    height: 150px;
+    margin-top: -75px;
+  }
+
+  .profile-online-dot {
+    bottom: 15px;
+    right: 15px;
+    width: 20px;
+    height: 20px;
+    border-width: 3px;
+  }
+
   .profile-header-content {
     padding: 0 16px;
   }
 
   .username-title {
-    font-size: 28px;
+    font-size: 24px;
   }
 
   .rating-stars {
@@ -960,13 +1005,31 @@ html.dark-mode .history-number {
     padding-bottom: 30px;
   }
 
+  .cover-section {
+    height: 250px;
+  }
+
+  .avatar-section {
+    width: 130px;
+    height: 130px;
+    margin-top: -65px;
+  }
+
+  .profile-online-dot {
+    bottom: 12px;
+    right: 12px;
+    width: 18px;
+    height: 18px;
+    border-width: 3px;
+  }
+
   .profile-header-content {
     margin: 16px auto 32px;
     padding: 0 12px;
   }
 
   .username-title {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .rating-stars {
@@ -1063,6 +1126,24 @@ html.dark-mode .history-number {
 
 /* Extra Small Mobile */
 @media (max-width: 360px) {
+  .cover-section {
+    height: 220px;
+  }
+
+  .avatar-section {
+    width: 110px;
+    height: 110px;
+    margin-top: -55px;
+  }
+
+  .profile-online-dot {
+    bottom: 10px;
+    right: 10px;
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+  }
+
   .username-title {
     font-size: 20px;
   }

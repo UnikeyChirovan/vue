@@ -531,7 +531,7 @@ html.dark-mode .card-header-custom {
   gap: 40px;
 }
 
-/* ========== MEDIA SECTION - RESPONSIVE FIRST ========== */
+/* ========== MEDIA SECTION ========== */
 .media-section {
   display: flex;
   flex-wrap: wrap;
@@ -689,6 +689,7 @@ html.dark-mode .form-label {
 
 html.dark-mode .form-control {
   border-color: #333;
+  background: #2a2a2a;
   color: #e0e0e0;
 }
 
@@ -723,10 +724,6 @@ select.form-control {
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 40px;
-}
-
-html.dark-mode select.form-control {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e0e0e0' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
 }
 
 .input-error {
@@ -927,9 +924,14 @@ html.dark-mode .btn-save:hover {
   .card-body-custom {
     padding: 32px 28px;
   }
+
+  .media-section {
+    padding: 28px 36px;
+    gap: 36px;
+  }
 }
 
-/* Tablet - Media section becomes single column */
+/* Tablet */
 @media (max-width: 768px) {
   .edit-card {
     margin: 60px 15px 40px;
@@ -948,6 +950,10 @@ html.dark-mode .btn-save:hover {
     padding: 28px 24px;
   }
 
+  .form-layout {
+    gap: 32px;
+  }
+
   .form-columns {
     grid-template-columns: 1fr;
     gap: 24px;
@@ -955,7 +961,8 @@ html.dark-mode .btn-save:hover {
 
   .media-section {
     flex-direction: column;
-    padding: 20px;
+    padding: 24px;
+    gap: 32px;
   }
 
   .media-item {
@@ -963,12 +970,23 @@ html.dark-mode .btn-save:hover {
     max-width: 100%;
   }
 
+  .avatar-preview {
+    width: 160px;
+    height: 160px;
+  }
+
   .cover-preview {
     max-width: 100%;
+    height: 160px;
+  }
+
+  .delete-btn {
+    max-width: 180px;
   }
 
   .form-actions {
     flex-direction: column-reverse;
+    gap: 10px;
   }
 
   .btn-cancel,
@@ -997,26 +1015,41 @@ html.dark-mode .btn-save:hover {
   }
 
   .form-layout {
-    gap: 32px;
+    gap: 28px;
   }
 
   .media-section {
-    padding: 16px;
+    padding: 20px 16px;
     gap: 24px;
   }
 
+  .media-item {
+    gap: 12px;
+  }
+
   .avatar-preview {
-    width: 130px;
-    height: 130px;
+    width: 140px;
+    height: 140px;
+    border: 3px solid #0c713d;
+  }
+
+  html.dark-mode .avatar-preview {
+    border-color: #0f8a4a;
   }
 
   .cover-preview {
     height: 140px;
+    border: 3px solid #0c713d;
+  }
+
+  html.dark-mode .cover-preview {
+    border-color: #0f8a4a;
   }
 
   .delete-btn {
     padding: 10px 20px;
     font-size: 0.85rem;
+    max-width: 160px;
   }
 
   .form-column {
@@ -1041,29 +1074,64 @@ html.dark-mode .btn-save:hover {
     padding: 12px 24px;
     font-size: 0.9rem;
   }
+
+  .form-actions {
+    margin-top: 24px;
+    padding-top: 20px;
+  }
 }
 
 /* Extra Small Mobile */
 @media (max-width: 360px) {
   .edit-card {
     margin: 40px 8px 20px;
+    border-radius: 12px;
+  }
+
+  .card-header-custom {
+    padding: 14px 16px;
   }
 
   .card-header-custom h2 {
     font-size: 1.1rem;
   }
 
+  .card-body-custom {
+    padding: 20px 16px;
+  }
+
+  .form-layout {
+    gap: 24px;
+  }
+
+  .media-section {
+    padding: 16px 12px;
+    gap: 20px;
+  }
+
   .avatar-preview {
-    width: 110px;
-    height: 110px;
+    width: 120px;
+    height: 120px;
   }
 
   .cover-preview {
     height: 120px;
   }
 
+  .delete-btn {
+    padding: 9px 16px;
+    font-size: 0.8rem;
+    max-width: 140px;
+  }
+
   .form-control {
     padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  .btn-cancel,
+  .btn-save {
+    padding: 11px 20px;
     font-size: 0.85rem;
   }
 }
