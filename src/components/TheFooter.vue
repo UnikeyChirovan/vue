@@ -88,7 +88,7 @@
           <h5 class="column-title">VỀ CHÚNG TÔI</h5>
           <ul class="footer-links">
             <li><router-link to="/about">Giới Thiệu</router-link></li>
-            <li><router-link to="/contact">liên lạc</router-link></li>
+            <li><router-link to="/contact">Liên Lạc</router-link></li>
           </ul>
         </div>
 

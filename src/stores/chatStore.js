@@ -513,7 +513,7 @@ export const useChatStore = defineStore('chat', () => {
     const userId = authStore.user?.id;
 
     if (!token) {
-      console.error('No access token found');
+      // console.error('No access token found');
       return;
     }
 

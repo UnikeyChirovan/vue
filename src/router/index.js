@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
-// import api from '../services/axiosInterceptor';
 import admin from './admin';
 import home from './home';
 import about from './about';
@@ -33,6 +32,12 @@ const routes = [
   ...PrivacyPolicy,
   ...TermsOfService,
   ...FAQ,
+  // Route 404
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('../pages/NotFound.vue'),
+  },
 ];
 
 const router = createRouter({
@@ -49,23 +54,57 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
-  // truy cập vào mà chưa load dữ liệu
-  if (!localStorage.getItem('Before') && to.path !== '/') {
-    return next({ path: '/' });
+
+  // 1. Kiểm tra dữ liệu cơ bản đã load chưa
+  const isDataLoaded = localStorage.getItem('Before') === 'ok';
+
+  if (!isDataLoaded && to.name !== 'home') {
+    return next({ name: 'home' });
   }
-  // truy cập mà chưa đăng nhập
-  if (to.meta.requiresManager) {
-    const user = authStore.user;
-    if (!user || ![1, 3].includes(user.department_id)) {
+
+  // 2. Kiểm tra xác thực
+  const isAuthenticated = authStore.isLoggedIn && authStore.user;
+
+  // Nếu route yêu cầu đăng nhập mà user chưa đăng nhập
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    return next({
+      name: 'home',
+      query: { redirect: to.fullPath },
+    });
+  }
+
+  // 3. Kiểm tra quyền Admin (department_id = 1)
+  if (to.meta.requiresAdmin) {
+    if (!isAuthenticated) {
+      return next({ name: 'home' });
+    }
+
+    // Kiểm tra department_id từ user object
+    if (!authStore.user || authStore.user.department_id !== 1) {
       return next({ name: 'home' });
     }
   }
 
-  if (to.meta.requiresAdmin && !authStore.isAdmin) {
-    return next({ name: 'home' });
-  } else {
-    next();
+  // 4. Kiểm tra quyền Manager (department_id = 3 hoặc 1)
+  if (to.meta.requiresManager) {
+    if (!isAuthenticated) {
+      return next({ name: 'home' });
+    }
+
+    // Kiểm tra department_id: 1 (admin) hoặc 3 (manager)
+    const departmentId = authStore.user?.department_id;
+    if (departmentId !== 1 && departmentId !== 3) {
+      return next({ name: 'home' });
+    }
   }
+
+  // Cho phép truy cập
+  next();
+});
+
+// Global error handler
+router.onError((error) => {
+  router.push({ name: 'home' });
 });
 
 export default router;

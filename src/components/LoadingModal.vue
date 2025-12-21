@@ -12,14 +12,16 @@
         status="success"
         :percentage="loadingStore.loadingProgress"
       />
-      <p v-if="loadingStore.loadingProgress < 100">Đang tải dữ liệu... {{ loadingStore.loadingProgress }}%</p>
+      <p v-if="loadingStore.loadingProgress < 100">
+        Đang tải dữ liệu... {{ loadingStore.loadingProgress }}%
+      </p>
     </n-space>
   </div>
 </template>
 
 <script setup>
 import { useLoadingStore } from '../stores/loadingStore';
- const loadingStore = useLoadingStore();
+const loadingStore = useLoadingStore();
 </script>
 
 <style scoped>

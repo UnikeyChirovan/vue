@@ -317,9 +317,9 @@ html.dark-mode .editor-container__editor-wrapper {
   background: #1a1a1a;
 }
 
-.editor-container__editor {
+/* .editor-container__editor {
   min-height: 450px;
-}
+} */
 
 /* ========== CKEDITOR DARK MODE CSS VARIABLES ========== */
 /* Giải pháp chính thức từ CKEditor: https://ckeditor.com/docs/ckeditor5/latest/framework/deep-dive/ui/theme-customization.html */

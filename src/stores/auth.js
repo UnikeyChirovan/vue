@@ -10,40 +10,39 @@ export const useAuthStore = defineStore('auth', {
     isManager: false,
     user: null,
     accessToken: null,
+    rememberMe: false,
   }),
+
   actions: {
     async login(userData, isAdmin, accessToken, rememberMe) {
       this.isLoggedIn = true;
       this.accessToken = accessToken;
-      this.isAdmin = isAdmin;
+      // Kiểm tra department_id để set quyền
+      this.isAdmin = userData.department_id === 1;
       this.isManager = userData.department_id === 3;
       this.rememberMe = rememberMe;
       this.user = userData;
 
-      // ===== THÊM PHẦN NÀY =====
       // Set user online sau khi login thành công
       try {
         await apiLinks.users.setOnline();
-        console.log('✓ Online status set');
+        // console.log('✓ Online status set');
       } catch (error) {
         console.error('Failed to set online status:', error);
       }
-      // ===== KẾT THÚC THÊM =====
     },
 
     async logout() {
       try {
         const token = this.accessToken;
 
-        // ===== THÊM PHẦN NÀY =====
         // Set user offline TRƯỚC KHI logout
         try {
           await apiLinks.users.setOffline();
-          console.log('✓ Offline status set');
+          // console.log('✓ Offline status set');
         } catch (error) {
           console.error('Failed to set offline status:', error);
         }
-        // ===== KẾT THÚC THÊM =====
 
         await api.post(
           '/auth/logout',
@@ -55,54 +54,42 @@ export const useAuthStore = defineStore('auth', {
           }
         );
 
-        this.isLoggedIn = false;
-        this.isAdmin = false;
-        this.isManager = false;
-        this.user = null;
-        this.accessToken = null;
-        localStorage.clear();
-        sessionStorage.clear();
-        router.push({ name: 'home' });
+        this.clearAuthState();
       } catch (error) {
         console.error('Đăng xuất thất bại:', error);
+        // Vẫn clear state ngay cả khi có lỗi
+        this.clearAuthState();
       }
     },
 
     async forceLogout() {
       try {
-        // ===== THÊM PHẦN NÀY =====
         // Set offline trước khi force logout
         try {
           await apiLinks.users.setOffline();
         } catch (error) {
           console.error('Failed to set offline:', error);
         }
-        // ===== KẾT THÚC THÊM =====
 
-        const userId = this.user.id;
-        await api.post('/auth/force-logout', { user_id: userId });
-        this.isLoggedIn = false;
-        this.isAdmin = false;
-        this.isManager = false;
-        this.user = null;
-        this.accessToken = null;
-        localStorage.clear();
-        sessionStorage.clear();
-        router.push({ name: 'home' });
+        const userId = this.user?.id;
+        if (userId) {
+          await api.post('/auth/force-logout', { user_id: userId });
+        }
+
+        this.clearAuthState();
       } catch (error) {
-        console.log(error);
+        console.error('Force logout thất bại:', error);
+        this.clearAuthState();
       }
     },
 
     async superForceLogout() {
       try {
-        // ===== THÊM PHẦN NÀY =====
         try {
           await apiLinks.users.setOffline();
         } catch (error) {
           console.error('Failed to set offline:', error);
         }
-        // ===== KẾT THÚC THÊM =====
 
         const token = this.accessToken;
         await api.post(
@@ -115,28 +102,20 @@ export const useAuthStore = defineStore('auth', {
           }
         );
 
-        this.isLoggedIn = false;
-        this.isAdmin = false;
-        this.isManager = false;
-        this.user = null;
-        this.accessToken = null;
-        localStorage.clear();
-        sessionStorage.clear();
-        router.push({ name: 'home' });
+        this.clearAuthState();
       } catch (error) {
         console.error('Đăng xuất tất cả thiết bị thất bại:', error);
+        this.clearAuthState();
       }
     },
 
     async selfDeleteAccount() {
       try {
-        // ===== THÊM PHẦN NÀY =====
         try {
           await apiLinks.users.setOffline();
         } catch (error) {
           console.error('Failed to set offline:', error);
         }
-        // ===== KẾT THÚC THÊM =====
 
         const token = this.accessToken;
         await api.delete('/auth/delete-account', {
@@ -145,14 +124,7 @@ export const useAuthStore = defineStore('auth', {
           },
         });
 
-        this.isLoggedIn = false;
-        this.isAdmin = false;
-        this.isManager = false;
-        this.user = null;
-        this.accessToken = null;
-        localStorage.clear();
-        sessionStorage.clear();
-        router.push({ name: 'home' });
+        this.clearAuthState();
       } catch (error) {
         console.error('Lỗi khi xóa tài khoản:', error);
         throw (
@@ -161,9 +133,34 @@ export const useAuthStore = defineStore('auth', {
         );
       }
     },
+
+    // Clear toàn bộ auth state và dữ liệu
+    clearAuthState() {
+      this.isLoggedIn = false;
+      this.isAdmin = false;
+      this.isManager = false;
+      this.user = null;
+      this.accessToken = null;
+      this.rememberMe = false;
+
+      // Clear storage
+      localStorage.clear();
+      sessionStorage.clear();
+
+      // Redirect về trang chủ
+      router.push({ name: 'home' });
+    },
   },
+
   persist: {
     storage: localStorage,
-    paths: ['isLoggedIn', 'user', 'isAdmin', 'isManager', 'accessToken'],
+    paths: [
+      'isLoggedIn',
+      'user',
+      'isAdmin',
+      'isManager',
+      'accessToken',
+      'rememberMe',
+    ],
   },
 });
