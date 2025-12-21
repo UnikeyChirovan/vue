@@ -43,7 +43,16 @@
     </div>
   </div>
 
+  <!-- Avatar Cropper Modal -->
   <CropperModal v-if="isCropperModal" @showModal="isCropperModal = false" />
+
+  <!-- Cover Cropper Modal -->
+  <CoverCropperModal
+    v-if="isCoverCropperModal"
+    @showModal="isCoverCropperModal = false"
+  />
+
+  <!-- Image Display Modal -->
   <ImageDisplay v-if="isImageDisplay" />
 
   <TheFooter />
@@ -55,12 +64,14 @@ import { useGeneralStore } from '../stores/general';
 import { storeToRefs } from 'pinia';
 
 const useGeneral = useGeneralStore();
-const { isCropperModal, isImageDisplay } = storeToRefs(useGeneral);
+const { isCropperModal, isCoverCropperModal, isImageDisplay } =
+  storeToRefs(useGeneral);
 
 import TheHeader from '../components/TheHeader.vue';
 import TheFooter from '../components/TheFooter.vue';
 import TheMenuProfile from '../components/TheMenuProfile.vue';
 import CropperModal from '../components/CropperModal.vue';
+import CoverCropperModal from '../components/CoverCropperModal.vue';
 import ImageDisplay from '../components/ImageDisplay.vue';
 
 const isMenuOpen = ref(false);

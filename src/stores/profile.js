@@ -5,7 +5,6 @@ import { ref } from 'vue';
 export const useProfileStore = defineStore('profile', () => {
   const avatarUrl = ref('');
   const coverUrl = ref('');
-  const cover_position = ref(0);
   const users = ref({});
   const backendUrl = 'http://127.0.0.1:8000';
 
@@ -18,10 +17,6 @@ export const useProfileStore = defineStore('profile', () => {
     if (storedProfile) {
       users.value = JSON.parse(storedProfile);
 
-      if (users.value.cover_position !== undefined) {
-        cover_position.value = users.value.cover_position;
-      }
-
       if (users.value.avatar) {
         avatarUrl.value = `${backendUrl}/storage/avatars/${id}/${users.value.avatar}`;
       }
@@ -32,10 +27,6 @@ export const useProfileStore = defineStore('profile', () => {
       try {
         const response = await api.get(`/profile/${id}`);
         users.value = response.data;
-
-        if (users.value.cover_position !== undefined) {
-          cover_position.value = users.value.cover_position;
-        }
 
         if (users.value.avatar) {
           avatarUrl.value = `${backendUrl}/storage/avatars/${id}/${users.value.avatar}`;
@@ -60,12 +51,6 @@ export const useProfileStore = defineStore('profile', () => {
     syncWithStorage();
   };
 
-  const updateCoverPosition = (position) => {
-    cover_position.value = Number(position);
-    users.value.cover_position = Number(position);
-    syncWithStorage();
-  };
-
   const updateCoverUrl = (newUrl) => {
     coverUrl.value = newUrl.startsWith('http')
       ? newUrl
@@ -83,11 +68,9 @@ export const useProfileStore = defineStore('profile', () => {
   return {
     avatarUrl,
     coverUrl,
-    cover_position,
     users,
     getProfile,
     updateAvatarUrl,
-    updateCoverPosition,
     updateCoverUrl,
     updateUser,
   };

@@ -2,92 +2,16 @@
   <div class="profile-page">
     <!-- Cover Section -->
     <div class="cover-section">
-      <div class="cover-container" v-show="!showChange && !showEdit">
+      <div class="cover-container">
         <img
-          :src="coverUrl ? coverUrl : 'https://picsum.photos/1200/300'"
+          :src="coverUrl ? coverUrl : 'https://picsum.photos/1200/400'"
           alt="Cover Image"
           class="cover-img"
-          :style="coverStyle"
         />
       </div>
 
-      <div class="cover-change" v-if="showChange">
-        <n-upload
-          :headers="uploadHeaders"
-          :max="1"
-          accept="image/*"
-          @change="handleUpload"
-          class="upload-container"
-          :show-file-list="false"
-        >
-          <n-button type="primary" class="select-image-btn">
-            <i class="fa-solid fa-image"></i>
-            <span>Chọn hình</span>
-          </n-button>
-        </n-upload>
-
-        <div
-          class="custom-cover"
-          :style="{ cursor: 'grab' }"
-          @mousedown="startDrag($event, 'cover')"
-          v-if="newCoverUrl"
-        >
-          <img
-            :src="newCoverUrl"
-            class="img-cover-custom"
-            alt="Cover"
-            :style="coverStyle"
-          />
-        </div>
-
-        <n-space class="slider-container">
-          <n-slider
-            v-model:value="coverPosition"
-            :min="-1000"
-            :max="0"
-            vertical
-          />
-        </n-space>
-        <n-button @click="cancelChange" class="cancel-button" type="error">
-          Hủy
-        </n-button>
-        <n-button @click="saveNewCover" class="save-button" type="info">
-          Lưu
-        </n-button>
-      </div>
-
-      <div class="cover-edit" v-if="showEdit">
-        <div
-          class="custom-cover"
-          :style="{ cursor: 'grab' }"
-          @mousedown="startDrag($event, 'cover')"
-          v-if="coverUrl"
-        >
-          <img
-            :src="coverUrl"
-            class="img-cover-custom"
-            alt="Cover"
-            :style="coverStyle"
-          />
-        </div>
-        <n-space class="slider-container">
-          <n-slider
-            v-model:value="coverPosition"
-            :min="-1000"
-            :max="0"
-            vertical
-          />
-        </n-space>
-        <n-button @click="cancelEdit" class="cancel-button" type="error">
-          Hủy
-        </n-button>
-        <n-button @click="saveEditedCover" class="save-button" type="info">
-          Lưu
-        </n-button>
-      </div>
-
       <div class="edit-cover-btn" v-if="authStore.user?.id === users.id">
-        <n-dropdown :options="options" @select="handleSelect">
+        <n-dropdown :options="coverOptions" @select="handleCoverSelect">
           <n-button
             strong
             secondary
@@ -121,7 +45,7 @@
     <n-modal
       v-model:show="showViewModal"
       preset="card"
-      title="Xem hình cover"
+      title="Coi Hình Bìa"
       class="view-cover-modal"
     >
       <n-image :src="coverUrl" class="full-cover-img" />
@@ -316,7 +240,7 @@
 
 <script setup>
 import { storeToRefs } from 'pinia';
-import { ref, onMounted, computed, watch, onBeforeUnmount, h } from 'vue';
+import { ref, onMounted, computed, watch, h } from 'vue';
 import { useMessage, NIcon } from 'naive-ui';
 import { useAuthStore } from '../../../stores/auth.js';
 import { useMenuProfile } from '../../../stores/use-menu-profile.js';
@@ -325,7 +249,7 @@ import { useGeneralStore } from '../../../stores/general';
 import { useChatStore } from '../../../stores/chatStore.js';
 import api from '../../../services/axiosInterceptor.js';
 import dayjs from 'dayjs';
-import { Pencil, Eye, CloudUpload } from '@vicons/ionicons5';
+import { Eye, CloudUpload } from '@vicons/ionicons5';
 import ExploreModal from '../../../components/ExploreModal.vue';
 import FollowingListModal from '../../../components/FollowingListModal.vue';
 import ChatInboxModal from '../../../components/ChatInboxModal.vue';
@@ -342,8 +266,9 @@ const openFollowingModal = () => followingModalRef.value.openModal();
 const authStore = useAuthStore();
 const useGeneral = useGeneralStore();
 const useProfile = useProfileStore();
-const { cover_position } = storeToRefs(useProfile);
-const { isCropperModal, avatarUpdated } = storeToRefs(useGeneral);
+
+const { isCropperModal, isCoverCropperModal, avatarUpdated, coverUpdated } =
+  storeToRefs(useGeneral);
 
 const id = authStore.user?.id;
 const { users, avatarUrl, coverUrl } = storeToRefs(useProfile);
@@ -351,6 +276,10 @@ const message = useMessage();
 
 const handleCameraClick = () => {
   isCropperModal.value = true;
+};
+
+const handleCoverClick = () => {
+  isCoverCropperModal.value = true;
 };
 
 const formattedBirthday = computed(() => {
@@ -374,149 +303,33 @@ watch(
   }
 );
 
+watch(
+  () => coverUpdated.value,
+  (newValue) => {
+    if (newValue) {
+      useProfile.updateCoverUrl(`${useProfile.coverUrl}`);
+      useGeneral.setCoverUpdated(false);
+    }
+  }
+);
+
 function renderIcon(icon) {
   return () => h(NIcon, null, { default: () => h(icon) });
 }
 
-const options = [
-  { label: 'Coi Hình', key: 'viewcover', icon: renderIcon(Eye) },
-  { label: 'Thay Hình', key: 'changecover', icon: renderIcon(CloudUpload) },
-  { label: 'Sửa Hình', key: 'settingcover', icon: renderIcon(Pencil) },
+const coverOptions = [
+  { label: 'Coi Hình Bìa', key: 'viewcover', icon: renderIcon(Eye) },
+  { label: 'Thay Hình Bìa', key: 'changecover', icon: renderIcon(CloudUpload) },
 ];
 
-const uploadHeaders = { Authorization: `Bearer ${authStore.accessToken}` };
-
-const dragging = ref(false);
-let startY = 0;
-let originalCoverPosition = 0;
-
-const coverStyle = computed(() => ({
-  transform: `translateY(${cover_position.value}px)`,
-}));
-
-const coverPosition = computed({
-  get() {
-    return cover_position.value;
-  },
-  set(value) {
-    cover_position.value = value;
-    coverStyle.value.transform = `translateY(${cover_position.value}px)`;
-  },
-});
-
-const onKeyDown = (event) => {
-  if (event.key === 'Escape' && dragging.value) cancelDrag();
-};
-
-const startDrag = (event) => {
-  dragging.value = true;
-  startY = event.clientY;
-  originalCoverPosition = cover_position.value;
-  window.addEventListener('mousemove', onDrag);
-  window.addEventListener('mouseup', stopDrag);
-  window.addEventListener('keydown', onKeyDown);
-};
-
-const onDrag = (event) => {
-  if (!dragging.value) return;
-  const currentY = event.clientY;
-  const deltaY = currentY - startY;
-  startY = currentY;
-  cover_position.value += deltaY;
-  coverStyle.value.transform = `translateY(${cover_position.value}px)`;
-};
-
-const stopDrag = () => {
-  dragging.value = false;
-  window.removeEventListener('mousemove', onDrag);
-  window.removeEventListener('mouseup', stopDrag);
-  window.removeEventListener('keydown', onKeyDown);
-};
-
-const cancelDrag = () => {
-  users.cover_position = originalCoverPosition;
-  coverStyle.value.transform = `translateY(${users.cover_position}px)`;
-  stopDrag();
-  message.info('Thao tác kéo đã bị hủy và vị trí đã được khôi phục.');
-};
-
-const newCoverFile = ref(null);
-const newCoverUrl = ref(null);
-
-const handleUpload = ({ file }) => {
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    newCoverUrl.value = event.target.result;
-  };
-  newCoverFile.value = file.file;
-  reader.readAsDataURL(file.file);
-};
-
-const saveNewCover = () => {
-  if (!newCoverFile.value) {
-    message.error('Vui lòng chọn một tệp hình ảnh!');
-    return;
-  }
-  const formData = new FormData();
-  formData.append('file', newCoverFile.value);
-  formData.append('position', cover_position.value);
-  api
-    .post(`link/upload/cover`, formData, {
-      headers: { ...uploadHeaders, 'Content-Type': 'multipart/form-data' },
-    })
-    .then((response) => {
-      if (response.status === 200) {
-        useProfile.updateCoverPosition(response.data.positionY);
-        useProfile.updateCoverUrl(response.data.url);
-        showChange.value = false;
-        message.success('Cover đã được lưu thành công!');
-      }
-    })
-    .catch(() => message.error('Lưu hình cover thất bại!'));
-};
-
-const cancelChange = () => {
-  showChange.value = false;
-  newCoverUrl.value = null;
-  message.info('Đã hủy thao tác thay đổi hình cover.');
-};
-
-const cancelEdit = () => {
-  showEdit.value = false;
-  cover_position.value = originalCoverPosition;
-  message.info('Đã hủy thao tác chỉnh sửa hình cover.');
-};
-
 const showViewModal = ref(false);
-const showChange = ref(false);
-const showEdit = ref(false);
 
-const handleSelect = (key) => {
-  if (key === 'viewcover') showViewModal.value = true;
-  else if (key === 'changecover') {
-    showChange.value = true;
-    showEdit.value = false;
-  } else if (key === 'settingcover') {
-    showEdit.value = true;
-    showChange.value = false;
+const handleCoverSelect = (key) => {
+  if (key === 'viewcover') {
+    showViewModal.value = true;
+  } else if (key === 'changecover') {
+    handleCoverClick();
   }
-};
-
-const saveEditedCover = () => {
-  api
-    .patch(
-      `link/update/cover-position`,
-      { position: cover_position.value },
-      { headers: uploadHeaders }
-    )
-    .then((response) => {
-      if (response.status === 200) {
-        useProfile.updateCoverPosition(response.data.positionY);
-        showEdit.value = false;
-        message.success('Vị trí cover đã được lưu thành công!');
-      }
-    })
-    .catch(() => message.error('Lưu vị trí cover thất bại!'));
 };
 
 const lastChapter = ref('');
@@ -553,13 +366,8 @@ onMounted(() => {
   getLastChapter();
   getlastEpisode();
 });
-
-onBeforeUnmount(() => {
-  window.removeEventListener('mousemove', onDrag);
-  window.removeEventListener('mouseup', stopDrag);
-  window.removeEventListener('keydown', onKeyDown);
-});
 </script>
+
 <style lang="scss" scoped>
 /* ========== COVER & AVATAR ========== */
 .profile-page {
@@ -575,7 +383,7 @@ html.dark-mode .profile-page {
 
 .cover-section {
   position: relative;
-  height: 300px;
+  height: 400px;
   background-color: #282c34;
   overflow: hidden;
 }
@@ -584,9 +392,7 @@ html.dark-mode .cover-section {
   background-color: #1a1a1a;
 }
 
-.cover-container,
-.cover-change,
-.cover-edit {
+.cover-container {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -594,11 +400,10 @@ html.dark-mode .cover-section {
 }
 
 .cover-img {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
+  height: 100%;
   object-fit: cover;
+  object-position: center;
 }
 
 .edit-cover-btn {
@@ -608,7 +413,6 @@ html.dark-mode .cover-section {
   z-index: 10;
 }
 
-/* Dropdown Toggle Button */
 .edit-cover-btn :deep(.dropdown-toggle) {
   background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%) !important;
   color: white !important;
@@ -629,48 +433,6 @@ html.dark-mode .edit-cover-btn :deep(.dropdown-toggle) {
 .edit-cover-btn :deep(.dropdown-toggle:hover) {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
-}
-
-html.dark-mode .edit-cover-btn :deep(.dropdown-toggle:hover) {
-  box-shadow: 0 6px 20px rgba(15, 138, 74, 0.4);
-}
-
-/* Dropdown Menu Styling */
-.edit-cover-btn :deep(.n-dropdown-menu) {
-  background: white !important;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-  min-width: 180px;
-}
-
-html.dark-mode .edit-cover-btn :deep(.n-dropdown-menu) {
-  background: #1e1e1e !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-}
-
-.edit-cover-btn :deep(.n-dropdown-option) {
-  color: #333 !important;
-  padding: 12px 16px;
-  transition: all 0.2s ease;
-}
-
-html.dark-mode .edit-cover-btn :deep(.n-dropdown-option) {
-  color: #e0e0e0 !important;
-}
-
-.edit-cover-btn :deep(.n-dropdown-option:hover) {
-  background: rgba(12, 113, 61, 0.1) !important;
-  color: #0c713d !important;
-}
-
-html.dark-mode .edit-cover-btn :deep(.n-dropdown-option:hover) {
-  background: rgba(15, 138, 74, 0.2) !important;
-  color: #0f8a4a !important;
-}
-
-.edit-cover-btn :deep(.n-dropdown-option .n-dropdown-option__icon) {
-  color: inherit;
 }
 
 .avatar-section {
@@ -738,121 +500,6 @@ html.dark-mode .camera-btn i {
   color: #e0e0e0;
 }
 
-/* Cover Upload Controls */
-.custom-cover {
-  width: 100%;
-  height: auto;
-  position: relative;
-  user-select: none;
-}
-
-.img-cover-custom {
-  width: 100%;
-  object-fit: cover;
-  transition: transform 0.2s ease;
-}
-
-.upload-container {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 10;
-}
-
-.select-image-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px !important;
-  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%) !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 50px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.3);
-}
-
-html.dark-mode .select-image-btn {
-  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%) !important;
-  box-shadow: 0 4px 12px rgba(15, 138, 74, 0.3);
-}
-
-.select-image-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
-}
-
-html.dark-mode .select-image-btn:hover {
-  box-shadow: 0 6px 20px rgba(15, 138, 74, 0.4);
-}
-
-.save-button,
-.cancel-button {
-  position: absolute;
-  right: 3rem;
-  padding: 12px 28px;
-  color: white;
-  border: none;
-  border-radius: 50px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  z-index: 10;
-}
-
-.save-button {
-  bottom: 3.5rem;
-}
-
-.cancel-button {
-  bottom: 1rem;
-}
-
-.slider-container {
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 10;
-  height: 200px;
-  display: flex;
-  align-items: center;
-}
-
-.slider-container :deep(.n-slider) {
-  height: 200px;
-}
-
-.slider-container :deep(.n-slider-rail) {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-html.dark-mode .slider-container :deep(.n-slider-rail) {
-  background: rgba(0, 0, 0, 0.3);
-}
-
-.slider-container :deep(.n-slider-fill) {
-  background: #0c713d;
-}
-
-html.dark-mode .slider-container :deep(.n-slider-fill) {
-  background: #0f8a4a;
-}
-
-.slider-container :deep(.n-slider-handle) {
-  border: 2px solid #0c713d;
-  background: white;
-}
-
-html.dark-mode .slider-container :deep(.n-slider-handle) {
-  border-color: #0f8a4a;
-  background: #1e1e1e;
-}
-
-/* Modal Styling */
 :deep(.view-cover-modal.n-card) {
   max-width: 90vw;
   max-height: 90vh;
@@ -862,17 +509,6 @@ html.dark-mode .slider-container :deep(.n-slider-handle) {
 
 html.dark-mode :deep(.view-cover-modal.n-card) {
   background: #1e1e1e;
-}
-
-:deep(.view-cover-modal .n-card__header) {
-  background: transparent;
-  color: #1f2937;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-html.dark-mode :deep(.view-cover-modal .n-card__header) {
-  color: #e0e0e0;
-  border-bottom-color: #333;
 }
 
 .full-cover-img {
@@ -946,37 +582,9 @@ html.dark-mode .action-btn {
   box-shadow: 0 4px 12px rgba(15, 138, 74, 0.3);
 }
 
-.action-btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  transform: translate(-50%, -50%);
-  transition:
-    width 0.6s,
-    height 0.6s;
-}
-
-.action-btn:hover::before {
-  width: 300px;
-  height: 300px;
-}
-
 .action-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
-}
-
-html.dark-mode .action-btn:hover {
-  box-shadow: 0 6px 20px rgba(15, 138, 74, 0.4);
-}
-
-.action-btn:active {
-  transform: translateY(0);
 }
 
 .list-btn {
@@ -984,25 +592,9 @@ html.dark-mode .action-btn:hover {
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
-html.dark-mode .list-btn {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-}
-
-.list-btn:hover {
-  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-}
-
 .inbox-btn {
   background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
   box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
-}
-
-html.dark-mode .inbox-btn {
-  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-}
-
-.inbox-btn:hover {
-  box-shadow: 0 6px 20px rgba(8, 145, 178, 0.4);
 }
 
 .badge-count {
@@ -1048,10 +640,6 @@ html.dark-mode .profile-card {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
-html.dark-mode .profile-card:hover {
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-}
-
 .card-header-green {
   background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
   color: white;
@@ -1064,14 +652,6 @@ html.dark-mode .profile-card:hover {
   text-transform: uppercase;
 }
 
-html.dark-mode .card-header-green {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-}
-
-.card-header-green i {
-  font-size: 22px;
-}
-
 .card-body-white {
   background: white;
   padding: 28px;
@@ -1081,7 +661,6 @@ html.dark-mode .card-body-white {
   background: #1e1e1e;
 }
 
-/* Info Rows */
 .info-row {
   display: flex;
   align-items: flex-start;
@@ -1104,10 +683,6 @@ html.dark-mode .info-row {
   width: 24px;
   flex-shrink: 0;
   margin-top: 2px;
-}
-
-html.dark-mode .icon-label {
-  color: #22c55e;
 }
 
 .info-content {
@@ -1134,7 +709,6 @@ html.dark-mode .info-content span {
   color: #b0b0b0;
 }
 
-/* Stats Grid */
 .stats-grid-content {
   display: flex;
   justify-content: space-around;
@@ -1194,7 +768,6 @@ html.dark-mode .stat-label {
   color: #b0b0b0;
 }
 
-/* History Items */
 .history-item-box {
   display: flex;
   align-items: center;
@@ -1224,10 +797,6 @@ html.dark-mode .history-icon {
   color: #22c55e;
 }
 
-.history-text {
-  flex: 1;
-}
-
 .history-text span {
   color: #374151;
   font-size: 15px;
@@ -1248,7 +817,6 @@ html.dark-mode .history-number {
   color: #ef4444;
 }
 
-/* Social Icons */
 .social-icons-row {
   display: flex;
   justify-content: center;
@@ -1293,22 +861,9 @@ html.dark-mode .history-number {
 
 /* ========== RESPONSIVE DESIGN ========== */
 
-/* Large Tablet */
-@media (max-width: 1024px) {
-  .username-title {
-    font-size: 28px;
-  }
-
-  .profile-content-wrapper {
-    max-width: 800px;
-    padding: 0 16px;
-  }
-}
-
-/* Tablet */
 @media (max-width: 768px) {
   .cover-section {
-    height: 250px;
+    height: 300px;
   }
 
   .avatar-section {
@@ -1324,20 +879,8 @@ html.dark-mode .history-number {
     font-size: 16px;
   }
 
-  .profile-header-content {
-    padding: 0 16px;
-  }
-
   .username-title {
     font-size: 24px;
-  }
-
-  .rating-stars {
-    margin-bottom: 20px;
-  }
-
-  .rating-stars i {
-    font-size: 20px;
   }
 
   .action-buttons-group {
@@ -1349,247 +892,21 @@ html.dark-mode .history-number {
   .action-btn {
     width: 100%;
     justify-content: center;
-    padding: 14px 24px;
-  }
-
-  .profile-content-wrapper {
-    padding: 0 16px;
-    gap: 20px;
-  }
-
-  .card-header-green {
-    padding: 16px 20px;
-    font-size: 16px;
-  }
-
-  .card-header-green i {
-    font-size: 20px;
-  }
-
-  .card-body-white {
-    padding: 22px;
-  }
-
-  .stats-grid-content {
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .stat-circle-item {
-    display: flex;
-    align-items: center;
-    text-align: left;
-    padding: 16px;
-    background: #f9fafb;
-    border-radius: 12px;
-    gap: 20px;
-  }
-
-  html.dark-mode .stat-circle-item {
-    background: #252525;
-  }
-
-  .stat-circle {
-    margin: 0;
-    width: 70px;
-    height: 70px;
-    font-size: 24px;
-  }
-
-  .social-icons-row {
-    gap: 16px;
-  }
-
-  .social-circle {
-    width: 55px;
-    height: 55px;
-    font-size: 22px;
-  }
-
-  .save-button,
-  .cancel-button {
-    right: 1.5rem;
-    padding: 10px 20px;
-  }
-
-  .save-button {
-    bottom: 3rem;
-  }
-
-  .cancel-button {
-    bottom: 0.8rem;
   }
 }
 
-/* Mobile */
 @media (max-width: 480px) {
-  .profile-page {
-    padding-bottom: 30px;
-  }
-
   .cover-section {
     height: 250px;
   }
 
   .avatar-section {
-    width: 150px;
-    height: 150px;
-    margin-top: -75px;
-  }
-
-  .camera-btn {
-    width: 35px;
-    height: 35px;
-    top: 110px;
-    font-size: 16px;
-  }
-
-  .profile-header-content {
-    margin: 16px auto 32px;
-    padding: 0 12px;
-  }
-
-  .username-title {
-    font-size: 22px;
-  }
-
-  .rating-stars {
-    margin-bottom: 18px;
-  }
-
-  .rating-stars i {
-    font-size: 18px;
-  }
-
-  .action-btn {
-    padding: 12px 20px;
-    font-size: 14px;
-    gap: 6px;
-  }
-
-  .badge-count {
-    top: -6px;
-    right: -6px;
-    font-size: 10px;
-    padding: 2px 6px;
-  }
-
-  .profile-content-wrapper {
-    padding: 0 12px;
-    gap: 18px;
-  }
-
-  .card-header-green {
-    padding: 14px 18px;
-    font-size: 15px;
-  }
-
-  .card-header-green i {
-    font-size: 18px;
-  }
-
-  .card-body-white {
-    padding: 20px;
-  }
-
-  .info-row {
-    padding: 12px 0;
-    gap: 12px;
-  }
-
-  .icon-label {
-    font-size: 18px;
-    width: 20px;
-  }
-
-  .info-content strong {
-    font-size: 14px;
-  }
-
-  .info-content span {
-    font-size: 14px;
-  }
-
-  .stat-circle-item {
-    padding: 14px;
-  }
-
-  .stat-circle {
-    width: 60px;
-    height: 60px;
-    font-size: 20px;
-  }
-
-  .stat-number {
-    font-size: 24px;
-  }
-
-  .stat-label {
-    font-size: 13px;
-  }
-
-  .history-item-box {
-    padding: 14px;
-    gap: 12px;
-  }
-
-  .history-icon {
-    font-size: 20px;
-  }
-
-  .history-text span {
-    font-size: 14px;
-  }
-
-  .history-number {
-    font-size: 16px;
-  }
-
-  .social-circle {
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-  }
-
-  .save-button,
-  .cancel-button {
-    right: 1rem;
-    padding: 10px 20px;
-    font-size: 14px;
-  }
-
-  .save-button {
-    bottom: 3rem;
-  }
-
-  .cancel-button {
-    bottom: 0.5rem;
-  }
-}
-
-/* Extra Small Mobile */
-@media (max-width: 360px) {
-  .username-title {
-    font-size: 20px;
-  }
-
-  .action-btn {
-    padding: 10px 16px;
-    font-size: 13px;
-  }
-
-  .card-header-green {
-    padding: 12px 16px;
-    font-size: 14px;
-  }
-
-  .card-body-white {
-    padding: 18px;
-  }
-
-  .avatar-section {
     width: 120px;
     height: 120px;
+  }
+
+  .username-title {
+    font-size: 20px;
   }
 }
 </style>

@@ -11,8 +11,14 @@
           :before-upload="beforeUpload"
         >
           <div class="cover" @click="handleCoverClick">
-            <img v-if="coverUrl" :src="coverUrl" alt="cover" class="img-cover" :style="coverStyle"/>
-            <div v-else class="upload-prompt">Nhấn để tải ảnh bìa lên</div>
+            <img
+              v-if="coverUrl"
+              :src="coverUrl"
+              alt="cover"
+              class="img-cover"
+              :style="coverStyle"
+            />
+            <div v-else class="upload-prompt">Nhấn để tải hình bìa lên</div>
           </div>
         </n-upload>
       </div>
@@ -20,7 +26,7 @@
     <div class="row dem"></div>
     <div class="row">
       <div class="col-12 col-sm-3 sidebar m-0 p-0">
-        <div style="height: 100px;"></div>
+        <div style="height: 100px"></div>
         <h1>{{ users.name }}</h1>
         <h2>{{ users.occupation }}</h2>
         <n-rate color="#4fb233" readonly :default-value="5" />
@@ -29,7 +35,8 @@
             <i class="fa-solid fa-mars-and-venus me-1"></i> {{ users.gender }}
           </p>
           <p v-if="users.phone_number">
-            <i class="fa-solid fa-square-phone me-1"></i> {{ users.phone_number }}
+            <i class="fa-solid fa-square-phone me-1"></i>
+            {{ users.phone_number }}
           </p>
           <p v-if="users.email">
             <i class="fa-solid fa-envelope me-1"></i> {{ users.email }}
@@ -38,12 +45,12 @@
             <i class="fa-solid fa-location-dot me-1"></i> {{ users.address }}
           </p>
           <p v-if="formattedBirthday">
-            <i class="fa-solid fa-cake-candles me-1"></i> {{ formattedBirthday }}
+            <i class="fa-solid fa-cake-candles me-1"></i>
+            {{ formattedBirthday }}
           </p>
         </div>
       </div>
-      <div class="col-12 col-sm-9 content m-0 p-0">
-        Content</div>
+      <div class="col-12 col-sm-9 content m-0 p-0">Content</div>
     </div>
     <n-upload
       ref="uploadRef"
@@ -54,25 +61,29 @@
       :before-upload="beforeUpload"
     >
       <div class="avatar" @click="handleAvatarClick">
-        <img v-if="avatarUrl" :src="avatarUrl" alt="avatar" class="img-cover" :style="avatarStyle" />
+        <img
+          v-if="avatarUrl"
+          :src="avatarUrl"
+          alt="avatar"
+          class="img-cover"
+          :style="avatarStyle"
+        />
         <div v-else class="upload-prompt">Nhấn để tải avatar lên</div>
       </div>
     </n-upload>
   </div>
 </template>
 
-
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed } from 'vue';
 import { useMessage } from 'naive-ui';
 import api from '../../../services/axiosInterceptor.js';
-import { useAuthStore } from "../../../stores/auth.js";
-import { useMenuProfile } from "../../../stores/use-menu-profile.js";
-import { useProfileStore } from "../../../stores/profile.js";
+import { useAuthStore } from '../../../stores/auth.js';
+import { useMenuProfile } from '../../../stores/use-menu-profile.js';
+import { useProfileStore } from '../../../stores/profile.js';
 import dayjs from 'dayjs';
 
-
-const backendUrl = "http://127.0.0.1:8000"
+const backendUrl = 'http://127.0.0.1:8000';
 const profileStore = useProfileStore();
 const authStore = useAuthStore();
 const uploadHeaders = computed(() => ({
@@ -82,8 +93,8 @@ const uploadCoverUrl = `${api.defaults.baseURL}/link/upload/cover`;
 const uploadAvatarUrl = `${api.defaults.baseURL}/link/upload/avatar`;
 const id = authStore.user?.id;
 const users = ref({});
-const avatarUrl = ref(null); 
-const coverUrl = ref(null);  
+const avatarUrl = ref(null);
+const coverUrl = ref(null);
 const uploadRef = ref(null);
 const uploadCoverRef = ref(null);
 const message = useMessage();
@@ -118,29 +129,32 @@ const getProfile = async () => {
     coverStyle.value.transform = `translateY(${users.value.cover_position * 2.5}px)`;
   } catch (error) {
     console.error(error);
-    if(error.response && error.response.status === 429){
-      message.warning(error.response.data.message)
+    if (error.response && error.response.status === 429) {
+      message.warning(error.response.data.message);
     }
   }
 };
 
 const beforeUpload = (file) => {
-  const isImage = file.type.startsWith("image/");
+  const isImage = file.type.startsWith('image/');
   if (!isImage) {
-    message.error("Vui lòng chọn một tệp hình ảnh!");
+    message.error('Vui lòng chọn một tệp hình ảnh!');
   }
   return isImage;
 };
 
 const handleAvatarClick = () => {
   if (uploadRef.value && typeof uploadRef.value.handleClick === 'function') {
-    uploadRef.value.handleClick(); 
+    uploadRef.value.handleClick();
   }
 };
 
 const handleCoverClick = () => {
-  if (uploadCoverRef.value && typeof uploadCoverRef.value.handleClick === 'function') {
-    uploadCoverRef.value.handleClick(); 
+  if (
+    uploadCoverRef.value &&
+    typeof uploadCoverRef.value.handleClick === 'function'
+  ) {
+    uploadCoverRef.value.handleClick();
   }
 };
 
@@ -215,7 +229,6 @@ onMounted(() => {
   object-position: center; /* Căn giữa hình ảnh */
 }
 
-
 .upload-prompt {
   color: white;
   font-size: 1.5rem;
@@ -232,7 +245,7 @@ onMounted(() => {
   border: 20px solid green;
   position: absolute;
   top: calc(30vh - 100px);
-  left: calc((100% / 12) * 1.5 - 100px); 
+  left: calc((100% / 12) * 1.5 - 100px);
   z-index: 10;
   overflow: hidden;
   cursor: pointer;
@@ -255,10 +268,9 @@ onMounted(() => {
   object-fit: cover;
 }
 
-.dem{
+.dem {
   height: 2vh;
   box-sizing: border-box;
   background-color: green;
 }
 </style>
-

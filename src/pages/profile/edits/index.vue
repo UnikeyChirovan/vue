@@ -31,7 +31,6 @@
                   :src="coverUrl || '../../../assets/cover.jpg'"
                   alt="Cover"
                   class="media-img cover-img"
-                  :style="{ transform: `translateY(${coverStyle}px)` }"
                 />
               </div>
               <button type="button" @click="deleteCover" class="delete-btn">
@@ -286,7 +285,6 @@ const useProfile = useProfileStore();
 const router = useRouter();
 
 const id = authStore.user?.id;
-let coverStyle = useProfile.cover_position * 0.2213;
 
 const showPassword = ref(false);
 const showPasswordConfirm = ref(false);
@@ -586,29 +584,8 @@ html.dark-mode .media-preview {
   width: 100%;
   max-width: 380px;
   height: 180px;
-  position: relative;
   border-radius: 12px;
-}
-
-.cover-preview::before,
-.cover-preview::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 25%;
-  background-color: rgba(0, 0, 0, 0.3);
-  z-index: 1;
-}
-
-.cover-preview::before {
-  top: 0;
-  border-radius: 12px 12px 0 0;
-}
-
-.cover-preview::after {
-  bottom: 0;
-  border-radius: 0 0 12px 12px;
+  position: relative;
 }
 
 .media-img {
@@ -618,9 +595,7 @@ html.dark-mode .media-preview {
 }
 
 .cover-img {
-  position: absolute;
-  top: 25%;
-  left: 0;
+  object-position: center;
 }
 
 .delete-btn {
