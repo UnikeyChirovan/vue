@@ -5,7 +5,7 @@
       <div class="page-header">
         <h1 class="page-title">
           <i class="fa-solid fa-film"></i>
-          Hoạt Hình
+          HOẠT HÌNH
         </h1>
         <p class="page-subtitle">Thưởng thức các tập phim đặc sắc</p>
       </div>

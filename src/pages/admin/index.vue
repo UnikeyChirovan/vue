@@ -1087,4 +1087,167 @@ onMounted(() => {
     font-size: 14px;
   }
 }
+/* ========== ADMIN DASHBOARD - DARK MODE ========== */
+
+/* Base wrapper */
+html.dark-mode .admin-dashboard {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+}
+
+/* Welcome Banner */
+html.dark-mode .welcome-banner {
+  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+  box-shadow: 0 8px 32px rgba(15, 138, 74, 0.3);
+}
+
+html.dark-mode .welcome-content {
+  color: #ffffff;
+}
+
+html.dark-mode .welcome-text h1 {
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+html.dark-mode .welcome-text p {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+html.dark-mode .welcome-date {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+html.dark-mode .circle {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Loading State */
+html.dark-mode .loading-text {
+  color: #0f8a4a;
+}
+
+/* Dashboard Content */
+html.dark-mode .dashboard-content {
+  background: transparent;
+}
+
+html.dark-mode .section-header h3 {
+  color: #e0e0e0;
+}
+
+html.dark-mode .section-subtitle {
+  color: #888888;
+}
+
+/* Statistics Cards */
+html.dark-mode .stat-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+  border: 1px solid #2a2a2a;
+}
+
+html.dark-mode .stat-card:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  border-color: #0f8a4a;
+}
+
+html.dark-mode .stat-label {
+  color: #888888;
+}
+
+html.dark-mode .stat-value {
+  color: #e0e0e0;
+}
+
+html.dark-mode .stat-trend.up {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+}
+
+html.dark-mode .stat-trend.stable {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+html.dark-mode .stat-hover-effect {
+  background: linear-gradient(90deg, #0f8a4a 0%, #0c713d 100%);
+}
+
+/* Quick Actions */
+html.dark-mode .quick-action-card {
+  background: #1e1e1e;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  border: 1px solid #2a2a2a;
+}
+
+html.dark-mode .quick-action-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+  border-color: #0f8a4a;
+}
+
+html.dark-mode .action-label {
+  color: #e0e0e0;
+}
+
+/* Module Cards */
+html.dark-mode .module-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+  border: 1px solid #2a2a2a;
+}
+
+html.dark-mode .module-card:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
+}
+
+html.dark-mode .module-card-header {
+  border-bottom: 2px solid #2a2a2a;
+}
+
+html.dark-mode .module-title {
+  color: #e0e0e0;
+}
+
+html.dark-mode .module-link {
+  background: #252525;
+  color: #b0b0b0;
+  border: 1px solid transparent;
+}
+
+html.dark-mode .module-link:hover {
+  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+/* System Info */
+html.dark-mode .system-info {
+  background: #1e1e1e;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+  border: 1px solid #2a2a2a;
+}
+
+html.dark-mode .info-card {
+  background: #252525;
+  border: 1px solid #333333;
+}
+
+html.dark-mode .info-card i {
+  color: #0f8a4a;
+}
+
+html.dark-mode .info-label {
+  color: #888888;
+}
+
+html.dark-mode .info-value {
+  color: #e0e0e0;
+}
+
+html.dark-mode .status-active {
+  color: #4ade80;
+}
 </style>

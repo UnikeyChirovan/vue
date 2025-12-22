@@ -1178,4 +1178,278 @@ onMounted(() => {
     font-size: 0.95rem;
   }
 }
+/* ========== SUPPORT STATISTICS - DARK MODE ========== */
+
+/* Base wrapper */
+html.dark-mode .support-statistics {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+}
+
+/* Page Header */
+html.dark-mode .page-header {
+  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+  box-shadow: 0 10px 40px rgba(15, 138, 74, 0.4);
+  color: #ffffff;
+}
+
+html.dark-mode .header-content h1 {
+  color: #ffffff;
+}
+
+html.dark-mode .header-content p {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+html.dark-mode .period-selector {
+  background: rgba(10, 10, 10, 0.6);
+  border: 1px solid rgba(15, 138, 74, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+html.dark-mode .period-btn {
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+html.dark-mode .period-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+html.dark-mode .period-btn.active {
+  background: linear-gradient(
+    135deg,
+    rgba(12, 113, 61, 0.85) 0%,
+    rgba(12, 113, 61, 0.75) 50%,
+    rgba(20, 90, 50, 0.8) 100%
+  );
+  backdrop-filter: blur(2px);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.5);
+  font-weight: 700;
+  border: 1px solid rgba(15, 138, 74, 0.5);
+}
+
+/* Loading */
+html.dark-mode .loading-container {
+  color: #888888;
+}
+
+html.dark-mode .loading-container i {
+  color: #0f8a4a;
+}
+
+html.dark-mode .loading-container p {
+  color: #b0b0b0;
+}
+
+/* Overview Cards */
+html.dark-mode .stat-card {
+  background: #1e1e1e;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  border: 1px solid #2a2a2a;
+}
+
+html.dark-mode .stat-card::before {
+  /* Giữ nguyên gradient của từng loại card */
+}
+
+html.dark-mode .stat-card:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+
+html.dark-mode .stat-label {
+  color: #888888;
+}
+
+html.dark-mode .stat-value {
+  color: #e0e0e0;
+}
+
+/* Performance Section */
+html.dark-mode .performance-section {
+  background: #1e1e1e;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(15, 138, 74, 0.2);
+}
+
+html.dark-mode .section-title {
+  color: #e0e0e0;
+  border-bottom: 2px solid rgba(15, 138, 74, 0.2);
+}
+
+html.dark-mode .section-title i {
+  color: #0f8a4a;
+}
+
+html.dark-mode .metric-card {
+  background: linear-gradient(135deg, #252525 0%, #2a2a2a 100%);
+  border: 1px solid #333333;
+}
+
+html.dark-mode .metric-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+  border-color: #0f8a4a;
+}
+
+html.dark-mode .metric-label {
+  color: #888888;
+}
+
+html.dark-mode .metric-value {
+  color: #e0e0e0;
+}
+
+/* Managers Section - Desktop */
+html.dark-mode .managers-section {
+  background: #1e1e1e;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(15, 138, 74, 0.2);
+}
+
+html.dark-mode .table-header {
+  background: linear-gradient(135deg, #252525 0%, #2a2a2a 100%);
+  color: #888888;
+  border: 1px solid #333333;
+}
+
+html.dark-mode .table-row {
+  background: #1e1e1e;
+  border: 1px solid transparent;
+}
+
+html.dark-mode .table-row:hover {
+  background: linear-gradient(135deg, #252525 0%, #2a2a2a 100%);
+  box-shadow: 0 8px 20px rgba(15, 138, 74, 0.2);
+  border-color: #0f8a4a;
+}
+
+html.dark-mode .rank-badge.rank-1 {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  color: #1a1a1a;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+}
+
+html.dark-mode .rank-badge.rank-2 {
+  background: linear-gradient(135deg, #c0c0c0 0%, #dcdcdc 100%);
+  color: #1a1a1a;
+}
+
+html.dark-mode .rank-badge.rank-3 {
+  background: linear-gradient(135deg, #cd7f32 0%, #d4a574 100%);
+  color: #ffffff;
+}
+
+html.dark-mode .rank-number {
+  color: #0f8a4a;
+}
+
+html.dark-mode .manager-avatar {
+  border: 3px solid #0f8a4a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+html.dark-mode .manager-name {
+  color: #e0e0e0;
+}
+
+html.dark-mode .col-stat {
+  color: #b0b0b0;
+}
+
+html.dark-mode .rating-value {
+  color: #ffc107;
+}
+
+html.dark-mode .rating-icon {
+  color: #ffc107;
+}
+
+/* Managers Section - Mobile */
+html.dark-mode .manager-card {
+  background: #1e1e1e;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  border: 2px solid transparent;
+}
+
+html.dark-mode .manager-card:hover {
+  box-shadow: 0 8px 25px rgba(15, 138, 74, 0.3);
+  border-color: #0f8a4a;
+}
+
+html.dark-mode .card-rank .rank-number {
+  background: linear-gradient(135deg, #0f8a4a 0%, #0c713d 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(15, 138, 74, 0.3);
+}
+
+html.dark-mode .card-header {
+  border-bottom: 2px solid rgba(15, 138, 74, 0.2);
+}
+
+html.dark-mode .manager-avatar-large {
+  border: 4px solid #0f8a4a;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+html.dark-mode .card-header .manager-name {
+  color: #e0e0e0;
+}
+
+html.dark-mode .stat-row {
+  background: linear-gradient(135deg, #252525 0%, #2a2a2a 100%);
+  border: 1px solid #333333;
+}
+
+html.dark-mode .stat-row .stat-label {
+  color: #888888;
+}
+
+html.dark-mode .stat-row .stat-label i {
+  color: #0f8a4a;
+}
+
+html.dark-mode .stat-row .stat-value {
+  color: #e0e0e0;
+}
+
+html.dark-mode .rating-row {
+  background: linear-gradient(135deg, #332800 0%, #443300 100%);
+  border: 1px solid #554400;
+}
+
+html.dark-mode .rating-row .stat-value {
+  color: #ffc107;
+}
+
+/* ========== RESPONSIVE ADJUSTMENTS ========== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  /* Dark mode styles remain consistent */
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  html.dark-mode .welcome-banner {
+    border-radius: 0 0 16px 16px;
+  }
+
+  html.dark-mode .page-header {
+    border-radius: 16px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  html.dark-mode .welcome-banner {
+    border-radius: 0 0 12px 12px;
+  }
+
+  html.dark-mode .page-header {
+    border-radius: 12px;
+  }
+}
 </style>

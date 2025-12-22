@@ -11,24 +11,26 @@
       </div>
 
       <div class="faq-content">
-        <n-collapse accordion :default-expanded-names="['0']">
-          <n-collapse-item
-            v-for="(faq, index) in faqList"
-            :key="index"
-            :name="String(index)"
-            class="faq-item"
-          >
-            <template #header>
-              <div class="faq-question">
-                <i class="fa-solid fa-circle-chevron-right"></i>
-                <span>{{ faq.question }}</span>
-              </div>
-            </template>
-            <div class="faq-answer">
-              {{ faq.answer }}
+        <div
+          v-for="(faq, index) in faqList"
+          :key="index"
+          class="faq-item"
+          :class="{ active: activeIndex === index }"
+        >
+          <div class="faq-header-item" @click="toggleFaq(index)">
+            <div class="faq-question">
+              <i class="fa-solid fa-circle-chevron-right"></i>
+              <span>{{ faq.question }}</span>
             </div>
-          </n-collapse-item>
-        </n-collapse>
+          </div>
+          <transition name="faq-expand">
+            <div v-if="activeIndex === index" class="faq-answer-wrapper">
+              <div class="faq-answer">
+                {{ faq.answer }}
+              </div>
+            </div>
+          </transition>
+        </div>
       </div>
 
       <div class="faq-actions">
@@ -60,6 +62,12 @@ const router = useRouter();
 const goToTerms = () => router.push('/terms');
 const goToHome = () => router.push('/');
 const goToPolicy = () => router.push('/policy');
+
+const activeIndex = ref(0);
+
+const toggleFaq = (index) => {
+  activeIndex.value = activeIndex.value === index ? null : index;
+};
 
 const faqList = ref([
   {
@@ -186,11 +194,7 @@ html.dark-mode .header-subtitle {
   margin-bottom: 40px;
 }
 
-.faq-content :deep(.n-collapse) {
-  background: transparent;
-}
-
-.faq-content :deep(.n-collapse-item) {
+.faq-item {
   background: white;
   border-radius: 16px;
   margin-bottom: 16px;
@@ -199,36 +203,24 @@ html.dark-mode .header-subtitle {
   transition: all 0.3s ease;
 }
 
-html.dark-mode .faq-content :deep(.n-collapse-item) {
+html.dark-mode .faq-item {
   background: #1e1e1e;
   border-color: #333;
 }
 
-.faq-content :deep(.n-collapse-item:hover) {
+.faq-item:hover {
   box-shadow: 0 4px 16px rgba(12, 113, 61, 0.1);
   transform: translateY(-2px);
 }
 
-html.dark-mode .faq-content :deep(.n-collapse-item:hover) {
+html.dark-mode .faq-item:hover {
   box-shadow: 0 4px 16px rgba(74, 222, 128, 0.2);
 }
 
-.faq-content :deep(.n-collapse-item__header) {
+.faq-header-item {
   padding: 20px 24px;
-  background: transparent;
-  font-weight: 600;
-}
-
-html.dark-mode .faq-content :deep(.n-collapse-item__header) {
-  color: #e5e5e5;
-}
-
-.faq-content :deep(.n-collapse-item__content-wrapper) {
-  background: transparent;
-}
-
-.faq-content :deep(.n-collapse-item__content-inner) {
-  padding: 0 24px 20px 24px;
+  cursor: pointer;
+  user-select: none;
 }
 
 .faq-question {
@@ -236,6 +228,12 @@ html.dark-mode .faq-content :deep(.n-collapse-item__header) {
   align-items: center;
   gap: 12px;
   font-size: 1.05rem;
+  font-weight: 600;
+  color: #333;
+}
+
+html.dark-mode .faq-question {
+  color: #e5e5e5;
 }
 
 .faq-question i {
@@ -248,19 +246,41 @@ html.dark-mode .faq-question i {
   color: #4ade80;
 }
 
-.faq-content :deep(.n-collapse-item--active) .faq-question i {
+.faq-item.active .faq-question i {
   transform: rotate(90deg);
+}
+
+.faq-answer-wrapper {
+  overflow: hidden;
 }
 
 .faq-answer {
   color: #666;
   line-height: 1.7;
   font-size: 0.98rem;
-  padding-left: 32px;
+  padding: 0 24px 20px 56px;
 }
 
 html.dark-mode .faq-answer {
   color: #a3a3a3;
+}
+
+/* ========== TRANSITION ========== */
+.faq-expand-enter-active,
+.faq-expand-leave-active {
+  transition: all 0.3s ease;
+}
+
+.faq-expand-enter-from,
+.faq-expand-leave-to {
+  opacity: 0;
+  max-height: 0;
+}
+
+.faq-expand-enter-to,
+.faq-expand-leave-from {
+  opacity: 1;
+  max-height: 500px;
 }
 
 /* ========== ACTIONS ========== */
@@ -377,17 +397,13 @@ html.dark-mode .faq-answer {
     font-size: 1rem;
   }
 
-  .faq-content :deep(.n-collapse-item) {
+  .faq-item {
     margin-bottom: 14px;
     border-radius: 14px;
   }
 
-  .faq-content :deep(.n-collapse-item__header) {
+  .faq-header-item {
     padding: 18px 20px;
-  }
-
-  .faq-content :deep(.n-collapse-item__content-inner) {
-    padding: 0 20px 18px 20px;
   }
 
   .faq-question {
@@ -400,7 +416,7 @@ html.dark-mode .faq-answer {
 
   .faq-answer {
     font-size: 0.92rem;
-    padding-left: 30px;
+    padding: 0 20px 18px 50px;
   }
 
   .faq-actions {
@@ -443,17 +459,13 @@ html.dark-mode .faq-answer {
     font-size: 0.95rem;
   }
 
-  .faq-content :deep(.n-collapse-item) {
+  .faq-item {
     margin-bottom: 12px;
     border-radius: 12px;
   }
 
-  .faq-content :deep(.n-collapse-item__header) {
+  .faq-header-item {
     padding: 16px 18px;
-  }
-
-  .faq-content :deep(.n-collapse-item__content-inner) {
-    padding: 0 18px 16px 18px;
   }
 
   .faq-question {
@@ -466,7 +478,7 @@ html.dark-mode .faq-answer {
 
   .faq-answer {
     font-size: 0.88rem;
-    padding-left: 28px;
+    padding: 0 18px 16px 46px;
   }
 
   .action-btn {
@@ -507,12 +519,8 @@ html.dark-mode .faq-answer {
     font-size: 0.9rem;
   }
 
-  .faq-content :deep(.n-collapse-item__header) {
+  .faq-header-item {
     padding: 14px 16px;
-  }
-
-  .faq-content :deep(.n-collapse-item__content-inner) {
-    padding: 0 16px 14px 16px;
   }
 
   .faq-question {
@@ -521,7 +529,7 @@ html.dark-mode .faq-answer {
 
   .faq-answer {
     font-size: 0.85rem;
-    padding-left: 26px;
+    padding: 0 16px 14px 42px;
   }
 
   .action-btn {
