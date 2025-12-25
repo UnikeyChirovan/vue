@@ -125,6 +125,13 @@
         </div>
       </div>
     </div>
+    <div class="container">
+      <CommentSection
+        v-if="chapterStore.selectedChapter"
+        type="chapter"
+        :id="chapterStore.selectedChapter"
+      />
+    </div>
     <SettingsModal />
     <TableofContent />
     <TheFooter />
@@ -139,6 +146,7 @@ import api from '../../services/axiosInterceptor';
 import SettingsModal from '../../components/SettingsModal.vue';
 import TableofContent from '../../components/TableofContent.vue';
 import TheFooter from '../../components/TheFooter.vue';
+import CommentSection from '../../components/CommentSection.vue';
 
 const chapterStore = useChapterStore();
 const storyName = ref('');

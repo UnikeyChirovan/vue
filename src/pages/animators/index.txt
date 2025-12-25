@@ -108,11 +108,6 @@
         <div class="spinner"></div>
         <p>Đang tải video...</p>
       </div>
-      <CommentSection
-        v-if="currentVideo"
-        type="episode"
-        :id="currentVideo.id"
-      />
     </div>
   </div>
   <TheFooter />
@@ -123,7 +118,6 @@ import { ref, onMounted, nextTick, computed } from 'vue';
 import api from '../../services/axiosInterceptor';
 import TheHeader from '../../components/TheHeader.vue';
 import TheFooter from '../../components/TheFooter.vue';
-import CommentSection from '../../components/CommentSection.vue';
 
 const BaseURL = 'http://127.0.0.1:8000/storage';
 const videoList = ref([]);
