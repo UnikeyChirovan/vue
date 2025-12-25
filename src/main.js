@@ -29,6 +29,10 @@ import {
   Upload,
   Tag,
   Pagination,
+  FormItem,
+  InputNumber,
+  Switch,
+  Form,
 } from 'ant-design-vue';
 import {
   create,
@@ -155,6 +159,10 @@ app.use(Radio);
 app.use(Upload);
 app.use(Pagination);
 app.use(Tag);
+// app.use(FormItem);
+app.use(InputNumber);
+app.use(Switch);
+app.use(Form);
 app.use(naive);
 app.use(CkeditorPlugin);
 

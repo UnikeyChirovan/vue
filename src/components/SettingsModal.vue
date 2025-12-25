@@ -1639,8 +1639,8 @@ onUnmounted(() => {
 @media (max-width: 1023px) {
   .settings-button {
     top: auto;
-    bottom: 100px;
-    right: 15px;
+    bottom: 12px;
+    left: 15px;
     min-width: 48px;
     width: 48px;
     height: 48px;
@@ -1723,8 +1723,8 @@ onUnmounted(() => {
 /* Mobile (480px - 767px) */
 @media (min-width: 480px) and (max-width: 767px) {
   .settings-button {
-    bottom: 100px;
-    right: 15px;
+    bottom: 12px;
+    left: 12px;
     width: 48px;
     height: 48px;
   }
@@ -1742,8 +1742,8 @@ onUnmounted(() => {
 /* Small Mobile (361px - 480px) */
 @media (max-width: 480px) {
   .settings-button {
-    bottom: 95px;
-    right: 12px;
+    bottom: 12px;
+    left: 12px;
     width: 48px;
     height: 48px;
   }
@@ -1816,8 +1816,8 @@ onUnmounted(() => {
 /* Extra Small Mobile (≤360px) */
 @media (max-width: 360px) {
   .settings-button {
-    bottom: 90px;
-    right: 10px;
+    bottom: 10px;
+    left: 10px;
     width: 45px;
     height: 45px;
   }

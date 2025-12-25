@@ -77,6 +77,18 @@
         <span class="menu-text">Quản lý Video</span>
       </RouterLink>
     </a-menu-item>
+    <a-menu-item key="admin-music-albums" class="menu-item">
+      <RouterLink :to="{ name: 'admin-music-albums' }" class="menu-link">
+        <i class="fa-solid fa-compact-disc menu-icon"></i>
+        <span class="menu-text">Quản lý Album nhạc</span>
+      </RouterLink>
+    </a-menu-item>
+    <a-menu-item key="admin-music-tracks" class="menu-item">
+      <RouterLink :to="{ name: 'admin-music-tracks' }" class="menu-link">
+        <i class="fa-solid fa-music menu-icon"></i>
+        <span class="menu-text">Quản lý Bài hát</span>
+      </RouterLink>
+    </a-menu-item>
     <a-menu-item key="admin-contacts" class="menu-item">
       <RouterLink :to="{ name: 'admin-contacts' }" class="menu-link">
         <i class="fa-regular fa-paper-plane menu-icon"></i>

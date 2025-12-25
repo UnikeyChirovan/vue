@@ -134,6 +134,7 @@
     </div>
     <SettingsModal />
     <TableofContent />
+    <MusicPlayer />
     <TheFooter />
   </div>
 </template>
@@ -147,6 +148,7 @@ import SettingsModal from '../../components/SettingsModal.vue';
 import TableofContent from '../../components/TableofContent.vue';
 import TheFooter from '../../components/TheFooter.vue';
 import CommentSection from '../../components/CommentSection.vue';
+import MusicPlayer from '../../components/MusicPlayer.vue';
 
 const chapterStore = useChapterStore();
 const storyName = ref('');

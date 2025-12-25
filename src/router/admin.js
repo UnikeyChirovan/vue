@@ -294,6 +294,20 @@ const admin = [
         component: () => import('../pages/admin/support/SupportStatistics.vue'),
         meta: { requiresAuth: true, requiresAdmin: true },
       },
+      {
+        path: 'music-albums',
+        name: 'admin-music-albums',
+        component: () => import('../pages/admin/music-albums/index.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
+
+      // Quản lý Music Tracks
+      {
+        path: 'music-tracks',
+        name: 'admin-music-tracks',
+        component: () => import('../pages/admin/music-tracks/index.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
     ],
   },
 ];
