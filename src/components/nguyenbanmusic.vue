@@ -1,17 +1,13 @@
 <template>
   <div class="music-player-wrapper">
-    <!-- Floating Button with Album Cover - DRAGGABLE -->
+    <!-- Floating Button with Album Cover -->
     <div
-      ref="floatButton"
-      @mousedown="handleMouseDown"
-      @touchstart="handleTouchStart"
+      @click="togglePlayer"
       class="music-float-button"
       :class="{
         'is-playing': isPlaying,
         'dark-mode': themeStore.isDarkMode,
-        'is-dragging': isDragging,
       }"
-      :style="buttonPosition"
     >
       <!-- Animated Rings for Playing State -->
       <div v-if="isPlaying" class="sound-waves">
@@ -124,17 +120,12 @@
 
             <button
               @click="toggleRepeat"
-              class="control-btn repeat-btn"
-              :class="{
-                active: repeatMode !== 'off',
-                'repeat-one': repeatMode === 'one',
-              }"
-              :title="getRepeatTitle()"
+              class="control-btn"
+              :class="{ active: repeatMode !== 'off' }"
             >
-              <i class="fas fa-repeat"></i>
-              <span v-if="repeatMode === 'one'" class="repeat-one-badge"
-                >1</span
-              >
+              <i v-if="repeatMode === 'all'" class="fas fa-repeat"></i>
+              <i v-else-if="repeatMode === 'one'" class="fas fa-repeat-1"></i>
+              <i v-else class="fas fa-repeat"></i>
             </button>
 
             <button @click="showPlaylistModal = true" class="control-btn">
@@ -329,7 +320,6 @@ import { useMessage } from 'naive-ui';
 
 const themeStore = useThemeStore();
 const message = useMessage();
-
 // UI State
 const showPlayer = ref(false);
 const showPlaylistModal = ref(false);
@@ -356,14 +346,6 @@ const audioPlayer = ref(null);
 const originalPlaylist = ref([]);
 const shuffledPlaylist = ref([]);
 
-// Draggable State
-const floatButton = ref(null);
-const isDragging = ref(false);
-const hasDragged = ref(false);
-const dragStart = ref({ x: 0, y: 0, startX: 0, startY: 0 });
-const dragThreshold = 5;
-const buttonPos = ref({ x: null, y: 0 });
-
 // Computed Properties
 const hasPrevious = computed(() => currentTrackIndex.value > 0);
 const hasNext = computed(
@@ -372,21 +354,17 @@ const hasNext = computed(
 
 const currentTrackCover = computed(() => {
   if (!currentTrack.value) return null;
+
+  // Tìm album chứa track hiện tại
   const album = albums.value.find((a) =>
     a.active_tracks?.some((t) => t.id === currentTrack.value.id)
   );
+
   if (album?.cover_image) {
     return getAlbumCoverUrl(album.cover_image);
   }
-  return null;
-});
 
-const buttonPosition = computed(() => {
-  const x = buttonPos.value.x ?? getDefaultX();
-  return {
-    transform: `translate(${x}px, ${buttonPos.value.y}px)`,
-    cursor: isDragging.value ? 'grabbing' : 'grab',
-  };
+  return null;
 });
 
 // Helper Functions
@@ -402,268 +380,6 @@ const shuffleArray = (array) => {
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
-};
-
-// Draggable Functions
-const getButtonSize = () => {
-  if (!floatButton.value) {
-    const isDesktop = window.innerWidth >= 1024;
-    return { width: isDesktop ? 150 : 56, height: isDesktop ? 150 : 56 };
-  }
-  const rect = floatButton.value.getBoundingClientRect();
-  return { width: rect.width, height: rect.height };
-};
-
-const getDefaultX = () => {
-  const isDesktop = window.innerWidth >= 1024;
-  if (isDesktop) {
-    return window.innerWidth - 200;
-  } else {
-    const { width } = getButtonSize();
-    return (window.innerWidth - width) / 2;
-  }
-};
-
-const constrainPosition = () => {
-  const { width, height } = getButtonSize();
-  const isDesktop = window.innerWidth >= 1024;
-
-  let minX, maxX, minY, maxY;
-
-  if (isDesktop) {
-    // Desktop: cho phép kéo ra ngoài một chút (30px visible)
-    const minVisiblePart = 30;
-    minX = 0;
-    maxX = window.innerWidth - minVisiblePart;
-    minY = 70;
-    maxY = window.innerHeight - height;
-  } else {
-    // Mobile/Tablet: giữ toàn bộ button trong viewport
-    minX = 0;
-    maxX = window.innerWidth - width;
-    minY = 70;
-    maxY = window.innerHeight - height;
-  }
-
-  // Constrain X
-  if (buttonPos.value.x !== null) {
-    if (buttonPos.value.x < minX) {
-      buttonPos.value.x = minX;
-    } else if (buttonPos.value.x > maxX) {
-      buttonPos.value.x = maxX;
-    }
-  } else {
-    buttonPos.value.x = getDefaultX();
-  }
-
-  // Constrain Y
-  if (buttonPos.value.y < minY) {
-    buttonPos.value.y = minY;
-  } else if (buttonPos.value.y > maxY) {
-    buttonPos.value.y = maxY;
-  }
-
-  localStorage.setItem('musicButtonPosition', JSON.stringify(buttonPos.value));
-};
-
-const initializePosition = () => {
-  const savedPos = localStorage.getItem('musicButtonPosition');
-  if (savedPos) {
-    try {
-      const parsed = JSON.parse(savedPos);
-      buttonPos.value = parsed;
-      // Delay để đảm bảo DOM đã render
-      setTimeout(() => {
-        constrainPosition();
-      }, 100);
-      return;
-    } catch (e) {
-      console.error('Failed to parse saved position:', e);
-    }
-  }
-
-  // Default position
-  const isDesktop = window.innerWidth >= 1024;
-  if (isDesktop) {
-    buttonPos.value = { x: window.innerWidth - 200, y: 180 };
-  } else {
-    const { width } = getButtonSize();
-    buttonPos.value = {
-      x: (window.innerWidth - width) / 2,
-      y: window.innerHeight - 80,
-    };
-  }
-
-  setTimeout(() => {
-    constrainPosition();
-  }, 100);
-};
-
-const savePosition = () => {
-  localStorage.setItem('musicButtonPosition', JSON.stringify(buttonPos.value));
-};
-
-const handleMouseDown = (e) => {
-  if (e.button !== 0) return; // Only left click
-
-  isDragging.value = true;
-  hasDragged.value = false;
-
-  const clientX = e.clientX;
-  const clientY = e.clientY;
-
-  const currentX = buttonPos.value.x ?? getDefaultX();
-
-  dragStart.value = {
-    x: clientX - currentX,
-    y: clientY - buttonPos.value.y,
-    startX: clientX,
-    startY: clientY,
-  };
-
-  document.addEventListener('mousemove', handleMouseMove);
-  document.addEventListener('mouseup', handleMouseUp);
-
-  e.preventDefault();
-};
-
-const handleMouseMove = (e) => {
-  if (!isDragging.value) return;
-
-  const clientX = e.clientX;
-  const clientY = e.clientY;
-
-  const deltaX = Math.abs(clientX - dragStart.value.startX);
-  const deltaY = Math.abs(clientY - dragStart.value.startY);
-
-  if (deltaX > dragThreshold || deltaY > dragThreshold) {
-    hasDragged.value = true;
-  }
-
-  if (hasDragged.value) {
-    const newX = clientX - dragStart.value.x;
-    const newY = clientY - dragStart.value.y;
-
-    const { width, height } = getButtonSize();
-    const isDesktop = window.innerWidth >= 1024;
-
-    let minX, maxX, minY, maxY;
-
-    if (isDesktop) {
-      const minVisiblePart = 30;
-      minX = 0;
-      maxX = window.innerWidth - minVisiblePart;
-      minY = 70;
-      maxY = window.innerHeight - height;
-    } else {
-      minX = 0;
-      maxX = window.innerWidth - width;
-      minY = 70;
-      maxY = window.innerHeight - height;
-    }
-
-    buttonPos.value.x = Math.max(minX, Math.min(newX, maxX));
-    buttonPos.value.y = Math.max(minY, Math.min(newY, maxY));
-
-    savePosition();
-  }
-
-  e.preventDefault();
-};
-
-const handleMouseUp = (e) => {
-  if (!hasDragged.value) {
-    togglePlayer();
-  }
-
-  isDragging.value = false;
-
-  setTimeout(() => {
-    hasDragged.value = false;
-  }, 50);
-
-  document.removeEventListener('mousemove', handleMouseMove);
-  document.removeEventListener('mouseup', handleMouseUp);
-};
-
-const handleTouchStart = (e) => {
-  isDragging.value = true;
-  hasDragged.value = false;
-
-  const touch = e.touches[0];
-  const clientX = touch.clientX;
-  const clientY = touch.clientY;
-
-  const currentX = buttonPos.value.x ?? getDefaultX();
-
-  dragStart.value = {
-    x: clientX - currentX,
-    y: clientY - buttonPos.value.y,
-    startX: clientX,
-    startY: clientY,
-  };
-
-  document.addEventListener('touchmove', handleTouchMove, { passive: false });
-  document.addEventListener('touchend', handleTouchEnd);
-
-  e.preventDefault();
-};
-
-const handleTouchMove = (e) => {
-  if (!isDragging.value) return;
-
-  const touch = e.touches[0];
-  const clientX = touch.clientX;
-  const clientY = touch.clientY;
-
-  const deltaX = Math.abs(clientX - dragStart.value.startX);
-  const deltaY = Math.abs(clientY - dragStart.value.startY);
-
-  if (deltaX > dragThreshold || deltaY > dragThreshold) {
-    hasDragged.value = true;
-  }
-
-  if (hasDragged.value) {
-    const newX = clientX - dragStart.value.x;
-    const newY = clientY - dragStart.value.y;
-
-    const { width, height } = getButtonSize();
-
-    // Mobile/Tablet: giữ toàn bộ button trong viewport
-    const minX = 0;
-    const maxX = window.innerWidth - width;
-    const minY = 70;
-    const maxY = window.innerHeight - height;
-
-    buttonPos.value.x = Math.max(minX, Math.min(newX, maxX));
-    buttonPos.value.y = Math.max(minY, Math.min(newY, maxY));
-
-    savePosition();
-  }
-
-  e.preventDefault();
-};
-
-const handleTouchEnd = (e) => {
-  if (!hasDragged.value) {
-    togglePlayer();
-  }
-
-  isDragging.value = false;
-
-  setTimeout(() => {
-    hasDragged.value = false;
-  }, 50);
-
-  document.removeEventListener('touchmove', handleTouchMove);
-  document.removeEventListener('touchend', handleTouchEnd);
-};
-
-const handleResize = () => {
-  // Khi resize, đảm bảo button vẫn trong viewport
-  setTimeout(() => {
-    constrainPosition();
-  }, 100);
 };
 
 // Core Audio Functions
@@ -857,15 +573,6 @@ const toggleRepeat = () => {
   message.info(modeLabels[repeatMode.value]);
 };
 
-const getRepeatTitle = () => {
-  const titles = {
-    off: 'Bật lặp tất cả',
-    all: 'Lặp một bài',
-    one: 'Tắt lặp lại',
-  };
-  return titles[repeatMode.value];
-};
-
 // Favorites Management
 const isFavorite = (trackId) => favorites.value.some((f) => f.id === trackId);
 
@@ -970,20 +677,12 @@ onMounted(async () => {
   loadLastPlayedTrack();
   loadVolume();
   loadShuffleMode();
-  initializePosition();
-
-  window.addEventListener('resize', handleResize);
 });
 
 onUnmounted(() => {
   if (audioPlayer.value) {
     audioPlayer.value.pause();
   }
-  window.removeEventListener('resize', handleResize);
-  document.removeEventListener('mousemove', handleMouseMove);
-  document.removeEventListener('mouseup', handleMouseUp);
-  document.removeEventListener('touchmove', handleTouchMove);
-  document.removeEventListener('touchend', handleTouchEnd);
 });
 
 // Watchers
@@ -995,8 +694,8 @@ watch(volume, () => {
 /* ========== FLOATING BUTTON - BASE (MOBILE) ========== */
 .music-float-button {
   position: fixed;
-  top: 0;
-  left: 0;
+  bottom: 15px;
+  right: 80px;
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -1004,23 +703,14 @@ watch(volume, () => {
   color: white;
   border: none;
   box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
-  cursor: grab;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.3rem;
+  transition: all 0.3s ease;
   z-index: 999;
   overflow: visible;
-  touch-action: none;
-  user-select: none;
-  will-change: transform;
-  transition: box-shadow 0.3s ease;
-}
-
-.music-float-button.is-dragging {
-  cursor: grabbing;
-  box-shadow: 0 10px 30px rgba(12, 113, 61, 0.6);
-  z-index: 1000;
 }
 
 .music-float-button .button-content {
@@ -1033,13 +723,11 @@ watch(volume, () => {
   justify-content: center;
   border-radius: 50%;
   overflow: hidden;
-  pointer-events: none;
 }
 
 /* Mobile Icons - Hiển thị trên mobile */
 .mobile-only {
   display: block;
-  pointer-events: none;
 }
 
 /* Desktop Elements - Ẩn trên mobile */
@@ -1047,7 +735,7 @@ watch(volume, () => {
   display: none;
 }
 
-/* Sound Waves Animation - Single Wave with Trail Effect */
+/* Sound Waves Animation */
 .sound-waves {
   position: absolute;
   inset: -10px;
@@ -1059,196 +747,80 @@ watch(volume, () => {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 2px solid rgba(12, 113, 61, 0.7);
-  animation: wave-pulse-trail 3.5s ease-out infinite;
-  box-shadow:
-    0 0 0 0px rgba(12, 113, 61, 0.5),
-    0 0 0 0px rgba(12, 113, 61, 0.3),
-    0 0 0 0px rgba(12, 113, 61, 0.15);
+  border: 2px solid rgba(12, 113, 61, 0.6);
+  animation: wave-pulse 2s ease-out infinite;
 }
 
 .wave-1 {
   animation-delay: 0s;
 }
 
-.wave-2,
-.wave-3 {
-  display: none;
+.wave-2 {
+  animation-delay: 0.6s;
 }
 
-@keyframes wave-pulse-trail {
+.wave-3 {
+  animation-delay: 1.2s;
+}
+
+@keyframes wave-pulse {
   0% {
     transform: scale(1);
-    opacity: 0.8;
-    box-shadow:
-      0 0 0 0px rgba(12, 113, 61, 0.5),
-      0 0 0 0px rgba(12, 113, 61, 0.3),
-      0 0 0 0px rgba(12, 113, 61, 0.15);
-  }
-  20% {
-    transform: scale(1.2);
-    opacity: 0.7;
-    box-shadow:
-      0 0 0 8px rgba(12, 113, 61, 0.4),
-      0 0 0 4px rgba(12, 113, 61, 0.25),
-      0 0 0 2px rgba(12, 113, 61, 0.12);
-  }
-  40% {
-    transform: scale(1.5);
-    opacity: 0.5;
-    box-shadow:
-      0 0 0 16px rgba(12, 113, 61, 0.3),
-      0 0 0 10px rgba(12, 113, 61, 0.18),
-      0 0 0 6px rgba(12, 113, 61, 0.08);
-  }
-  60% {
-    transform: scale(1.8);
-    opacity: 0.3;
-    box-shadow:
-      0 0 0 24px rgba(12, 113, 61, 0.2),
-      0 0 0 16px rgba(12, 113, 61, 0.12),
-      0 0 0 10px rgba(12, 113, 61, 0.05);
-  }
-  80% {
-    transform: scale(2.1);
-    opacity: 0.1;
-    box-shadow:
-      0 0 0 30px rgba(12, 113, 61, 0.08),
-      0 0 0 22px rgba(12, 113, 61, 0.04),
-      0 0 0 14px rgba(12, 113, 61, 0.02);
+    opacity: 1;
   }
   100% {
-    transform: scale(2.3);
+    transform: scale(2.2);
     opacity: 0;
-    box-shadow:
-      0 0 0 36px rgba(12, 113, 61, 0),
-      0 0 0 28px rgba(12, 113, 61, 0),
-      0 0 0 20px rgba(12, 113, 61, 0);
   }
 }
 
-.music-float-button:not(.is-dragging):hover {
+.music-float-button:hover {
+  transform: translateY(-3px) scale(1.05);
   box-shadow: 0 8px 28px rgba(12, 113, 61, 0.5);
 }
 
 /* ========== DESKTOP VERSION (≥ 1024px) ========== */
 @media (min-width: 1024px) {
   .music-float-button {
-    width: 150px;
-    height: 150px;
+    top: 180px;
+    right: 90px;
+    bottom: auto;
+    width: 80px;
+    height: 80px;
     background: transparent;
     box-shadow: none;
     border: none;
-    cursor: grab;
   }
 
-  .music-float-button.is-dragging {
-    cursor: grabbing;
-    box-shadow: none;
-    z-index: 1000;
-  }
-
+  /* Ẩn mobile icons trên desktop */
   .mobile-only {
     display: none;
   }
 
+  /* Hiển thị desktop elements */
   .desktop-only {
     display: flex;
   }
 
+  /* Button content là container cho hình tròn */
   .music-float-button .button-content {
     background: transparent;
-    position: relative;
+  }
+
+  /* Album Cover - Hình tròn đầy đủ 80x80px */
+  .music-float-button .cover-image {
     width: 100%;
     height: 100%;
-  }
-
-  /* Vinyl Record Player */
-  .music-float-button .cover-image {
-    width: 105px;
-    height: 105px;
     object-fit: cover;
     border-radius: 50%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border: 6px solid #1a1a1a;
-    box-shadow:
-      0 0 0 2px #333,
-      0 0 20px rgba(0, 0, 0, 0.8),
-      inset 0 0 30px rgba(0, 0, 0, 0.6);
-    z-index: 2;
+    border: 3px solid #0c713d;
+    box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
   }
 
-  .music-float-button .cover-image::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 26px;
-    height: 26px;
-    background: radial-gradient(circle, #2a2a2a 0%, #1a1a1a 100%);
-    border-radius: 50%;
-    border: 2px solid #444;
-    box-shadow:
-      0 0 0 1px #222,
-      inset 0 2px 5px rgba(0, 0, 0, 0.8);
-  }
-
-  /* Turntable Base */
-  .music-float-button .button-content::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 135px;
-    height: 20px;
-    background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
-    border-radius: 6px;
-    box-shadow:
-      0 4px 15px rgba(0, 0, 0, 0.6),
-      inset 0 1px 2px rgba(255, 255, 255, 0.15);
-    z-index: 1;
-  }
-
-  /* Tonearm */
-  .music-float-button .button-content::after {
-    content: '';
-    position: absolute;
-    top: 30%;
-    right: 5px;
-    width: 55px;
-    height: 2.5px;
-    background: linear-gradient(90deg, #555 0%, #777 50%, #555 100%);
-    border-radius: 2px;
-    transform-origin: right center;
-    transform: rotate(-60deg);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-    z-index: 3;
-    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .music-float-button.is-playing .button-content::after {
-    transform: rotate(-35deg);
-    animation: tonearmPlay 3s ease-in-out infinite alternate;
-  }
-
-  @keyframes tonearmPlay {
-    0% {
-      transform: rotate(-35deg);
-    }
-    100% {
-      transform: rotate(-32deg);
-    }
-  }
-
-  /* Default Icon */
+  /* Default Icon khi không có cover */
   .music-float-button .default-icon {
-    width: 105px;
-    height: 105px;
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1256,104 +828,49 @@ watch(volume, () => {
     border-radius: 50%;
     font-size: 2rem;
     color: white;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border: 6px solid #1a1a1a;
-    box-shadow:
-      0 0 0 2px #333,
-      0 0 20px rgba(12, 113, 61, 0.4),
-      inset 0 0 30px rgba(0, 0, 0, 0.3);
-    z-index: 2;
+    box-shadow: 0 6px 20px rgba(12, 113, 61, 0.4);
   }
 
-  .music-float-button .default-icon::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 26px;
-    height: 26px;
-    background: radial-gradient(circle, #0a5a31 0%, #084024 100%);
-    border-radius: 50%;
-    border: 2px solid #0c713d;
-    box-shadow:
-      0 0 0 1px #063920,
-      inset 0 2px 5px rgba(0, 0, 0, 0.5);
+  /* Quay hình như đĩa CD khi đang phát */
+  .music-float-button.is-playing .cover-image {
+    animation: spin 7s linear infinite;
   }
 
-  .music-float-button:not(.is-dragging) .cover-image,
-  .music-float-button:not(.is-dragging) .default-icon {
-    animation: vinylPulse 4s ease-in-out infinite;
-  }
-
-  @keyframes vinylPulse {
-    0%,
-    100% {
-      transform: translate(-50%, -50%) scale(1);
-      box-shadow:
-        0 0 0 2px #333,
-        0 0 20px rgba(0, 0, 0, 0.8),
-        inset 0 0 30px rgba(0, 0, 0, 0.6);
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
     }
-    50% {
-      transform: translate(-50%, -50%) scale(1.03);
-      box-shadow:
-        0 0 0 2px #333,
-        0 0 30px rgba(0, 0, 0, 1),
-        inset 0 0 30px rgba(0, 0, 0, 0.6);
+    to {
+      transform: rotate(360deg);
     }
   }
 
-  .music-float-button.is-playing:not(.is-dragging) .cover-image,
-  .music-float-button.is-playing:not(.is-dragging) .default-icon {
-    animation: vinylSpinWithPulse 3s linear infinite;
-  }
-
-  @keyframes vinylSpinWithPulse {
-    0% {
-      transform: translate(-50%, -50%) rotate(0deg) scale(1);
-    }
-    25% {
-      transform: translate(-50%, -50%) rotate(90deg) scale(1.02);
-    }
-    50% {
-      transform: translate(-50%, -50%) rotate(180deg) scale(1.03);
-    }
-    75% {
-      transform: translate(-50%, -50%) rotate(270deg) scale(1.02);
-    }
-    100% {
-      transform: translate(-50%, -50%) rotate(360deg) scale(1);
-    }
-  }
-
+  /* Hiệu ứng lan tỏa mạnh hơn trên desktop */
   .music-float-button .wave {
-    border-width: 2px;
+    border-width: 3px;
   }
+}
 
-  .music-float-button .cover-image::before {
-    content: '';
-    position: absolute;
-    inset: 15px;
-    border-radius: 50%;
-    background: repeating-radial-gradient(
-      circle at center,
-      transparent 0px,
-      transparent 2px,
-      rgba(255, 255, 255, 0.03) 2px,
-      rgba(255, 255, 255, 0.03) 3px
-    );
-    pointer-events: none;
+/* ========== RESPONSIVE FOR SPECIFIC DESKTOP SIZES ========== */
+/* Từ 1024px đến 1279px */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .music-float-button {
+    top: 175px;
+    right: 70px;
+  }
+}
+
+/* Từ 1280px đến 1440px */
+@media (min-width: 1280px) and (max-width: 1440px) {
+  .music-float-button {
+    right: 90px;
   }
 }
 
 /* ========== PLAYER CONTAINER ========== */
 .music-player-container {
   position: fixed;
-  bottom: 2px;
+  bottom: 85px;
   right: 15px;
   width: 380px;
   background: white;
@@ -1404,6 +921,7 @@ watch(volume, () => {
   padding: 20px;
 }
 
+/* ========== CURRENT TRACK INFO ========== */
 .current-track-info {
   display: flex;
   gap: 15px;
@@ -1458,6 +976,7 @@ watch(volume, () => {
   text-overflow: ellipsis;
 }
 
+/* ========== PROGRESS BAR ========== */
 .progress-container {
   display: flex;
   align-items: center;
@@ -1506,6 +1025,7 @@ watch(volume, () => {
   border: none;
 }
 
+/* ========== PLAYER CONTROLS ========== */
 .player-controls {
   display: flex;
   justify-content: center;
@@ -1520,14 +1040,13 @@ watch(volume, () => {
   border-radius: 50%;
   border: 2px solid #e9ecef;
   background: white;
-  color: #666;
+  color: #0c713d;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
   transition: all 0.3s ease;
-  position: relative;
 }
 
 .control-btn:hover:not(:disabled) {
@@ -1564,47 +1083,6 @@ watch(volume, () => {
   border-radius: 50%;
 }
 
-.repeat-btn {
-  position: relative;
-}
-
-.repeat-btn:not(.active) {
-  color: #666;
-}
-
-.repeat-btn.active:not(.repeat-one) {
-  background: #0c713d;
-  color: white;
-  border-color: #0c713d;
-}
-
-.repeat-btn.repeat-one {
-  background: #0c713d;
-  color: white;
-  border-color: #0c713d;
-}
-
-.repeat-one-badge {
-  position: absolute;
-  bottom: 3px;
-  right: 8px;
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: white;
-  background: rgba(255, 255, 255, 0.3);
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
-
-.repeat-btn:hover:not(.active) {
-  color: white;
-}
-
 .play-btn {
   width: 55px;
   height: 55px;
@@ -1620,6 +1098,7 @@ watch(volume, () => {
   box-shadow: 0 6px 16px rgba(12, 113, 61, 0.4);
 }
 
+/* ========== VOLUME CONTROL ========== */
 .volume-container {
   display: flex;
   align-items: center;
@@ -1725,6 +1204,7 @@ watch(volume, () => {
   padding: 24px;
 }
 
+/* ========== TABS ========== */
 .playlist-tabs {
   display: flex;
   gap: 12px;
@@ -1759,6 +1239,7 @@ watch(volume, () => {
   border-color: #0c713d;
 }
 
+/* ========== TAB CONTENT ========== */
 .tab-content {
   animation: fadeIn 0.3s ease;
 }
@@ -1796,6 +1277,7 @@ watch(volume, () => {
   color: #bbb;
 }
 
+/* ========== TRACK LIST ========== */
 .track-list {
   display: flex;
   flex-direction: column;
@@ -1913,6 +1395,7 @@ watch(volume, () => {
   border-color: #dc2626;
 }
 
+/* ========== ALBUMS LIST ========== */
 .albums-list {
   display: flex;
   flex-direction: column;
@@ -2051,17 +1534,13 @@ watch(volume, () => {
   box-shadow: 0 6px 20px rgba(15, 138, 74, 0.4);
 }
 
-.music-float-button.dark-mode.is-dragging {
-  box-shadow: 0 10px 30px rgba(15, 138, 74, 0.6);
+.music-float-button.dark-mode:hover {
+  box-shadow: 0 8px 28px rgba(15, 138, 74, 0.5);
 }
 
 @media (min-width: 1024px) {
   .music-float-button.dark-mode {
     background: transparent;
-    box-shadow: none;
-  }
-
-  .music-float-button.dark-mode.is-dragging {
     box-shadow: none;
   }
 
@@ -2080,78 +1559,7 @@ watch(volume, () => {
   }
 
   .music-float-button.dark-mode .wave {
-    border-color: rgba(15, 138, 74, 0.7);
-    box-shadow:
-      0 0 0 0px rgba(15, 138, 74, 0.5),
-      0 0 0 0px rgba(15, 138, 74, 0.3),
-      0 0 0 0px rgba(15, 138, 74, 0.15);
-  }
-
-  @keyframes wave-pulse-trail-dark {
-    0% {
-      transform: scale(1);
-      opacity: 0.8;
-      box-shadow:
-        0 0 0 0px rgba(15, 138, 74, 0.5),
-        0 0 0 0px rgba(15, 138, 74, 0.3),
-        0 0 0 0px rgba(15, 138, 74, 0.15);
-    }
-    20% {
-      transform: scale(1.2);
-      opacity: 0.7;
-      box-shadow:
-        0 0 0 8px rgba(15, 138, 74, 0.4),
-        0 0 0 4px rgba(15, 138, 74, 0.25),
-        0 0 0 2px rgba(15, 138, 74, 0.12);
-    }
-    40% {
-      transform: scale(1.5);
-      opacity: 0.5;
-      box-shadow:
-        0 0 0 16px rgba(15, 138, 74, 0.3),
-        0 0 0 10px rgba(15, 138, 74, 0.18),
-        0 0 0 6px rgba(15, 138, 74, 0.08);
-    }
-    60% {
-      transform: scale(1.8);
-      opacity: 0.3;
-      box-shadow:
-        0 0 0 24px rgba(15, 138, 74, 0.2),
-        0 0 0 16px rgba(15, 138, 74, 0.12),
-        0 0 0 10px rgba(15, 138, 74, 0.05);
-    }
-    80% {
-      transform: scale(2.1);
-      opacity: 0.1;
-      box-shadow:
-        0 0 0 30px rgba(15, 138, 74, 0.08),
-        0 0 0 22px rgba(15, 138, 74, 0.04),
-        0 0 0 14px rgba(15, 138, 74, 0.02);
-    }
-    100% {
-      transform: scale(2.3);
-      opacity: 0;
-      box-shadow:
-        0 0 0 36px rgba(15, 138, 74, 0),
-        0 0 0 28px rgba(15, 138, 74, 0),
-        0 0 0 20px rgba(15, 138, 74, 0);
-    }
-  }
-
-  .music-float-button.dark-mode .wave {
-    animation: wave-pulse-trail-dark 3.5s ease-out infinite;
-  }
-
-  .music-float-button.dark-mode .button-content::before {
-    background: linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%);
-    box-shadow:
-      0 4px 15px rgba(0, 0, 0, 0.8),
-      inset 0 1px 3px rgba(255, 255, 255, 0.25);
-  }
-
-  .music-float-button.dark-mode .button-content::after {
-    background: linear-gradient(90deg, #666 0%, #888 50%, #666 100%);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+    border-color: rgba(15, 138, 74, 0.6);
   }
 }
 
@@ -2180,99 +1588,17 @@ watch(volume, () => {
 .music-player-container.dark-mode .control-btn {
   background: var(--dark-bg-elevated);
   border-color: var(--dark-border);
-  color: var(--dark-text-secondary);
+  color: var(--dark-accent-green);
 }
 
-.music-player-container.dark-mode
-  .control-btn:not(.active):hover:not(:disabled) {
+.music-player-container.dark-mode .control-btn:hover:not(:disabled) {
   background: var(--dark-accent-green);
   color: var(--dark-text-primary);
-  border-color: var(--dark-accent-green);
 }
 
 .music-player-container.dark-mode .control-btn.active {
   background: var(--dark-accent-green);
   color: var(--dark-text-primary);
-  border-color: var(--dark-accent-green);
-}
-
-.music-player-container.dark-mode .repeat-btn:not(.active) {
-  background: var(--dark-bg-elevated);
-  border-color: var(--dark-border);
-  color: var(--dark-text-muted);
-  opacity: 0.5;
-}
-
-.music-player-container.dark-mode .repeat-btn:not(.active):hover {
-  background: #2a2a2a;
-  border-color: #4a4a4a;
-  color: var(--dark-text-secondary);
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-.music-player-container.dark-mode .repeat-btn.active:not(.repeat-one) {
-  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
-  border-color: #4ade80;
-  color: white;
-  opacity: 1;
-  box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.3);
-}
-
-.music-player-container.dark-mode .repeat-btn.active:not(.repeat-one):hover {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-  border-color: #22c55e;
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.6);
-}
-
-.music-player-container.dark-mode .repeat-btn.repeat-one {
-  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
-  border-color: #4ade80;
-  color: white;
-  opacity: 1;
-  box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.3);
-}
-
-.music-player-container.dark-mode .repeat-btn.repeat-one:hover {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-  border-color: #22c55e;
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.6);
-}
-
-.music-player-container.dark-mode .repeat-one-badge {
-  background: rgba(255, 255, 255, 0.4);
-  color: white;
-}
-
-.music-player-container.dark-mode .shuffle-btn:not(.active) {
-  background: var(--dark-bg-elevated);
-  border-color: var(--dark-border);
-  color: var(--dark-text-secondary);
-}
-
-.music-player-container.dark-mode .shuffle-btn.active {
-  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
-  border-color: #4ade80;
-  color: white;
-  box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.3);
-}
-
-.music-player-container.dark-mode .shuffle-btn.active:hover {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-  border-color: #22c55e;
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.6);
-}
-
-.music-player-container.dark-mode .shuffle-btn.active::after {
-  background: white;
-}
-
-.music-player-container.dark-mode .progress-bar,
-.music-player-container.dark-mode .volume-slider {
-  background: var(--dark-bg-elevated);
 }
 
 .modal-container.dark-mode {
@@ -2365,8 +1691,25 @@ watch(volume, () => {
 }
 
 /* ========== MOBILE RESPONSIVE ========== */
+@media (max-width: 1023px) {
+  .music-float-button {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+  .music-float-button:hover {
+    transform: translateX(-50%) translateY(-3px) scale(1.05);
+  }
+
+  /* Thêm active state cho mobile */
+  .music-float-button:active {
+    transform: translateX(-50%) translateY(-1px) scale(1.02);
+  }
+}
+
 @media (max-width: 767px) {
   .music-float-button {
+    bottom: 12px;
     width: 48px;
     height: 48px;
     font-size: 1.1rem;
@@ -2374,8 +1717,6 @@ watch(volume, () => {
 
   .music-player-container {
     bottom: 70px;
-    left: 15px;
-    right: 15px;
     width: calc(100% - 30px);
     max-width: none;
   }
@@ -2400,9 +1741,10 @@ watch(volume, () => {
 
 @media (min-width: 768px) and (max-width: 1023px) {
   .music-float-button {
-    width: 52px;
-    height: 52px;
-    font-size: 1.2rem;
+    bottom: 15px;
+    width: 48px;
+    height: 48px;
+    font-size: 1.1rem;
   }
 
   .music-player-container {

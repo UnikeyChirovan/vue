@@ -167,7 +167,6 @@ const sending = ref(false);
 const loading = ref(false);
 const resolving = ref(false);
 const transferring = ref(false);
-let messagePollingInterval = null;
 
 const showTransferModal = ref(false);
 const availableManagers = ref([]);
@@ -223,6 +222,7 @@ const loadMessages = async () => {
   }
 };
 
+// ✅ OPTIMIZED: Loại bỏ mark as read sau send
 const sendMessage = async () => {
   if (!messageText.value.trim() || sending.value) return;
 
@@ -235,12 +235,17 @@ const sendMessage = async () => {
       props.conversation.id,
       text
     );
+
+    // Thêm message vào UI
     const exists = messages.value.find((m) => m.id === response.id);
     if (!exists) {
       messages.value.push(response);
     }
+
     scrollToBottom();
-    await supportApi.markAsReadByManager(props.conversation.id);
+
+    // ❌ REMOVED: Không cần mark as read vì message của mình
+    // await supportApi.markAsReadByManager(props.conversation.id);
   } catch (error) {
     console.error('Error sending message:', error);
     if (toast) toast.error('Không thể gởi tin nhắn');
@@ -256,7 +261,7 @@ const resolveConversation = async () => {
   try {
     await supportStore.resolveConversation(props.conversation.id);
     if (toast) toast.success('Đã đánh dấu đã giải quyết');
-    emit('refresh');
+    // ❌ REMOVED: emit('refresh') - store đã tự update
     emit('close');
   } catch (error) {
     console.error('Error resolving conversation:', error);
@@ -287,7 +292,7 @@ const confirmTransfer = async () => {
     );
     if (toast) toast.success('Đã chuyển tiếp cuộc hội thoại');
     showTransferModal.value = false;
-    emit('refresh');
+    // ❌ REMOVED: emit('refresh') - store đã tự update
     emit('close');
   } catch (error) {
     console.error('Error transferring conversation:', error);
@@ -323,17 +328,36 @@ const scrollToBottom = () => {
   });
 };
 
-const startMessagePolling = () => {
-  messagePollingInterval = setInterval(() => {
-    loadMessages();
-  }, 3000);
+// ✅ OPTIMIZED: Xử lý realtime message
+const handleNewMessage = (event) => {
+  if (event.conversation_id !== props.conversation.id) {
+    return;
+  }
+
+  // Chỉ thêm message từ user (message của mình đã được thêm trong sendMessage)
+  if (event.sender_type === 'user') {
+    const exists = messages.value.find((m) => m.id === event.id);
+    if (!exists) {
+      messages.value.push({
+        id: event.id,
+        sender_type: event.sender_type,
+        message: event.message,
+        is_read: event.is_read,
+        timestamp: event.timestamp,
+      });
+      scrollToBottom();
+    }
+  }
 };
 
-const stopMessagePolling = () => {
-  if (messagePollingInterval) {
-    clearInterval(messagePollingInterval);
-    messagePollingInterval = null;
+const subscribeToMessages = () => {
+  if (!supportStore.echo) {
+    supportStore.subscribeToManagerChannel();
   }
+
+  const channelName = `support.manager.${authStore.user.id}`;
+  const channel = supportStore.echo.private(channelName);
+  channel.listen('.support.message.sent', handleNewMessage);
 };
 
 watch(
@@ -346,14 +370,20 @@ watch(
 onMounted(() => {
   loadMessages();
   loadManagers();
-  startMessagePolling();
+  subscribeToMessages();
+
+  // Mark as read nếu có unread
   if (props.conversation.unread_count > 0) {
     supportApi.markAsReadByManager(props.conversation.id);
   }
 });
 
 onUnmounted(() => {
-  stopMessagePolling();
+  if (supportStore.echo) {
+    const channelName = `support.manager.${authStore.user.id}`;
+    const channel = supportStore.echo.private(channelName);
+    channel.stopListening('.support.message.sent', handleNewMessage);
+  }
 });
 </script>
 

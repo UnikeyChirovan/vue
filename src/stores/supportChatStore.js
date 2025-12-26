@@ -141,6 +141,7 @@ export const useSupportChatStore = defineStore('supportChat', {
       }
     },
 
+    // ✅ OPTIMIZED: Xử lý realtime update thông minh hơn
     subscribeToManagerChannel() {
       const authStore = useAuthStore();
       if (!authStore.user) return;
@@ -151,15 +152,97 @@ export const useSupportChatStore = defineStore('supportChat', {
       this.echo
         .private(`support.manager.${authStore.user.id}`)
         .listen('.support.message.sent', (event) => {
-          this.refreshManagerConversations();
+          // ✅ Thay vì refresh toàn bộ, chỉ update conversation cụ thể
+          this.handleRealtimeMessageUpdate(event);
         });
 
       if (authStore.isAdmin) {
         this.echo
           .private('support.admin')
           .listen('.support.message.sent', (event) => {
-            this.refreshManagerConversations();
+            this.handleRealtimeMessageUpdate(event);
           });
+      }
+    },
+
+    // ✅ NEW: Xử lý update conversation realtime mà không cần refresh toàn bộ
+    handleRealtimeMessageUpdate(event) {
+      const conversationId = event.conversation_id;
+      const authStore = useAuthStore();
+
+      // Update trong pending list
+      const pendingIndex = this.pendingConversations.findIndex(
+        (c) => c.id === conversationId
+      );
+      if (pendingIndex !== -1) {
+        this.pendingConversations[pendingIndex].last_message = {
+          message: event.message,
+          timestamp: event.timestamp,
+        };
+        this.pendingConversations[pendingIndex].last_message_at =
+          event.timestamp;
+
+        // Update unread count nếu message từ user
+        if (event.sender_type === 'user') {
+          this.pendingConversations[pendingIndex].unread_count++;
+        }
+
+        // Di chuyển lên đầu list
+        const conv = this.pendingConversations.splice(pendingIndex, 1)[0];
+        this.pendingConversations.unshift(conv);
+      }
+
+      // Update trong my_active list
+      const myActiveIndex = this.myActiveConversations.findIndex(
+        (c) => c.id === conversationId
+      );
+      if (myActiveIndex !== -1) {
+        this.myActiveConversations[myActiveIndex].last_message = {
+          message: event.message,
+          timestamp: event.timestamp,
+        };
+        this.myActiveConversations[myActiveIndex].last_message_at =
+          event.timestamp;
+
+        if (event.sender_type === 'user') {
+          this.myActiveConversations[myActiveIndex].unread_count++;
+        }
+
+        const conv = this.myActiveConversations.splice(myActiveIndex, 1)[0];
+        this.myActiveConversations.unshift(conv);
+      }
+
+      // Update trong all_active list (admin only)
+      if (authStore.isAdmin) {
+        const allActiveIndex = this.allActiveConversations.findIndex(
+          (c) => c.id === conversationId
+        );
+        if (allActiveIndex !== -1) {
+          this.allActiveConversations[allActiveIndex].last_message = {
+            message: event.message,
+            timestamp: event.timestamp,
+          };
+          this.allActiveConversations[allActiveIndex].last_message_at =
+            event.timestamp;
+
+          if (event.sender_type === 'user') {
+            this.allActiveConversations[allActiveIndex].unread_count++;
+          }
+
+          const conv = this.allActiveConversations.splice(allActiveIndex, 1)[0];
+          this.allActiveConversations.unshift(conv);
+        }
+      }
+
+      // Nếu không tìm thấy trong bất kỳ list nào, có thể là conversation mới
+      // Chỉ khi đó mới cần refresh (ít khi xảy ra)
+      if (pendingIndex === -1 && myActiveIndex === -1) {
+        // Conversation mới hoặc status thay đổi - chỉ refresh list cần thiết
+        if (event.conversation?.status === 'pending') {
+          this.loadManagerConversations('pending');
+        } else if (event.conversation?.assigned_to === authStore.user.id) {
+          this.loadManagerConversations('my_active');
+        }
       }
     },
 
@@ -303,8 +386,19 @@ export const useSupportChatStore = defineStore('supportChat', {
     async claimConversation(conversationId) {
       try {
         const response = await supportApi.claimConversation(conversationId);
-        await this.refreshManagerConversations();
-        return response.data.conversation;
+
+        // ✅ Optimized: Chỉ update conversations liên quan
+        const claimedConv = response.data.conversation;
+
+        // Xóa khỏi pending
+        this.pendingConversations = this.pendingConversations.filter(
+          (c) => c.id !== conversationId
+        );
+
+        // Thêm vào my_active
+        this.myActiveConversations.unshift(claimedConv);
+
+        return claimedConv;
       } catch (error) {
         console.error('Error claiming conversation:', error);
         throw error;
@@ -317,6 +411,26 @@ export const useSupportChatStore = defineStore('supportChat', {
           conversationId,
           message
         );
+
+        // ✅ Update last_message local ngay lập tức
+        const updateLastMessage = (list) => {
+          const index = list.findIndex((c) => c.id === conversationId);
+          if (index !== -1) {
+            list[index].last_message = {
+              message: response.data.message.message,
+              timestamp: response.data.message.timestamp,
+            };
+            list[index].last_message_at = response.data.message.timestamp;
+
+            // Di chuyển lên đầu
+            const conv = list.splice(index, 1)[0];
+            list.unshift(conv);
+          }
+        };
+
+        updateLastMessage(this.myActiveConversations);
+        updateLastMessage(this.allActiveConversations);
+
         return response.data.message;
       } catch (error) {
         console.error('Error sending manager message:', error);
@@ -327,7 +441,11 @@ export const useSupportChatStore = defineStore('supportChat', {
     async transferConversation(conversationId, newManagerId) {
       try {
         await supportApi.transferConversation(conversationId, newManagerId);
-        await this.refreshManagerConversations();
+
+        // ✅ Optimized: Xóa khỏi my_active, không cần refresh toàn bộ
+        this.myActiveConversations = this.myActiveConversations.filter(
+          (c) => c.id !== conversationId
+        );
       } catch (error) {
         console.error('Error transferring conversation:', error);
         throw error;
@@ -337,13 +455,21 @@ export const useSupportChatStore = defineStore('supportChat', {
     async resolveConversation(conversationId) {
       try {
         await supportApi.resolveConversation(conversationId);
-        await this.refreshManagerConversations();
+
+        // ✅ Optimized: Xóa khỏi active lists
+        this.myActiveConversations = this.myActiveConversations.filter(
+          (c) => c.id !== conversationId
+        );
+        this.allActiveConversations = this.allActiveConversations.filter(
+          (c) => c.id !== conversationId
+        );
       } catch (error) {
         console.error('Error resolving conversation:', error);
         throw error;
       }
     },
 
+    // ✅ Giữ lại nhưng chỉ dùng khi thực sự cần (ví dụ: click refresh button)
     async refreshManagerConversations() {
       const authStore = useAuthStore();
 

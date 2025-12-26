@@ -116,7 +116,6 @@
       v-if="selectedConversation"
       :conversation="selectedConversation"
       @close="selectedConversation = null"
-      @refresh="refreshAll"
     />
   </div>
   <TheFooter />
@@ -191,6 +190,7 @@ const loadConversations = async () => {
   }
 };
 
+// ✅ Chỉ gọi khi user click button refresh
 const refreshAll = async () => {
   loading.value = true;
   try {
@@ -214,6 +214,9 @@ const claimConversation = async (conversationId) => {
   try {
     await supportStore.claimConversation(conversationId);
     if (toast) toast.success('Đã nhận cuộc hội thoại');
+
+    // ✅ Tự động switch sang tab my_active sau khi claim
+    activeTab.value = 'my_active';
   } catch (error) {
     console.error('Error claiming conversation:', error);
     if (toast) toast.error('Không thể nhận cuộc hội thoại');
@@ -261,15 +264,19 @@ onMounted(() => {
   loadConversations();
   supportStore.subscribeToManagerChannel();
 
+  // ✅ OPTIMIZED: Tăng interval lên 2 phút (thay vì 30s)
+  // Vì realtime updates đã handle hầu hết, chỉ cần refresh định kỳ để đồng bộ
   const interval = setInterval(() => {
-    supportStore.refreshManagerConversations();
-  }, 30000);
+    // Chỉ refresh tab hiện tại thay vì tất cả
+    loadConversations();
+  }, 120000); // 2 phút
 
   onUnmounted(() => {
     clearInterval(interval);
   });
 });
 </script>
+
 <style scoped>
 /* ========== MODERN SUPPORT DASHBOARD ========== */
 .support-dashboard {
