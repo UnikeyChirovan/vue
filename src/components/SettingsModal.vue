@@ -367,20 +367,32 @@ const modalStyle = computed(() => {
 const fontOptions = [
   { label: 'Arial', value: 'Arial' },
   { label: 'Times New Roman', value: 'Times New Roman' },
-  { label: 'Courier New', value: 'Courier New' },
+  { label: 'Georgia', value: 'Georgia' },
+  { label: 'Verdana', value: 'Verdana' },
+  { label: 'Tahoma', value: 'Tahoma' },
+  { label: 'Trebuchet MS', value: 'Trebuchet MS' },
+  { label: 'Segoe UI', value: 'Segoe UI' },
+  { label: 'Palatino Linotype', value: 'Palatino Linotype' },
+  { label: 'Roboto', value: 'Roboto, sans-serif' },
+  { label: 'Open Sans', value: 'Open Sans, sans-serif' },
+  { label: 'Noto Sans', value: 'Noto Sans, sans-serif' },
+  { label: 'Noto Serif', value: 'Noto Serif, serif' },
 ];
 
 const gradientOptions = [
   { label: 'Netflix', value: 'netflix' },
   { label: 'Vine', value: 'vine' },
   { label: 'Megatron', value: 'megatron' },
+  { label: 'Hoàng Hôn', value: 'sunset' },
+  { label: 'Bình Minh', value: 'dawn' },
+  { label: 'Đêm Sâu', value: 'deepNight' },
+  { label: 'Biển Lặng', value: 'calmSea' },
+  { label: 'Rừng Xanh', value: 'forest' },
+  { label: 'Tím Mộng', value: 'purpleDream' },
+  { label: 'Xám Khói', value: 'softGray' },
 ];
 
-const customGradientOptions = [
-  { label: 'Netflix', value: 'netflix' },
-  { label: 'Vine', value: 'vine' },
-  { label: 'Megatron', value: 'megatron' },
-];
+const customGradientOptions = gradientOptions;
 
 const backgroundOptions = ref([{ label: 'Mặc Định', value: 'none' }]);
 
@@ -865,14 +877,39 @@ const applySettings = () => {
 };
 
 const getGradient = (gradientName, opacity) => {
-  const gradientOpacity = `rgba(255, 255, 255, ${opacity})`;
+  const base = `rgba(255, 255, 255, ${opacity})`;
+
   switch (gradientName) {
     case 'netflix':
-      return `linear-gradient(to left, ${gradientOpacity}, rgba(142, 14, 0, ${opacity}))`;
+      return `linear-gradient(to left, ${base}, rgba(142, 14, 0, ${opacity}))`;
+
     case 'vine':
-      return `linear-gradient(to left, ${gradientOpacity}, rgba(0, 191, 143, ${opacity}))`;
+      return `linear-gradient(to left, ${base}, rgba(0, 191, 143, ${opacity}))`;
+
     case 'megatron':
-      return `linear-gradient(to left, ${gradientOpacity}, rgba(251, 215, 134, ${opacity}), rgba(198, 255, 221, ${opacity}))`;
+      return `linear-gradient(to left, ${base}, rgba(251, 215, 134, ${opacity}), rgba(198, 255, 221, ${opacity}))`;
+
+    case 'sunset':
+      return `linear-gradient(to left, ${base}, rgba(255, 94, 98, ${opacity}), rgba(255, 195, 113, ${opacity}))`;
+
+    case 'dawn':
+      return `linear-gradient(to left, ${base}, rgba(255, 236, 210, ${opacity}), rgba(252, 182, 159, ${opacity}))`;
+
+    case 'deepNight':
+      return `linear-gradient(to left, ${base}, rgba(44, 62, 80, ${opacity}), rgba(76, 161, 175, ${opacity}))`;
+
+    case 'calmSea':
+      return `linear-gradient(to left, ${base}, rgba(52, 143, 80, ${opacity}), rgba(86, 180, 211, ${opacity}))`;
+
+    case 'forest':
+      return `linear-gradient(to left, ${base}, rgba(34, 139, 34, ${opacity}), rgba(107, 142, 35, ${opacity}))`;
+
+    case 'purpleDream':
+      return `linear-gradient(to left, ${base}, rgba(138, 43, 226, ${opacity}), rgba(186, 85, 211, ${opacity}))`;
+
+    case 'softGray':
+      return `linear-gradient(to left, ${base}, rgba(189, 195, 199, ${opacity}), rgba(236, 240, 241, ${opacity}))`;
+
     default:
       return 'none';
   }

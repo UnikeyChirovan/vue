@@ -187,13 +187,38 @@ const deleteNotification = (id) => {
   notificationIdToDelete.value = id;
   isModalVisible.value = true;
 };
+// Trong admin-news-index.vue, sửa hàm handleOk:
+
 const handleOk = () => {
   api
     .delete(`/user-notifications/${notificationIdToDelete.value}`)
     .then((res) => {
       if (res.status === 204) {
         message.success('Xóa thông báo thành công');
+
+        // Cập nhật lại danh sách notifications trong component
         getNotifications();
+
+        // XÓA khỏi localStorage
+        const storedNotifications = localStorage.getItem('notifications');
+        if (storedNotifications) {
+          const allNotifications = JSON.parse(storedNotifications);
+          const updatedNotifications = allNotifications.filter(
+            (notification) => notification.id !== notificationIdToDelete.value
+          );
+          localStorage.setItem(
+            'notifications',
+            JSON.stringify(updatedNotifications)
+          );
+        }
+
+        // XÓA chi tiết notification khỏi localStorage
+        const notificationDetails = localStorage.getItem('notification_detail');
+        if (notificationDetails) {
+          const details = JSON.parse(notificationDetails);
+          delete details[notificationIdToDelete.value];
+          localStorage.setItem('notification_detail', JSON.stringify(details));
+        }
       }
     })
     .catch((err) => {

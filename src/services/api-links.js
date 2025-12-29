@@ -10,6 +10,10 @@ const apiLinks = {
     create: (data) => api.post('/user-notifications', data),
     updateText: (id, data) => api.put(`/user-notifications/${id}/text`, data),
     delete: (id) => api.delete(`/user-notifications/${id}`),
+    getVoteResults: (notificationId) =>
+      api.get(`/user-notifications/${notificationId}/vote/results`),
+    submitVote: (notificationId, data) =>
+      api.post(`/user-notifications/${notificationId}/vote`, data),
   },
   auth: {
     resetPassword: (data) => api.post('/auth/password-reset', data),

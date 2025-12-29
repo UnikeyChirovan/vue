@@ -43,8 +43,20 @@
           </select>
         </div>
 
-        <!-- Tải lên file -->
+        <!-- Loại thông báo -->
         <div class="form-section">
+          <label for="type" class="form-label">
+            <i class="fa-solid fa-layer-group"></i>
+            Loại Thông Báo
+          </label>
+          <select v-model="form.type" id="type" required class="form-select">
+            <option value="normal">Thông Báo Thường</option>
+            <option value="voting">Thông Báo Bình Chọn</option>
+          </select>
+        </div>
+
+        <!-- Tải lên file (chỉ cho normal) -->
+        <div v-if="form.type === 'normal'" class="form-section">
           <label for="file" class="form-label">
             <i class="fa-solid fa-file-import"></i>
             Tải Lên File Text
@@ -110,8 +122,8 @@
           </div>
         </div>
 
-        <!-- Nội dung các đoạn -->
-        <div class="content-section">
+        <!-- Normal Content - chỉ hiện khi type = 'normal' -->
+        <div v-if="form.type === 'normal'" class="content-section">
           <label class="form-label">
             <i class="fa-solid fa-align-left"></i>
             Nội Dung Thông Báo
@@ -157,6 +169,68 @@
               <span class="btn-content">
                 <i class="fa-solid fa-trash-can"></i>
                 <span>Xóa Toàn Bộ</span>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Voting Content - chỉ hiện khi type = 'voting' -->
+        <div v-if="form.type === 'voting'" class="voting-form-section">
+          <!-- Câu hỏi -->
+          <div class="form-section">
+            <label for="voting_question" class="form-label">
+              <i class="fa-solid fa-circle-question"></i>
+              Câu Hỏi Bình Chọn
+            </label>
+            <textarea
+              v-model="form.voting_question"
+              id="voting_question"
+              rows="3"
+              class="form-textarea"
+              placeholder="Nhập câu hỏi bình chọn..."
+              required
+            ></textarea>
+          </div>
+
+          <!-- Các lựa chọn -->
+          <div class="form-section">
+            <label class="form-label">
+              <i class="fa-solid fa-list-check"></i>
+              Các Lựa Chọn (Tối thiểu 2, tối đa 10)
+            </label>
+            <div class="voting-options-container">
+              <div
+                v-for="(option, index) in form.voting_options"
+                :key="index"
+                class="voting-option-item"
+              >
+                <span class="option-number">{{ index + 1 }}</span>
+                <input
+                  v-model="option.text"
+                  type="text"
+                  class="option-input"
+                  :placeholder="`Lựa chọn ${index + 1}`"
+                  required
+                />
+                <button
+                  v-if="form.voting_options.length > 2"
+                  @click="removeVotingOption(index)"
+                  type="button"
+                  class="option-remove-btn"
+                >
+                  <i class="fa-solid fa-times"></i>
+                </button>
+              </div>
+            </div>
+            <button
+              v-if="form.voting_options.length < 10"
+              @click="addVotingOption"
+              type="button"
+              class="add-option-btn"
+            >
+              <span class="btn-content">
+                <i class="fa-solid fa-plus-circle"></i>
+                <span>Thêm Lựa Chọn</span>
               </span>
             </button>
           </div>
@@ -208,18 +282,22 @@ import { message } from 'ant-design-vue';
 import api from '../../../services/axiosInterceptor';
 import ScrollButtons from '../../../components/ScrollButtons.vue';
 
+// Form state
 const form = ref({
   title: '',
   content: [''],
   images: [],
   page: '',
+  type: 'normal', // 'normal' hoặc 'voting'
+  voting_question: '',
+  voting_options: [{ text: '' }, { text: '' }],
 });
 
 const imagePreviews = ref([]);
 const isConfirmVisible = ref(false);
-
 const pageOptions = ref([]);
 
+// Fetch page options
 const fetchPageOptions = async () => {
   try {
     const response = await api.get('/user-notifications/page-options');
@@ -229,6 +307,7 @@ const fetchPageOptions = async () => {
   }
 };
 
+// Normal content functions
 const addSection = () => {
   form.value.content.push('');
 };
@@ -247,6 +326,28 @@ const removeAllSections = () => {
   isConfirmVisible.value = false;
 };
 
+const handleCancelDelete = () => {
+  isConfirmVisible.value = false;
+};
+
+// Voting functions
+const addVotingOption = () => {
+  if (form.value.voting_options.length < 10) {
+    form.value.voting_options.push({ text: '' });
+  } else {
+    message.warning('Tối đa 10 lựa chọn');
+  }
+};
+
+const removeVotingOption = (index) => {
+  if (form.value.voting_options.length > 2) {
+    form.value.voting_options.splice(index, 1);
+  } else {
+    message.warning('Cần ít nhất 2 lựa chọn');
+  }
+};
+
+// File upload functions
 const handleFileUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
@@ -274,25 +375,85 @@ const handleImageUpload = (event) => {
   }
 };
 
+// Submit form
+// Trong admin-news-create.vue, sửa hàm submitForm:
+
 const submitForm = async () => {
+  // Validate based on type
+  if (form.value.type === 'voting') {
+    if (!form.value.voting_question.trim()) {
+      message.error('Vui lòng nhập câu hỏi bình chọn');
+      return;
+    }
+
+    const validOptions = form.value.voting_options.filter((opt) =>
+      opt.text.trim()
+    );
+    if (validOptions.length < 2) {
+      message.error('Vui lòng nhập ít nhất 2 lựa chọn');
+      return;
+    }
+  }
+
   const formData = new FormData();
   formData.append('title', form.value.title);
-  formData.append('content', form.value.content.join('\n\n'));
   formData.append('page', form.value.page);
+  formData.append('type', form.value.type);
+
+  if (form.value.type === 'normal') {
+    formData.append('content', form.value.content.join('\n\n'));
+  } else if (form.value.type === 'voting') {
+    formData.append('voting_question', form.value.voting_question);
+    form.value.voting_options.forEach((option, index) => {
+      if (option.text.trim()) {
+        formData.append(`voting_options[${index}][text]`, option.text);
+      }
+    });
+  }
 
   form.value.images.forEach((image, index) => {
     formData.append(`images[${index}]`, image);
   });
 
   try {
-    await api.post('/user-notifications', formData, {
+    const response = await api.post('/user-notifications', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
-    message.success('File đã được tạo thành công');
+
+    message.success('Thông báo đã được tạo thành công');
+
+    // THÊM VÀO localStorage
+    const newNotification = response.data; // API trả về notification mới tạo
+
+    // Cập nhật danh sách notifications
+    const storedNotifications = localStorage.getItem('notifications');
+    if (storedNotifications) {
+      const allNotifications = JSON.parse(storedNotifications);
+      allNotifications.unshift(newNotification); // Thêm vào đầu mảng
+      localStorage.setItem('notifications', JSON.stringify(allNotifications));
+    }
+
+    // Lấy chi tiết notification và lưu vào localStorage
+    try {
+      const detailResponse = await api.get(
+        `/user-notifications/${newNotification.id}`
+      );
+      const notificationDetails = JSON.parse(
+        localStorage.getItem('notification_detail') || '{}'
+      );
+      notificationDetails[newNotification.id] = detailResponse.data;
+      localStorage.setItem(
+        'notification_detail',
+        JSON.stringify(notificationDetails)
+      );
+    } catch (error) {
+      console.error('Không thể lấy chi tiết notification:', error);
+    }
+
     resetForm();
   } catch (error) {
     console.error(error);
-    message.error('Đã xảy ra lỗi khi tạo file');
+    message.error('Đã xảy ra lỗi khi tạo thông báo');
   }
 };
 
@@ -302,12 +463,11 @@ const resetForm = () => {
     content: [''],
     images: [],
     page: '',
+    type: 'normal',
+    voting_question: '',
+    voting_options: [{ text: '' }, { text: '' }],
   };
   imagePreviews.value = [];
-};
-
-const handleCancelDelete = () => {
-  isConfirmVisible.value = false;
 };
 
 onMounted(() => {
@@ -393,7 +553,8 @@ onMounted(() => {
 }
 
 .form-input,
-.form-select {
+.form-select,
+.form-textarea {
   width: 100%;
   padding: 14px 18px;
   font-size: 1rem;
@@ -401,10 +562,17 @@ onMounted(() => {
   border-radius: 12px;
   transition: all 0.3s ease;
   background: white;
+  font-family: inherit;
+}
+
+.form-textarea {
+  resize: vertical;
+  line-height: 1.6;
 }
 
 .form-input:focus,
-.form-select:focus {
+.form-select:focus,
+.form-textarea:focus {
   outline: none;
   border-color: #0c713d;
   box-shadow: 0 0 0 3px rgba(12, 113, 61, 0.1);
@@ -529,7 +697,7 @@ onMounted(() => {
   font-weight: 700;
 }
 
-/* ========== CONTENT SECTION ========== */
+/* ========== CONTENT SECTION (NORMAL) ========== */
 .content-section {
   margin-bottom: 30px;
 }
@@ -704,9 +872,159 @@ onMounted(() => {
   transform: translateY(0);
 }
 
+/* ========== VOTING FORM SECTION ========== */
+.voting-form-section {
+  margin-bottom: 30px;
+}
+
+.voting-options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.voting-option-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #f6f9fc 0%, #ffffff 100%);
+  border-radius: 12px;
+  padding: 15px;
+  border: 2px solid #e8f5e9;
+  transition: all 0.3s ease;
+}
+
+.voting-option-item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px rgba(12, 113, 61, 0.1);
+}
+
+.option-number {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #0c713d 0%, #0a5a31 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.option-input {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.option-input:focus {
+  outline: none;
+  border-color: #0c713d;
+  box-shadow: 0 0 0 3px rgba(12, 113, 61, 0.1);
+}
+
+.option-remove-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.option-remove-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s,
+    height 0.6s;
+}
+
+.option-remove-btn:hover::before {
+  width: 80px;
+  height: 80px;
+}
+
+.option-remove-btn:hover {
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.4);
+}
+
+.option-remove-btn:active {
+  transform: scale(0.95) rotate(90deg);
+}
+
+.option-remove-btn i {
+  font-size: 1.1rem;
+}
+
+.add-option-btn {
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(82, 196, 26, 0.3);
+  width: 100%;
+}
+
+.add-option-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s,
+    height 0.6s;
+}
+
+.add-option-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.add-option-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(82, 196, 26, 0.4);
+}
+
+.add-option-btn:active {
+  transform: translateY(0);
+}
+
 .btn-content {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   padding: 12px 24px;
   font-weight: 700;
@@ -821,7 +1139,6 @@ onMounted(() => {
 
 /* ========== RESPONSIVE DESIGN ========== */
 
-/* Tablet */
 @media (max-width: 1024px) {
   .create-notification-wrapper {
     padding: 30px 15px;
@@ -844,7 +1161,6 @@ onMounted(() => {
   }
 }
 
-/* Mobile */
 @media (max-width: 768px) {
   .create-notification-wrapper {
     padding: 20px 10px;
@@ -885,7 +1201,8 @@ onMounted(() => {
   }
 
   .form-input,
-  .form-select {
+  .form-select,
+  .form-textarea {
     padding: 12px 16px;
     font-size: 0.95rem;
   }
@@ -931,6 +1248,30 @@ onMounted(() => {
     justify-content: center;
   }
 
+  .voting-option-item {
+    padding: 12px;
+  }
+
+  .option-number {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+
+  .option-input {
+    padding: 10px 14px;
+    font-size: 0.95rem;
+  }
+
+  .option-remove-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .option-remove-btn i {
+    font-size: 1rem;
+  }
+
   .submit-btn {
     width: 100%;
   }
@@ -942,7 +1283,6 @@ onMounted(() => {
   }
 }
 
-/* Small Mobile */
 @media (max-width: 480px) {
   .create-notification-wrapper {
     padding: 15px 8px;
@@ -981,7 +1321,8 @@ onMounted(() => {
   }
 
   .form-input,
-  .form-select {
+  .form-select,
+  .form-textarea {
     padding: 10px 14px;
     font-size: 0.9rem;
   }
@@ -1027,9 +1368,43 @@ onMounted(() => {
     font-size: 0.9rem;
   }
 
+  .voting-options-container {
+    gap: 12px;
+  }
+
+  .voting-option-item {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .option-number {
+    width: 30px;
+    height: 30px;
+    font-size: 0.85rem;
+  }
+
+  .option-input {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  .option-remove-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .option-remove-btn i {
+    font-size: 0.9rem;
+  }
+
   .btn-content {
     padding: 10px 20px;
     font-size: 0.95rem;
+  }
+
+  .add-option-btn .btn-content {
+    padding: 8px 16px;
+    font-size: 0.9rem;
   }
 
   .submit-content {
