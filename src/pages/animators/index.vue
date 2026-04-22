@@ -16,8 +16,8 @@
           <div class="video-player-wrapper">
             <video ref="videoPlayer" controls class="video-player">
               <source
-                v-if="currentVideo.video_path"
-                :src="BaseURL + '/' + currentVideo.video_path"
+                v-if="currentVideo.id"
+                :src="ApiURL + '/videos/stream/' + currentVideo.id"
                 type="video/mp4"
               />
               Trình duyệt của bạn không hỗ trợ video.
@@ -126,6 +126,7 @@ import TheFooter from '../../components/TheFooter.vue';
 import CommentSection from '../../components/CommentSection.vue';
 
 const BaseURL = 'http://127.0.0.1:8000/storage';
+const ApiURL = 'http://127.0.0.1:8000/api';
 const videoList = ref([]);
 const currentVideo = ref(null);
 const videoPlayer = ref(null);
@@ -306,7 +307,7 @@ onMounted(fetchVideos);
     transparent 50%
   );
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
 }
 
 .video-player {
@@ -314,6 +315,8 @@ onMounted(fetchVideos);
   width: 100%;
   aspect-ratio: 16/9;
   background: #000;
+  position: relative;
+  z-index: 1;
 }
 
 /* ========== VIDEO CONTROLS (STANDARD BUTTON STYLE) ========== */

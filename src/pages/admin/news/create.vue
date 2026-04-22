@@ -116,7 +116,7 @@
             >
               <img :src="image" alt="Image Preview" class="preview-image" />
               <div class="image-overlay">
-                <span>Ảnh {{ index + 1 }}</span>
+                <span>Hình {{ index + 1 }}</span>
               </div>
             </div>
           </div>

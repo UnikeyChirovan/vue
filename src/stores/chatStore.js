@@ -24,10 +24,7 @@ export const useChatStore = defineStore('chat', () => {
 
   // Getters
   const totalUnreadMessages = computed(() => {
-    return chatHistory.value.reduce(
-      (total, chat) => total + (chat.unread || 0),
-      0
-    );
+    return chatHistory.value.filter((chat) => (chat.unread || 0) > 0).length;
   });
 
   // Helper function to get avatar URL
@@ -52,8 +49,8 @@ export const useChatStore = defineStore('chat', () => {
       notificationAudio.value.volume = 0.3;
       notificationAudio.value.load();
 
-      // Test play để unlock audio (volume = 0 để không nghe thấy)
-      notificationAudio.value.volume = 0;
+      // Mute để play thử nghiệm (unlock autoplay)
+      notificationAudio.value.muted = true;
       const testPlay = notificationAudio.value.play();
 
       if (testPlay !== undefined) {
@@ -61,7 +58,7 @@ export const useChatStore = defineStore('chat', () => {
           .then(() => {
             notificationAudio.value.pause();
             notificationAudio.value.currentTime = 0;
-            notificationAudio.value.volume = 0.3;
+            notificationAudio.value.muted = false;
             audioInitialized.value = true;
           })
           .catch(() => {
@@ -116,6 +113,8 @@ export const useChatStore = defineStore('chat', () => {
       const response = await apiLinks.chat.getOrCreateConversation(user.id);
       const conversation = response.data.conversation;
 
+      const historyChat = chatHistory.value.find((c) => c.id === user.id);
+
       const newChat = {
         id: conversation.user_id,
         conversationId: conversation.id,
@@ -125,7 +124,7 @@ export const useChatStore = defineStore('chat', () => {
           user.avatar || conversation.avatar
         ),
         messages: [],
-        unread: 0,
+        unread: historyChat ? historyChat.unread : (user.unread || 0),
         minimized: false,
         online: false,
         typing: false,
@@ -214,7 +213,7 @@ export const useChatStore = defineStore('chat', () => {
     }
   };
 
-  const sendMessage = async (chatId, message) => {
+  const sendMessage = async (chatId, messageText) => {
     // Initialize audio on first interaction
     if (!audioInitialized.value) {
       initAudio();
@@ -226,54 +225,79 @@ export const useChatStore = defineStore('chat', () => {
 
     if (!chat) return;
 
+    // Optimistic update — hiển thị tin nhắn ngay lập tức
+    const tempId = 'temp_' + Date.now();
+    const tempMessage = {
+      id: tempId,
+      text: messageText,
+      sender: 'me',
+      timestamp: new Date().toISOString(),
+      read: false,
+      sending: true,
+    };
+    chat.messages.push(tempMessage);
+
+    // Update history ngay
+    const historyChat = chatHistory.value.find((c) => c.id === chatId);
+    if (historyChat) {
+      historyChat.lastMessage = messageText;
+      historyChat.lastMessageTime = new Date();
+
+      const index = chatHistory.value.findIndex((c) => c.id === chatId);
+      if (index > 0) {
+        const [movedChat] = chatHistory.value.splice(index, 1);
+        chatHistory.value.unshift(movedChat);
+      }
+    }
+
     try {
-      const response = await apiLinks.chat.sendMessage(chatId, message);
+      const response = await apiLinks.chat.sendMessage(chatId, messageText);
       const newMessage = response.data.message;
 
-      const formattedMessage = {
-        id: newMessage.id,
-        text: newMessage.message,
-        sender: 'me',
-        timestamp: newMessage.timestamp,
-        read: false,
-      };
-
-      chat.messages.push(formattedMessage);
-
-      // Update history
-      const historyChat = chatHistory.value.find((c) => c.id === chatId);
-      if (historyChat) {
-        historyChat.lastMessage = message;
-        historyChat.lastMessageTime = new Date();
-
-        const index = chatHistory.value.findIndex((c) => c.id === chatId);
-        if (index > 0) {
-          const [movedChat] = chatHistory.value.splice(index, 1);
-          chatHistory.value.unshift(movedChat);
-        }
+      // Thay thế tin nhắn tạm bằng tin nhắn thật từ server
+      const tempIndex = chat.messages.findIndex((m) => m.id === tempId);
+      if (tempIndex !== -1) {
+        chat.messages[tempIndex] = {
+          id: newMessage.id,
+          text: newMessage.message,
+          sender: 'me',
+          timestamp: newMessage.timestamp,
+          read: false,
+        };
       }
     } catch (error) {
       console.error('Error sending message:', error);
+
+      // Xóa tin nhắn tạm khi gửi thất bại
+      const tempIndex = chat.messages.findIndex((m) => m.id === tempId);
+      if (tempIndex !== -1) {
+        chat.messages.splice(tempIndex, 1);
+      }
+
+      // Thông báo lỗi cho user
+      const errorMsg = error.response?.data?.message || 'Không thể gửi tin nhắn. Vui lòng thử lại.';
+      throw new Error(errorMsg);
     }
   };
 
   const receiveMessage = (data) => {
     const { sender_id, message, timestamp, sender, conversation_id } = data;
+    const senderIdNum = Number(sender_id);
 
-    let chat = openChats.value.find((c) => c.id === sender_id);
+    let chat = openChats.value.find((c) => c.id === senderIdNum);
     let isMinimized = false;
 
     if (!chat) {
-      chat = minimizedChats.value.find((c) => c.id === sender_id);
+      chat = minimizedChats.value.find((c) => c.id === senderIdNum);
       isMinimized = true;
     }
 
     if (!chat) {
       chat = {
-        id: sender_id,
+        id: senderIdNum,
         conversationId: conversation_id,
         name: sender.name,
-        avatar: getAvatarUrl(sender_id, sender.avatar),
+        avatar: getAvatarUrl(senderIdNum, sender.avatar),
         messages: [],
         unread: 0,
         minimized: true,
@@ -285,7 +309,7 @@ export const useChatStore = defineStore('chat', () => {
     const newMessage = {
       id: data.id,
       text: message,
-      sender: sender_id,
+      sender: senderIdNum,
       timestamp: timestamp,
       read: false,
     };
@@ -293,7 +317,7 @@ export const useChatStore = defineStore('chat', () => {
     chat.messages.push(newMessage);
 
     // CHỈ tăng unread và phát âm thanh khi chat KHÔNG được mở (minimized hoặc closed)
-    const isOpen = openChats.value.find((c) => c.id === sender_id);
+    const isOpen = openChats.value.find((c) => c.id === senderIdNum);
 
     if (!isOpen) {
       // Chat đang minimized hoặc chưa mở
@@ -301,13 +325,13 @@ export const useChatStore = defineStore('chat', () => {
       unreadCount.value++;
 
       playNotificationSound();
-      triggerBubbleShake(sender_id);
+      triggerBubbleShake(senderIdNum);
     } else {
       // Chat đang mở - mark as read ngay
-      markAsRead(sender_id);
+      markAsRead(senderIdNum);
     }
 
-    updateChatHistory(sender_id, message, timestamp, sender, !isOpen);
+    updateChatHistory(senderIdNum, message, timestamp, sender, !isOpen);
   };
 
   const updateChatHistory = (
@@ -417,15 +441,14 @@ export const useChatStore = defineStore('chat', () => {
     }
 
     try {
-      // Clone audio để có thể play nhiều lần đồng thời
-      const audio = notificationAudio.value.cloneNode();
-      audio.volume = 0.3;
-
-      const playPromise = audio.play();
+      notificationAudio.value.currentTime = 0;
+      notificationAudio.value.volume = 0.3;
+      const playPromise = notificationAudio.value.play();
 
       if (playPromise !== undefined) {
         playPromise.catch(() => {
-          // Bỏ qua lỗi autoplay
+          // Nếu autoplay vẫn bị chặn, thử init lại vào lần tới
+          audioInitialized.value = false;
         });
       }
     } catch (error) {

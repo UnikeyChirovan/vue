@@ -115,73 +115,70 @@
     </h2>
     <div class="feature-grid">
       <div
-        class="feature-item"
+        class="feature-wrapper"
         v-for="(feature, index) in features"
         :key="feature.title"
-        @click="vote(index + 1)"
-        @mouseover="hoveredFeature = feature.title"
-        @mouseleave="hoveredFeature = null"
-        :class="{
-          hovered: hoveredFeature === feature.title,
-          voted: voteStore.userVoteChoice === index + 1,
-        }"
-        :data-aos="'zoom-in'"
-        :data-aos-delay="index * 100"
       >
-        <div class="feature-icon-wrapper">
-          <svg
-            v-if="index === 0"
-            class="feature-icon green-star"
-            width="64"
-            height="64"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-          >
-            <path
-              d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-            />
-          </svg>
-          <svg
-            v-else-if="index === 1"
-            class="feature-icon black-rocket"
-            width="64"
-            height="64"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-          >
-            <path
-              d="M13.13 22.19L11.5 18.36C13.07 17.78 14.54 17 15.9 16.09L13.13 22.19M5.64 12.5L1.81 10.87L7.91 8.1C7 9.46 6.22 10.93 5.64 12.5M19.22 4C19.5 4 19.75 4 19.96 4.05C20.13 5.44 19.94 8.3 16.66 11.58C14.96 13.29 12.93 14.6 10.65 15.47L8.5 13.37C9.42 11.06 10.73 9.03 12.42 7.34C15.18 4.58 17.64 4 19.22 4M19.22 2C17.24 2 14.24 2.69 11 5.93C8.81 8.12 7.5 10.53 6.65 12.64C6.37 13.39 6.56 14.21 7.11 14.77L9.24 16.89C9.79 17.45 10.61 17.63 11.36 17.35C13.5 16.53 15.88 15.19 18.07 13C23.73 7.34 21.61 2.39 21.61 2.39S20.7 2 19.22 2M14.54 9.46C13.76 8.68 13.76 7.41 14.54 6.63S16.59 5.85 17.37 6.63C18.14 7.41 18.15 8.68 17.37 9.46C16.59 10.24 15.32 10.24 14.54 9.46M8.88 16.53L7.47 15.12L8.88 16.53M6.24 22L9.88 18.36C9.54 18.27 9.21 18.12 8.91 17.91L4.83 22H6.24M2 22H3.41L8.18 17.24L6.76 15.83L2 20.59V22M2 19.17L6.09 15.09C5.88 14.79 5.73 14.47 5.64 14.12L2 17.76V19.17Z"
-            />
-          </svg>
-          <svg
-            v-else
-            class="feature-icon handshake"
-            width="64"
-            height="64"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              d="M11.364 3.176a1 1 0 0 0-1.414 0L6.732 6.393a3.25 3.25 0 0 0-.952 2.298v.073a2.5 2.5 0 0 0-.894 1.056l-.53 1.155a1 1 0 0 0 .088.95l1.639 2.344a1.25 1.25 0 0 0 1.025.535h3.348a1 1 0 0 0 .857-.485l1.753-2.92c.331-.551.508-1.184.508-1.829v-2.17a3.25 3.25 0 0 0-.952-2.298l-1.258-1.257-.001-.001Zm-2.12 6.177 1.46-1.46a.5.5 0 0 1 .707 0l.796.796a.5.5 0 0 1-.707.707l-.443-.442-.756.755a1 1 0 0 1-1.414-1.414l.357-.357Z"
-            />
-          </svg>
+        <div
+          class="feature-item"
+          @click="vote(index + 1)"
+          :class="{
+            voted: voteStore.userVoteChoice === index + 1,
+          }"
+          :data-aos="'zoom-in'"
+          :data-aos-delay="index * 100"
+        >
+          <div class="feature-icon-wrapper">
+            <svg
+              v-if="index === 0"
+              class="feature-icon green-star"
+              width="64"
+              height="64"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path
+                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+              />
+            </svg>
+            <svg
+              v-else-if="index === 1"
+              class="feature-icon black-rocket"
+              width="64"
+              height="64"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path
+                d="M13.13 22.19L11.5 18.36C13.07 17.78 14.54 17 15.9 16.09L13.13 22.19M5.64 12.5L1.81 10.87L7.91 8.1C7 9.46 6.22 10.93 5.64 12.5M19.22 4C19.5 4 19.75 4 19.96 4.05C20.13 5.44 19.94 8.3 16.66 11.58C14.96 13.29 12.93 14.6 10.65 15.47L8.5 13.37C9.42 11.06 10.73 9.03 12.42 7.34C15.18 4.58 17.64 4 19.22 4M19.22 2C17.24 2 14.24 2.69 11 5.93C8.81 8.12 7.5 10.53 6.65 12.64C6.37 13.39 6.56 14.21 7.11 14.77L9.24 16.89C9.79 17.45 10.61 17.63 11.36 17.35C13.5 16.53 15.88 15.19 18.07 13C23.73 7.34 21.61 2.39 21.61 2.39S20.7 2 19.22 2M14.54 9.46C13.76 8.68 13.76 7.41 14.54 6.63S16.59 5.85 17.37 6.63C18.14 7.41 18.15 8.68 17.37 9.46C16.59 10.24 15.32 10.24 14.54 9.46M8.88 16.53L7.47 15.12L8.88 16.53M6.24 22L9.88 18.36C9.54 18.27 9.21 18.12 8.91 17.91L4.83 22H6.24M2 22H3.41L8.18 17.24L6.76 15.83L2 20.59V22M2 19.17L6.09 15.09C5.88 14.79 5.73 14.47 5.64 14.12L2 17.76V19.17Z"
+              />
+            </svg>
+            <svg
+              v-else
+              class="feature-icon handshake"
+              width="64"
+              height="64"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                d="M11.364 3.176a1 1 0 0 0-1.414 0L6.732 6.393a3.25 3.25 0 0 0-.952 2.298v.073a2.5 2.5 0 0 0-.894 1.056l-.53 1.155a1 1 0 0 0 .088.95l1.639 2.344a1.25 1.25 0 0 0 1.025.535h3.348a1 1 0 0 0 .857-.485l1.753-2.92c.331-.551.508-1.184.508-1.829v-2.17a3.25 3.25 0 0 0-.952-2.298l-1.258-1.257-.001-.001Zm-2.12 6.177 1.46-1.46a.5.5 0 0 1 .707 0l.796.796a.5.5 0 0 1-.707.707l-.443-.442-.756.755a1 1 0 0 1-1.414-1.414l.357-.357Z"
+              />
+            </svg>
+          </div>
+          <h3 class="feature-title">{{ feature.title }}</h3>
+          <p class="feature-description">{{ feature.description }}</p>
         </div>
-        <h3 class="feature-title">{{ feature.title }}</h3>
-        <p class="feature-description">{{ feature.description }}</p>
-        <p v-if="voteResults.totalVotes > 0" class="feature-percentage">
-          {{
-            (
-              Math.round(
-                ((voteResults.votesByChoice[index + 1] || 0) /
-                  voteResults.totalVotes) *
-                  100 *
-                  100
-              ) / 100
-            )
-              .toFixed(2)
-              .replace(/\.00$/, '')
-          }}%
-        </p>
+        
+        <div 
+          class="podium-base" 
+          :class="'podium-color-' + index" 
+          :style="{ height: getPodiumHeight(index) }"
+        >
+          <span v-if="voteResults.totalVotes > 0" class="podium-percentage">
+            {{ getVotePercentage(index) }}%
+          </span>
+        </div>
       </div>
     </div>
   </section>
@@ -207,7 +204,12 @@ import { useCategoryStore } from '../../stores/useCategoryStore';
 import { useToast } from '../../stores/useToast';
 
 const BaseURL = 'http://127.0.0.1:8000';
-const getVideoUrl = (path) => `${BaseURL}/storage/${path}`;
+const getVideoUrl = (path) => {
+  if (featuredVideo.value && featuredVideo.value.id) {
+    return `${BaseURL}/api/videos/stream/${featuredVideo.value.id}`;
+  }
+  return `${BaseURL}/storage/${path}`;
+};
 
 const loadingStore = useLoadingStore();
 const voteStore = useVoteStore();
@@ -237,6 +239,18 @@ const voteResults = ref({
   totalVotes: 0,
   votesByChoice: {},
 });
+
+const getVotePercentage = (index) => {
+  if (voteResults.value.totalVotes === 0) return 0;
+  const count = voteResults.value.votesByChoice[index + 1] || 0;
+  return Number((Math.round((count / voteResults.value.totalVotes) * 100 * 100) / 100).toFixed(2).replace(/\.00$/, ''));
+};
+
+const getPodiumHeight = (index) => {
+  if (voteResults.value.totalVotes === 0) return '20px';
+  const percentage = getVotePercentage(index);
+  return `${20 + percentage * 1.5}px`;
+};
 
 const heroSlides = ref([]);
 const isHeroSlidesReady = ref(false);
@@ -1170,18 +1184,28 @@ video {
   gap: 35px;
   max-width: 1200px;
   margin: 0 auto;
+  align-items: flex-end;
+  min-height: 400px;
+}
+
+.feature-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
 }
 
 .feature-item {
   position: relative;
   background: white;
   cursor: pointer;
-  padding: 45px 35px 70px;
+  padding: 45px 35px 45px;
   border-radius: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid transparent;
   overflow: hidden;
+  z-index: 2;
 }
 
 .dark-mode .feature-item {
@@ -1307,33 +1331,33 @@ video {
   color: var(--dark-text-secondary);
 }
 
-.feature-percentage {
-  position: absolute;
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: #0c713d;
-  text-align: center;
-  background: linear-gradient(135deg, #e8f5ed 0%, #d4edda 100%);
-  border-radius: 25px;
-  padding: 12px 28px;
-  box-shadow: 0 4px 16px rgba(12, 113, 61, 0.2);
-  margin: 0;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 2px solid rgba(12, 113, 61, 0.2);
+.podium-base {
+  width: 100%;
+  margin-top: -15px; /* Overlap slightly with feature item */
+  border-radius: 0 0 20px 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: inset 0 4px 10px rgba(255, 255, 255, 0.1), 0 10px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  padding-top: 25px; /* Push percentage text down */
 }
 
-.dark-mode .feature-percentage {
-  color: var(--dark-accent-green-light);
-  background: linear-gradient(
-    135deg,
-    rgba(12, 113, 61, 0.3) 0%,
-    rgba(12, 113, 61, 0.2) 100%
-  );
-  border-color: var(--dark-accent-green);
-  box-shadow: 0 4px 16px rgba(12, 113, 61, 0.4);
+.podium-percentage {
+  color: white;
+  font-weight: 800;
+  font-size: 1.4rem;
+  text-shadow: 1px 2px 4px rgba(0,0,0,0.4);
 }
+
+.podium-color-0 { background: linear-gradient(to bottom, #0c713d, #064022); }
+.podium-color-1 { background: linear-gradient(to bottom, #2c3e50, #1a252f); }
+.podium-color-2 { background: linear-gradient(to bottom, #3498db, #1d6fa5); }
+
+.dark-mode .podium-color-0 { background: linear-gradient(to bottom, #22c55e, #10632e); }
+.dark-mode .podium-color-1 { background: linear-gradient(to bottom, #7f8c8d, #3e4849); }
+.dark-mode .podium-color-2 { background: linear-gradient(to bottom, #5dade2, #2471a3); }
 
 /* ========== RESPONSIVE DESIGN ========== */
 @media (max-width: 992px) {

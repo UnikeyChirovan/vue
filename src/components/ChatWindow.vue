@@ -173,11 +173,17 @@ const closeChat = () => {
   chatStore.closeChat(props.chat.id);
 };
 
-const sendMessage = () => {
+const sendMessage = async () => {
   if (messageText.value.trim()) {
-    chatStore.sendMessage(props.chat.id, messageText.value.trim());
+    const text = messageText.value.trim();
     messageText.value = '';
     scrollToBottom();
+
+    try {
+      await chatStore.sendMessage(props.chat.id, text);
+    } catch (error) {
+      message.error(error.message || 'Gửi tin nhắn thất bại');
+    }
   }
 };
 

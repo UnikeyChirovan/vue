@@ -84,7 +84,7 @@
           <div class="form-group" data-aos="fade-up">
             <label for="thumbnailFile" class="form-label">
               <i class="fa-solid fa-image"></i>
-              Thumbnail (Ảnh đại diện)
+              Thumbnail (Hình đại diện)
             </label>
             <div class="file-input-wrapper">
               <input
@@ -96,7 +96,7 @@
               />
               <label for="thumbnailFile" class="file-input-label">
                 <i class="fa-solid fa-upload"></i>
-                <span v-if="!thumbnailFile">Chọn ảnh thumbnail</span>
+                <span v-if="!thumbnailFile">Chọn hình thumbnail</span>
                 <span v-else class="file-selected">{{
                   thumbnailFile.name
                 }}</span>

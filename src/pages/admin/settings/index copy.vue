@@ -300,8 +300,8 @@
 
           <div class="setting-item">
             <div class="setting-info">
-              <label>Nén Ảnh</label>
-              <p>Tự động nén ảnh khi tải lên</p>
+              <label>Nén Hình</label>
+              <p>Tự động nén hình khi tải lên</p>
             </div>
             <n-switch v-model:value="settings.imageCompression" size="large">
               <template #checked>Bật</template>

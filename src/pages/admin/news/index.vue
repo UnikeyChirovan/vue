@@ -132,10 +132,10 @@
 <script setup>
 import { RouterLink } from 'vue-router';
 import { onMounted, ref, computed } from 'vue';
-import { message } from 'ant-design-vue';
+import { useMessage } from 'naive-ui';
 import { useMenu } from '../../../stores/use-menu';
 import api from '../../../services/axiosInterceptor';
-
+const message = useMessage();
 const baseUrl = 'http://127.0.0.1:8000';
 
 const notifications = ref([]);

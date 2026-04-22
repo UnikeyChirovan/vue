@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spirit Legends - Demo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        overflow: hidden;
+      }
+
+      #game-container {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Game UI */
+      #game-canvas {
+        flex: 1;
+        background: #1a1a2e;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Main Menu */
+      #main-menu {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        z-index: 10;
+      }
+
+      #main-menu h1 {
+        font-size: 4rem;
+        color: #fff;
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        margin-bottom: 2rem;
+        animation: glow 2s ease-in-out infinite;
+      }
+
+      @keyframes glow {
+        0%,
+        100% {
+          text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        50% {
+          text-shadow: 0 0 40px rgba(255, 255, 255, 0.8);
+        }
+      }
+
+      .menu-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .btn {
+        padding: 1rem 3rem;
+        font-size: 1.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+      }
+
+      /* Game Scenes */
+      .scene {
+        display: none;
+        width: 100%;
+        height: 100%;
+        padding: 2rem;
+        color: white;
+      }
+
+      .scene.active {
+        display: block;
+      }
+
+      /* Story Mode */
+      #story-mode {
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      }
+
+      .dialogue-box {
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 2rem;
+        border-radius: 15px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .speaker-name {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 0.5rem;
+      }
+
+      .dialogue-text {
+        font-size: 1.2rem;
+        line-height: 1.6;
+      }
+
+      /* Gacha Mode */
+      #gacha-mode {
+        background: linear-gradient(135deg, #c31432, #240b36);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .gacha-info {
+        background: rgba(0, 0, 0, 0.7);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+
+      .gacha-info h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .gems-display {
+        font-size: 2rem;
+        color: #ffd700;
+        margin: 1rem 0;
+      }
+
+      .gacha-buttons {
+        display: flex;
+        gap: 2rem;
+      }
+
+      .gacha-result {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        z-index: 100;
+      }
+
+      .gacha-result.show {
+        display: flex;
+      }
+
+      .spirit-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem;
+        border-radius: 20px;
+        text-align: center;
+        min-width: 300px;
+        animation: summonAppear 0.5s ease-out;
+      }
+
+      @keyframes summonAppear {
+        from {
+          opacity: 0;
+          transform: scale(0.5) rotateY(180deg);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) rotateY(0);
+        }
+      }
+
+      .spirit-card h3 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+
+      .rarity {
+        font-size: 1.5rem;
+        font-weight: bold;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        display: inline-block;
+        margin-top: 1rem;
+      }
+
+      .rarity.legendary {
+        background: linear-gradient(135deg, #f12711, #f5af19);
+      }
+      .rarity.rare {
+        background: linear-gradient(135deg, #a8edea, #fed6e3);
+        color: #333;
+      }
+      .rarity.common {
+        background: #ccc;
+        color: #333;
+      }
+
+      /* Battle Mode */
+      #battle-mode {
+        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 3rem;
+      }
+
+      .battle-unit {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 2rem;
+        border-radius: 15px;
+      }
+
+      .hp-bar {
+        width: 200px;
+        height: 30px;
+        background: #333;
+        border-radius: 15px;
+        overflow: hidden;
+        margin: 1rem 0;
+      }
+
+      .hp-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #f12711, #f5af19);
+        transition: width 0.3s ease;
+      }
+
+      .battle-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      /* Status Bar */
+      #status-bar {
+        background: rgba(0, 0, 0, 0.8);
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 2px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .status-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      .back-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      /* Loading */
+      #loading {
+        position: fixed;
+        inset: 0;
+        background: #000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      #loading.hide {
+        display: none;
+      }
+
+      .spinner {
+        width: 80px;
+        height: 80px;
+        border: 8px solid rgba(255, 255, 255, 0.1);
+        border-top-color: #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      #loading p {
+        color: white;
+        font-size: 1.5rem;
+        margin-top: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-container">
+      <!-- Loading Screen -->
+      <div id="loading">
+        <div class="spinner"></div>
+        <p>Loading Spirit Legends...</p>
+      </div>
+
+      <!-- Game Canvas -->
+      <div id="game-canvas">
+        <!-- Main Menu -->
+        <div id="main-menu" class="scene active">
+          <h1>⚔️ SPIRIT LEGENDS ⚔️</h1>
+          <div class="menu-buttons">
+            <button class="btn" onclick="startStory()">📖 Story Mode</button>
+            <button class="btn" onclick="startGacha()">🎲 Gacha Summon</button>
+            <button class="btn" onclick="startBattle()">⚔️ Battle Arena</button>
+            <button class="btn" onclick="showProfile()">👤 Profile</button>
+          </div>
+        </div>
+
+        <!-- Story Mode -->
+        <div id="story-mode" class="scene">
+          <div class="dialogue-box">
+            <div class="speaker-name" id="speaker">Narrator</div>
+            <div class="dialogue-text" id="dialogue">
+              Welcome to Spirit Legends! This is a demo version.
+            </div>
+          </div>
+        </div>
+
+        <!-- Gacha Mode -->
+        <div id="gacha-mode" class="scene">
+          <div class="gacha-info">
+            <h2>✨ Spirit Summon ✨</h2>
+            <div class="gems-display">
+              💎 Gems: <span id="gems-count">1000</span>
+            </div>
+            <div class="gacha-buttons">
+              <button class="btn" onclick="gachaPull(1)">
+                Single Pull (300 💎)
+              </button>
+              <button class="btn" onclick="gachaPull(10)">
+                10x Pull (2700 💎)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gacha Result -->
+        <div id="gacha-result" class="gacha-result">
+          <div class="spirit-card">
+            <h3 id="spirit-name">Yuki Asamiya</h3>
+            <p>⭐ Element: Ice</p>
+            <div class="rarity legendary" id="spirit-rarity">LEGENDARY</div>
+          </div>
+          <button
+            class="btn"
+            style="margin-top: 2rem"
+            onclick="closeGachaResult()"
+          >
+            Continue
+          </button>
+        </div>
+
+        <!-- Battle Mode -->
+        <div id="battle-mode" class="scene">
+          <div class="battle-unit">
+            <h3>Your Spirit</h3>
+            <div class="hp-bar">
+              <div class="hp-fill" id="player-hp" style="width: 100%"></div>
+            </div>
+            <p>HP: <span id="player-hp-text">5000 / 5000</span></p>
+            <div class="battle-actions">
+              <button class="btn" onclick="attack('player')">Attack</button>
+              <button class="btn" onclick="useSkill()">Use Skill</button>
+            </div>
+          </div>
+
+          <div style="font-size: 4rem">⚔️</div>
+
+          <div class="battle-unit">
+            <h3>Enemy</h3>
+            <div class="hp-bar">
+              <div class="hp-fill" id="enemy-hp" style="width: 100%"></div>
+            </div>
+            <p>HP: <span id="enemy-hp-text">3000 / 3000</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Bar -->
+      <div id="status-bar">
+        <button class="back-btn" onclick="backToMenu()">← Back to Menu</button>
+        <div style="display: flex; gap: 2rem">
+          <div class="status-item">
+            <span>Lv.</span>
+            <span id="player-level">1</span>
+          </div>
+          <div class="status-item">
+            <span>💎</span>
+            <span id="gems-status">1000</span>
+          </div>
+          <div class="status-item">
+            <span>💰</span>
+            <span id="gold-status">50000</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Game State
+      let gameState = {
+        userId: null,
+        playerName: 'Player',
+        level: 1,
+        gems: 1000,
+        gold: 50000,
+        playerHP: 5000,
+        playerMaxHP: 5000,
+        enemyHP: 3000,
+        enemyMaxHP: 3000,
+      };
+
+      // Initialize
+      window.onload = function () {
+        setTimeout(() => {
+          document.getElementById('loading').classList.add('hide');
+          sendToVue({ type: 'GAME_READY', data: 'Spirit Legends loaded' });
+          requestPlayerData();
+        }, 2000);
+      };
+
+      // Communication with Vue
+      function sendToVue(message) {
+        if (window.parent) {
+          window.parent.postMessage(message, '*');
+          console.log('Sent to Vue:', message);
+        }
+      }
+
+      // Listen for messages from Vue
+      window.addEventListener('message', function (event) {
+        const { type, data } = event.data || {};
+        console.log('Received from Vue:', type, data);
+
+        switch (type) {
+          case 'LOAD_PLAYER_DATA':
+            loadPlayerData(JSON.parse(data));
+            break;
+          case 'SAVE_SUCCESS':
+            console.log('Save successful!');
+            break;
+          case 'GACHA_RESULT':
+            processGachaResult(JSON.parse(data));
+            break;
+          case 'UPDATE_SETTINGS':
+            console.log('Settings updated');
+            break;
+        }
+      });
+
+      function requestPlayerData() {
+        sendToVue({ type: 'REQUEST_PLAYER_DATA', data: '' });
+      }
+
+      function loadPlayerData(data) {
+        gameState.userId = data.userId;
+        gameState.playerName = data.playerName;
+        gameState.level = data.level;
+        gameState.gems = data.gems;
+        gameState.gold = data.gold;
+
+        updateUI();
+        console.log('Player data loaded:', data);
+      }
+
+      function updateUI() {
+        document.getElementById('player-level').textContent = gameState.level;
+        document.getElementById('gems-status').textContent = gameState.gems;
+        document.getElementById('gold-status').textContent = gameState.gold;
+        document.getElementById('gems-count').textContent = gameState.gems;
+      }
+
+      function saveGameData() {
+        sendToVue({
+          type: 'SAVE_GAME_DATA',
+          data: JSON.stringify({
+            userId: gameState.userId,
+            level: gameState.level,
+            exp: 0,
+            gems: gameState.gems,
+            gold: gameState.gold,
+            currentChapter: 1,
+            currentScene: 1,
+          }),
+        });
+      }
+
+      // Scene Navigation
+      function hideAllScenes() {
+        document
+          .querySelectorAll('.scene')
+          .forEach((s) => s.classList.remove('active'));
+      }
+
+      function showScene(sceneId) {
+        hideAllScenes();
+        document.getElementById(sceneId).classList.add('active');
+      }
+
+      function backToMenu() {
+        showScene('main-menu');
+      }
+
+      function startStory() {
+        showScene('story-mode');
+      }
+
+      function startGacha() {
+        showScene('gacha-mode');
+      }
+
+      function startBattle() {
+        showScene('battle-mode');
+        gameState.playerHP = gameState.playerMaxHP;
+        gameState.enemyHP = gameState.enemyMaxHP;
+        updateBattleUI();
+      }
+
+      function showProfile() {
+        alert('Profile feature coming soon!');
+      }
+
+      // Gacha System
+      function gachaPull(count) {
+        const cost = count === 1 ? 300 : 2700;
+
+        if (gameState.gems < cost) {
+          alert('Not enough gems!');
+          return;
+        }
+
+        // Send gacha request to Vue/Laravel
+        sendToVue({
+          type: 'GACHA_PULL',
+          data: JSON.stringify({ pullCount: count }),
+        });
+      }
+
+      function processGachaResult(result) {
+        gameState.gems = result.remainingGems;
+        updateUI();
+
+        // Show first result (mock)
+        const rarities = ['Legendary', 'Rare', 'Common'];
+        const spirits = ['Yuki Asamiya', 'Fire Knight', 'Wind Mage'];
+
+        const rarity = rarities[Math.floor(Math.random() * 3)];
+        const spirit = spirits[Math.floor(Math.random() * 3)];
+
+        document.getElementById('spirit-name').textContent = spirit;
+        document.getElementById('spirit-rarity').textContent =
+          rarity.toUpperCase();
+        document.getElementById('spirit-rarity').className =
+          `rarity ${rarity.toLowerCase()}`;
+
+        document.getElementById('gacha-result').classList.add('show');
+      }
+
+      function closeGachaResult() {
+        document.getElementById('gacha-result').classList.remove('show');
+      }
+
+      // Battle System
+      function updateBattleUI() {
+        const playerHPPercent =
+          (gameState.playerHP / gameState.playerMaxHP) * 100;
+        const enemyHPPercent = (gameState.enemyHP / gameState.enemyMaxHP) * 100;
+
+        document.getElementById('player-hp').style.width =
+          playerHPPercent + '%';
+        document.getElementById('enemy-hp').style.width = enemyHPPercent + '%';
+        document.getElementById('player-hp-text').textContent =
+          `${gameState.playerHP} / ${gameState.playerMaxHP}`;
+        document.getElementById('enemy-hp-text').textContent =
+          `${gameState.enemyHP} / ${gameState.enemyMaxHP}`;
+      }
+
+      function attack(attacker) {
+        if (attacker === 'player') {
+          const damage = Math.floor(Math.random() * 500) + 300;
+          gameState.enemyHP = Math.max(0, gameState.enemyHP - damage);
+
+          if (gameState.enemyHP <= 0) {
+            setTimeout(() => {
+              alert('Victory! +1000 Gold, +500 EXP');
+              gameState.gold += 1000;
+              saveGameData();
+              backToMenu();
+            }, 500);
+          } else {
+            // Enemy counterattack
+            setTimeout(() => attack('enemy'), 1000);
+          }
+        } else {
+          const damage = Math.floor(Math.random() * 400) + 200;
+          gameState.playerHP = Math.max(0, gameState.playerHP - damage);
+
+          if (gameState.playerHP <= 0) {
+            alert('Defeat! Try again.');
+            backToMenu();
+          }
+        }
+
+        updateBattleUI();
+      }
+
+      function useSkill() {
+        const damage = Math.floor(Math.random() * 800) + 600;
+        gameState.enemyHP = Math.max(0, gameState.enemyHP - damage);
+        updateBattleUI();
+
+        if (gameState.enemyHP <= 0) {
+          setTimeout(() => {
+            alert('Victory! +1000 Gold, +500 EXP');
+            gameState.gold += 1000;
+            saveGameData();
+            backToMenu();
+          }, 500);
+        } else {
+          setTimeout(() => attack('enemy'), 1000);
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -679,6 +679,7 @@ html.dark-mode .list-btn {
 .inbox-btn {
   background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
   box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+  overflow: visible;
 }
 
 html.dark-mode .inbox-btn {
@@ -701,6 +702,9 @@ html.dark-mode .inbox-btn {
   border-radius: 10px;
   min-width: 20px;
   text-align: center;
+  z-index: 2;
+  line-height: 1.2;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
 }
 
 /* ========== PROFILE CARDS ========== */

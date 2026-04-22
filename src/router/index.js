@@ -15,6 +15,7 @@ import TermsOfService from './TermsOfService';
 import FAQ from './faq';
 import animators from './animator';
 import supportRoutes from './support';
+import game from './game';
 
 const routes = [
   ...admin,
@@ -25,6 +26,7 @@ const routes = [
   ...animators,
   ...settings,
   ...stories,
+  ...game,
   ...profile,
   ...supportRoutes,
   ...PasswordReset,

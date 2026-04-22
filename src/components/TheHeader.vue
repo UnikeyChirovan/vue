@@ -189,6 +189,7 @@ const listItem = reactive([
     icon: 'fas fa-home',
     requiresLogin: false,
     isAdmin: false,
+    isManager: false,
   },
   {
     name: 'Liên Lạc',
@@ -196,6 +197,7 @@ const listItem = reactive([
     icon: 'fas fa-envelope',
     requiresLogin: false,
     isAdmin: false,
+    isManager: false,
   },
   {
     name: 'Giới Thiệu',
@@ -203,6 +205,7 @@ const listItem = reactive([
     icon: 'fas fa-info-circle',
     requiresLogin: false,
     isAdmin: false,
+    isManager: false,
   },
   {
     name: 'Bản Đồ',
@@ -210,6 +213,7 @@ const listItem = reactive([
     icon: 'fas fa-map',
     requiresLogin: false,
     isAdmin: false,
+    isManager: false,
   },
   {
     name: 'Đọc Truyện',
@@ -217,6 +221,7 @@ const listItem = reactive([
     icon: 'fas fa-book',
     requiresLogin: true,
     isAdmin: false,
+    isManager: false,
   },
   {
     name: 'Hoạt Hình',
@@ -224,6 +229,15 @@ const listItem = reactive([
     icon: 'fas fa-film',
     requiresLogin: true,
     isAdmin: false,
+    isManager: false,
+  },
+  {
+    name: 'Trò Chơi', // 🎮 NEW MENU ITEM
+    link: 'game-hub',
+    icon: 'fas fa-gamepad',
+    requiresLogin: true,
+    isAdmin: false,
+    isManager: false,
   },
   {
     name: 'Hỗ Trợ',
@@ -281,6 +295,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* Copy nguyên CSS từ file gốc */
 /* ===== BASE STYLES ===== */
 .navbar-wrapper {
   position: sticky;
@@ -296,7 +311,6 @@ onMounted(() => {
   transition: background 0.3s ease;
 }
 
-/* Dark Mode for Navbar */
 html.dark-mode .navbar-container {
   background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -493,7 +507,6 @@ html.dark-mode .mobile-toggle:hover {
   z-index: 10;
 }
 
-/* Logo always centered when mobile auth toggle is visible (not logged in) */
 .navbar-content:has(.mobile-auth-toggle) .brand-section {
   position: absolute;
   left: 50%;
@@ -502,7 +515,6 @@ html.dark-mode .mobile-toggle:hover {
   gap: 0;
 }
 
-/* Logo always centered when logged in on mobile/tablet */
 .navbar-content:has(.mobile-user-section) .brand-section {
   position: absolute;
   left: 50%;
@@ -616,7 +628,6 @@ html.dark-mode .drawer-close:hover {
   padding: 1rem;
 }
 
-/* Custom scrollbar for drawer */
 .drawer-body::-webkit-scrollbar {
   width: 8px;
 }
@@ -803,8 +814,6 @@ html.dark-mode .mobile-nav-link.router-link-exact-active {
 }
 
 /* ===== RESPONSIVE BREAKPOINTS ===== */
-
-/* Small Mobile (< 480px) */
 @media (max-width: 479px) {
   .navbar-content {
     padding: 0.625rem 0.75rem;
@@ -853,7 +862,6 @@ html.dark-mode .mobile-nav-link.router-link-exact-active {
   }
 }
 
-/* Mobile (480px - 767px) */
 @media (min-width: 480px) and (max-width: 767px) {
   .navbar-content {
     padding: 0.75rem 1rem;
@@ -878,7 +886,6 @@ html.dark-mode .mobile-nav-link.router-link-exact-active {
   }
 }
 
-/* Tablet (768px - 1023px) */
 @media (min-width: 768px) and (max-width: 1023px) {
   .navbar-content {
     padding: 0.875rem 1.25rem;
@@ -907,7 +914,6 @@ html.dark-mode .mobile-nav-link.router-link-exact-active {
   }
 }
 
-/* Small Laptop (1024px - 1279px) */
 @media (min-width: 1024px) and (max-width: 1279px) {
   .navbar-content {
     padding: 0.875rem 1.5rem;
@@ -948,7 +954,6 @@ html.dark-mode .mobile-nav-link.router-link-exact-active {
   }
 }
 
-/* Desktop (1280px+) */
 @media (min-width: 1280px) {
   .mobile-toggle {
     display: none !important;
@@ -979,7 +984,6 @@ html.dark-mode .mobile-nav-link.router-link-exact-active {
   }
 }
 
-/* Large Desktop (1440px+) - Phần còn thiếu */
 @media (min-width: 1440px) {
   .navbar-content {
     padding: 1rem 2rem;
@@ -1048,5 +1052,8 @@ html.dark-mode .mobile-nav-link.router-link-exact-active {
 }
 .nav-item:nth-child(8) {
   animation-delay: 0.4s;
+}
+.nav-item:nth-child(9) {
+  animation-delay: 0.45s;
 }
 </style>
